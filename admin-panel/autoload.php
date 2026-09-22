@@ -126,13 +126,6 @@ if ($pt->config->live_video == 1) {
         try {
             $posts = $db->where('live_time','0','!=')->where('live_time',time() - 11,'<=')->get(T_VIDEOS);
             foreach ($posts as $key => $post) {
-                if ($pt->config->live_video == 1 && !empty($pt->config->agora_app_id) && !empty($pt->config->agora_customer_id) && !empty($pt->config->agora_customer_certificate) && $pt->config->live_video_save == 1) {
-                    StopCloudRecording(array('resourceId' => $post->agora_resource_id,
-                                             'sid' => $post->agora_sid,
-                                             'cname' => $post->stream_name,
-                                             'post_id' => $post->id,
-                                             'uid' => explode('_', $post->stream_name)[2]));
-                }
                 PT_DeleteVideo(PT_Secure($post->id));
             }
         } catch (Exception $e) {
@@ -141,15 +134,18 @@ if ($pt->config->live_video == 1) {
 
     }
     else{
-        if ($pt->config->live_video == 1 && $pt->config->amazone_s3_2 != 1) {
-            try {
+        try {
             $posts = $db->where('live_time','0','!=')->where('live_time',time() - 11,'<=')->get(T_VIDEOS);
             foreach ($posts as $key => $post) {
-                PT_DeleteVideo(PT_Secure($post->id));
+                if (!PT_SaveLiveRecording(PT_Secure($post->id))) {
+                    PT_DeleteVideo(PT_Secure($post->id));
+                }
+                else{
+                    $db->where('id',PT_Secure($post->id))->update(T_VIDEOS,array('live_ended' => 1));
+                }
             }
         } catch (Exception $e) {
 
-        }
         }
     }
 }

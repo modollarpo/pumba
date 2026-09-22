@@ -47,7 +47,7 @@
 		
 		
 		
-		<?php if ($pt->config->live_video == 1 && !empty($pt->config->agora_app_id)) { ?>
+		<?php if ($pt->config->live_video == 1 && !empty($pt->config->mediamtx_whip_url) && !empty($pt->config->mediamtx_url)) { ?>
 			<div class="live_mic_cam_switch" style="display: none;">
 				<div class="dropdown mic_drop">
 					<button class="btn btn-mat dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="{{LANG mic_source}}"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z" /></svg></button>
@@ -73,13 +73,10 @@
 </div>
 </div>
 </div>
-<?php if ($pt->config->live_video == 1 && !empty($pt->config->agora_app_id)) {
+<?php if ($pt->config->live_video == 1 && !empty($pt->config->mediamtx_whip_url) && !empty($pt->config->mediamtx_url)) {
   echo PT_LoadPage('live/agora');
 } ?>
 <script type="text/javascript">
-  <?php if ($pt->config->live_video == 1 && $pt->config->amazone_s3_2 == 1 && $pt->config->live_video_save != 1) { ?>
-    console.error("Creating a live stream that cloud recording is not enabled.");
-  <?php } ?>
   <?php //if ($pt->config->live_chat == 'on') { ?>
   function LiveChating(type) {
     post_id = $('#live_post_id').val();

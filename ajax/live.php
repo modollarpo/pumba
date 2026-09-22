@@ -17,10 +17,6 @@ if ($first == 'create') {
         if ($check_for_video > 0) {
             $video_id = PT_GenerateKey(15, 15);
         }
-        $token = null;
-        if (!empty($_POST['token']) && !is_null($_POST['token'])) {
-            $token = PT_Secure($_POST['token']);
-        }
         $video_name = 'live video '.$pt->user->name;
         if (!empty($_POST['video_name'])) {
             $video_name = PT_Secure($_POST['video_name']);
@@ -31,24 +27,10 @@ if ($first == 'create') {
                                              'stream_name' => PT_Secure($_POST['stream_name']),
                                              'registered' => date('Y') . '/' . intval(date('m')),
                                              'video_id' => $video_id,
-                                             'agora_token' => $token,
                                              'time' => time()));
         PT_RunInBackground(array('status' => 200,
                                  'post_id' => $post_id));
 
-        if ($pt->config->live_video == 1 && !empty($pt->config->agora_app_id) && !empty($pt->config->agora_customer_id) && !empty($pt->config->agora_customer_certificate) && $pt->config->live_video_save == 1) {
-
-            if ($pt->config->amazone_s3_2 == 1 && !empty($pt->config->bucket_name_2) && !empty($pt->config->amazone_s3_key_2) && !empty($pt->config->amazone_s3_s_key_2) && !empty($pt->config->region_2)) {
-
-                $region_array = array('us-east-1' => 0,'us-east-2' => 1,'us-west-1' => 2,'us-west-2' => 3,'eu-west-1' => 4,'eu-west-2' => 5,'eu-west-3' => 6,'eu-central-1' => 7,'ap-southeast-1' => 8,'ap-southeast-2' => 9,'ap-northeast-1' => 10,'ap-northeast-2' => 11,'sa-east-1' => 12,'ca-central-1' => 13,'ap-south-1' => 14,'cn-north-1' => 15,'us-gov-west-1' => 17);
-
-                if (in_array(strtolower($pt->config->region_2),array_keys($region_array) )) {
-
-                    StartCloudRecording(1,$region_array[strtolower($pt->config->region_2)],$pt->config->bucket_name_2,$pt->config->amazone_s3_key_2,$pt->config->amazone_s3_s_key_2,$_POST['stream_name'],explode('_', $_POST['stream_name'])[2],$post_id, $token);
-                }
-                
-            }
-        }
         pt_push_channel_notifiations($post_id,'started_live_video');
         $data['status'] = 200;
         $data['post_id'] = $post_id;
@@ -271,20 +253,8 @@ if ($first == 'delete') {
                 PT_DeleteVideo(PT_Secure($_POST['post_id']));
             }
             else{
-                if ($pt->config->live_video == 1 && !empty($pt->config->agora_app_id) && !empty($pt->config->agora_customer_id) && !empty($pt->config->agora_customer_certificate) && $pt->config->live_video_save == 1) {
-                    StopCloudRecording(array('resourceId' => $video->agora_resource_id,
-                                             'sid' => $video->agora_sid,
-                                             'cname' => $video->stream_name,
-                                             'post_id' => $video->id,
-                                             'token' => $video->agora_token,
-                                             'uid' => explode('_', $video->stream_name)[2]));
-                }
-                if ($pt->config->live_video == 1 && $pt->config->amazone_s3_2 != 1) {
-                    try {
-                        PT_DeleteVideo(PT_Secure($_POST['post_id']));
-                    } catch (Exception $e) {
-                        
-                    }
+                if (!PT_SaveLiveRecording(PT_Secure($_POST['post_id']))) {
+                    PT_DeleteVideo(PT_Secure($_POST['post_id']));
                 }
             }
         }

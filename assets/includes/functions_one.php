@@ -2270,102 +2270,50 @@ function PT_IsAdminInvitationExists($code = false) {
     $data_rows = mysqli_query($sqlConnect, "SELECT `id` FROM " . T_INVITATIONS . " WHERE `code` = '$code' AND status = '0'");
     return mysqli_num_rows($data_rows) > 0;
 }
-function StartCloudRecording($vendor,$region,$bucket,$accessKey,$secretKey,$cname,$uid,$post_id, $token)
+function PT_SaveLiveRecording($post_id)
 {
-    global $sqlConnect, $pt,$db;
-    $post_id = PT_Secure($post_id);
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://api.agora.io/v1/apps/".$pt->config->agora_app_id."/cloud_recording/acquire");
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic '.base64_encode($pt->config->agora_customer_id.":".$pt->config->agora_customer_certificate),'Content-Type: application/json;charset=utf-8'));
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-    curl_setopt($ch, CURLOPT_POSTFIELDS,'{
-      "cname": "'.$cname.'",
-      "uid": "'.$uid.'",
-      "clientRequest":{
-      }
-    }');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $response  = curl_exec($ch);
-    curl_close($ch);
-    $data = json_decode($response);
-    $resourceId = $data->resourceId;
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://api.agora.io/v1/apps/".$pt->config->agora_app_id."/cloud_recording/resourceid/".$resourceId."/mode/mix/start");
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic '.base64_encode($pt->config->agora_customer_id.":".$pt->config->agora_customer_certificate),'Content-Type: application/json;charset=utf-8'));
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-    curl_setopt($ch, CURLOPT_POSTFIELDS,'{
-    "cname":"'.$cname.'",
-    "uid":"'.$uid.'",
-    "clientRequest":{
-        "token":"' . $token . '",
-        "recordingConfig":{
-            "channelType":1,
-            "streamTypes":2,
-            "audioProfile":1,
-            "videoStreamType":1,
-            "maxIdleTime":120,
-            "transcodingConfig":{
-                "width":480,
-                "height":480,
-                "fps":24,
-                "bitrate":800,
-                "maxResolutionUid":"1",
-                "mixedVideoLayout":1
-                }
-            },
-        "storageConfig":{
-            "vendor":'.$vendor.',
-            "region":'.$region.',
-            "bucket":"'.$bucket.'",
-            "accessKey":"'.$accessKey.'",
-            "secretKey":"'.$secretKey.'",
-            "fileNamePrefix": [
-                "upload",
-                "videos",
-                "'.date('Y').'",
-                "'.date('m').'"
-              ]
-        }
-    }
-} ');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $response  = curl_exec($ch);
-    curl_close($ch);
-    $data = json_decode($response);
-    if (!empty($data->sid) && !empty($resourceId)) {
-        $db->where('id',$post_id)->update(T_VIDEOS,array('agora_resource_id' => $resourceId,
-                                                        'agora_sid' => $data->sid));
-    }
-    return true;
-}
-function StopCloudRecording($data)
-{
-    global $sqlConnect, $pt,$db;
-    if (empty($data) || $pt->config->live_video != 1 || empty($data['resourceId']) || empty($data['sid']) || empty($data['cname']) || empty($data['uid']) || empty($data['post_id'])) {
+    global $sqlConnect, $pt, $db;
+    $post = $db->where('id', PT_Secure($post_id))->getOne(T_VIDEOS);
+    if (empty($post) || empty($post->stream_name)) {
         return false;
     }
-    $post_id = PT_Secure($data['post_id']);
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://api.agora.io/v1/apps/".$pt->config->agora_app_id."/cloud_recording/resourceid/".$data['resourceId']."/sid/".$data['sid']."/mode/mix/stop");
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic '.base64_encode($pt->config->agora_customer_id.":".$pt->config->agora_customer_certificate),'Content-Type: application/json;charset=utf-8'));
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-    curl_setopt($ch, CURLOPT_POSTFIELDS,'{
-      "cname": "'.$data['cname'].'",
-      "uid": "'.$data['uid'].'",
-      "clientRequest":{
-        "token":"' . $data['token'] . '"
-      }
-    }');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $response  = curl_exec($ch);
-    curl_close($ch);
-    $data = json_decode($response);
-    if (!empty($data) && !empty($data->serverResponse) && !empty($data->serverResponse->fileList)) {
-        $db->where('id',$post_id)->update(T_VIDEOS,array('video_location' => $data->serverResponse->fileList));
+    $record_path = './recordings';
+    if (!empty($pt->config->mediamtx_recordings_path)) {
+        $record_path = rtrim($pt->config->mediamtx_recordings_path, '/\\');
     }
-    return true;
+    $source = $record_path . '/' . $post->stream_name . '.mp4';
+    if (!file_exists($source)) {
+        $source_ts = $record_path . '/' . $post->stream_name . '.ts';
+        if (!file_exists($source_ts)) {
+            return false;
+        }
+        $source = $source_ts;
+    }
+    if (!is_readable($source)) {
+        return false;
+    }
+    $dir = 'upload/videos/' . date('Y') . '/' . intval(date('m'));
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0777, true);
+    }
+    if (!is_dir($dir)) {
+        return false;
+    }
+    $final_file = $dir . '/' . $post->video_id . '_' . time() . '.mp4';
+    $saved = false;
+    if (pathinfo($source, PATHINFO_EXTENSION) == 'mp4' && !empty($pt->config->ffmpeg_binary_file) && file_exists($pt->config->ffmpeg_binary_file) && isfuncEnabled('shell_exec')) {
+        @shell_exec($pt->config->ffmpeg_binary_file . ' -y -i ' . escapeshellarg($source) . ' -c copy ' . escapeshellarg($final_file) . ' 2>&1');
+        $saved = file_exists($final_file) && filesize($final_file) > 0;
+    }
+    if (!$saved) {
+        $final_file = $dir . '/' . $post->video_id . '_' . time() . '.' . pathinfo($source, PATHINFO_EXTENSION);
+        $saved = copy($source, $final_file);
+    }
+    if ($saved) {
+        $db->where('id', $post_id)->update(T_VIDEOS, array('video_location' => $final_file, 'converted' => 1, 'live_ended' => 1));
+        return true;
+    }
+    return false;
 }
 function GetVideoTime($first,$second)
 {
@@ -3242,49 +3190,66 @@ function GetTiktokVideoDownloadLink($url='')
 
     $result = array('status' => 400,
                     'message' => $lang->error_msg);
-    $curl = curl_init();
 
-    curl_setopt_array($curl, [
-        CURLOPT_URL => "https://tiktok-video-no-watermark2.p.rapidapi.com/?url=".$url."&hd=1",
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => "",
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "GET",
-        CURLOPT_HTTPHEADER => [
-            "X-RapidAPI-Host: tiktok-video-no-watermark2.p.rapidapi.com",
-            "X-RapidAPI-Key: ".$pt->config->rapid_api
-        ],
-    ]);
-
-    $response = curl_exec($curl);
-
-    curl_close($curl);
-
-    if (!empty($response)) {
-        $json = json_decode($response,true);
-
-        if (!empty($json) && !empty($json['data'])) {
-            $video = $json['data'];
-            $author = $json['data']['author'];
-            $result =    array(
-                                'status' => 200,
-                                'video_url' => $video['play'],
-                                'cover' => $video['cover'],
-                                'id' => $video['id'],
-                                'title' => $author['nickname'],
-                                'desc' => $video['title'],
-                            );
-            // if (!empty($video['hdplay'])) {
-            //     $result['video_url'] = $video['hdplay'];
-            // }
-        }
-        elseif (!empty($json) && !empty($json['message']) && strpos($json['message'], 'not subscribed to this') !== false) {
-            $result = array('status' => 400,
-                            'message' => 'please use rapidapi valid key and subscribe to https://rapidapi.com/yi005/api/tiktok-video-no-watermark2');
+    $tiktok_api_url = trim((isset($pt->config->tiktok_api_url) && !empty($pt->config->tiktok_api_url)) ? $pt->config->tiktok_api_url : '', '/');
+    if (!empty($tiktok_api_url)) {
+        $api_response = connect_to_url($tiktok_api_url . '/api/tiktok/info?video_url=' . rawurlencode($url));
+        if (!empty($api_response)) {
+            $json = json_decode($api_response, true);
+            if (!empty($json['success']) && !empty($json['video_url'])) {
+                $result = array(
+                    'status' => 200,
+                    'video_url' => $json['video_url'],
+                    'cover' => (!empty($json['cover'])) ? $json['cover'] : '',
+                    'id' => (!empty($json['id'])) ? $json['id'] : '',
+                    'title' => (!empty($json['title'])) ? $json['title'] : '',
+                    'desc' => (!empty($json['desc'])) ? $json['desc'] : '',
+                );
+                return $result;
+            }
         }
     }
+
+    // Fallback to RapidAPI if configured
+    if (!empty($pt->config->rapid_api)) {
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => "https://tiktok-video-no-watermark2.p.rapidapi.com/?url=".$url."&hd=1",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => [
+                "X-RapidAPI-Host: tiktok-video-no-watermark2.p.rapidapi.com",
+                "X-RapidAPI-Key: ".$pt->config->rapid_api
+            ],
+        ]);
+        $response = curl_exec($curl);
+        curl_close($curl);
+        if (!empty($response)) {
+            $json = json_decode($response,true);
+            if (!empty($json) && !empty($json['data'])) {
+                $video = $json['data'];
+                $author = $json['data']['author'];
+                $result =    array(
+                                    'status' => 200,
+                                    'video_url' => $video['play'],
+                                    'cover' => $video['cover'],
+                                    'id' => $video['id'],
+                                    'title' => $author['nickname'],
+                                    'desc' => $video['title'],
+                                );
+                return $result;
+            }
+            elseif (!empty($json) && !empty($json['message']) && strpos($json['message'], 'not subscribed to this') !== false) {
+                $result = array('status' => 400,
+                                'message' => 'please use rapidapi valid key and subscribe to https://rapidapi.com/yi005/api/tiktok-video-no-watermark2');
+            }
+        }
+    }
+
     return $result;
 }
 
@@ -4606,72 +4571,36 @@ function getTopChannelsForThisMonth()
 }
 
 
-function compareQuality($a, $b) {
-    // Extract the quality strings (e.g., "1080p", "720p")
-    $qualityA = $a['quality'];
-    $qualityB = $b['quality'];
-
-    // Convert quality strings to integers for easy comparison
-    $qualityOrder = [
-        '144p' => 0,
-        '240p' => 1,
-        '360p' => 2,
-        '480p' => 3,
-        '720p' => 4,
-        '1080p' => 5,
-        // Add more resolutions as needed
-    ];
-
-    // Compare the quality based on their order in the $qualityOrder array
-    return $qualityOrder[$qualityB] - $qualityOrder[$qualityA];
-}
-
 function getYotubeRapidAPIData($id='')
 {
-    global $pt, $sqlConnect,$db,$lang_array;
+    global $pt;
 
-    $url = '';
+    $yt_api_url = trim((isset($pt->config->yt_api_url) && !empty($pt->config->yt_api_url)) ? $pt->config->yt_api_url : '', '/');
+    if (empty($yt_api_url)) {
+        return '';
+    }
 
-    $curl = curl_init();
+    if (empty($id)) {
+        return '';
+    }
 
-    curl_setopt_array($curl, [
-        CURLOPT_URL => "https://youtube-video-and-shorts-downloader.p.rapidapi.com/?url=" . $id,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => "",
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "GET",
-        CURLOPT_HTTPHEADER => [
-            "X-RapidAPI-Host: youtube-video-and-shorts-downloader.p.rapidapi.com",
-            "X-RapidAPI-Key: ".$pt->config->rapid_api
-        ],
-    ]);
-
-    $response = curl_exec($curl);
-    $err = curl_error($curl);
-
-    curl_close($curl);
-
-    if (!empty($response)) {
-        $json = json_decode($response, true);
-        
-        //print_r($json);
-        // if (!empty($json) && !empty($json['videos']) && !empty($json['videos']['items'])) {
-        //     $videoItems = $json['videos']['items'];
-        //     usort($videoItems, 'compareQuality');
-        //     return $videoItems[0]['url'];
-        // }
-        if (!empty($json) && !empty($json['data']) && !empty($json['data']['video_with_audio'])) {
-            $videoItems = $json['data']['video_with_audio'];
-            usort($videoItems, 'compareQuality');
-            return $videoItems[0]['url'];
-        }
-        elseif (!empty($json) && !empty($json['message']) && strpos($json['message'], 'not subscribed to this') !== false) {
-            throw new Exception('please use rapidapi valid key and subscribe to https://rapidapi.com/DataFanatic/api/youtube-media-downloader');
+    if (strpos($id, 'youtu') !== false) {
+        preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|shorts/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $id, $match);
+        if (!empty($match[1])) {
+            $id = $match[1];
         }
     }
-    return $url;
+
+    $response = connect_to_url($yt_api_url . '/api/video/download?id=' . rawurlencode($id));
+    if (empty($response)) {
+        return '';
+    }
+
+    $json = json_decode($response, true);
+    if (!empty($json['success']) && !empty($json['downloadUrl'])) {
+        return $json['downloadUrl'];
+    }
+    return '';
 }
 
 function downloadYPVideo($url='')

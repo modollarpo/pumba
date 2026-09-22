@@ -38,34 +38,16 @@ else{
 	        if ($check_for_video > 0) {
 	            $video_id = PT_GenerateKey(15, 15);
 	        }
-	        $token = null;
-            if (!empty($_POST['token']) && !is_null($_POST['token'])) {
-                $token = PT_Secure($_POST['token']);
-            }
 			$post_id = $db->insert(T_VIDEOS,array('user_id' => $pt->user->id,
 	                                             'type' => 'live',
 	                                             'title' => 'live video '.$pt->user->name,
 	                                             'stream_name' => PT_Secure($_POST['stream_name']),
 	                                             'registered' => date('Y') . '/' . intval(date('m')),
-	                                             'agora_token' => $token,
 	                                             'video_id' => $video_id,
 	                                             'time' => time()));
 	        PT_RunInBackground(array('status' => 200,
 	                                 'post_id' => $post_id));
 
-	        if ($pt->config->live_video == 1 && !empty($pt->config->agora_app_id) && !empty($pt->config->agora_customer_id) && !empty($pt->config->agora_customer_certificate) && $pt->config->live_video_save == 1) {
-
-	            if ($pt->config->amazone_s3_2 == 1 && !empty($pt->config->bucket_name_2) && !empty($pt->config->amazone_s3_key_2) && !empty($pt->config->amazone_s3_s_key_2) && !empty($pt->config->region_2)) {
-
-	                $region_array = array('us-east-1' => 0,'us-east-2' => 1,'us-west-1' => 2,'us-west-2' => 3,'eu-west-1' => 4,'eu-west-2' => 5,'eu-west-3' => 6,'eu-central-1' => 7,'ap-southeast-1' => 8,'ap-southeast-2' => 9,'ap-northeast-1' => 10,'ap-northeast-2' => 11,'sa-east-1' => 12,'ca-central-1' => 13,'ap-south-1' => 14,'cn-north-1' => 15,'us-gov-west-1' => 17);
-
-	                if (in_array(strtolower($pt->config->region_2),array_keys($region_array) )) {
-
-	                    StartCloudRecording(1,$region_array[strtolower($pt->config->region_2)],$pt->config->bucket_name_2,$pt->config->amazone_s3_key_2,$pt->config->amazone_s3_s_key_2,$_POST['stream_name'],explode('_', $_POST['stream_name'])[2],$post_id);
-	                }
-	                
-	            }
-	        }
 	        pt_push_channel_notifiations($post_id,'started_live_video');
 	        $response_data     = array(
 		        'api_status'   => '200',
@@ -254,35 +236,14 @@ else{
 			    );
 	        }
 	        else{
-	            if ($pt->config->live_video == 1 && !empty($pt->config->agora_app_id) && !empty($pt->config->agora_customer_id) && !empty($pt->config->agora_customer_certificate) && $pt->config->live_video_save == 1) {
-	                $post = $db->where('id',PT_Secure($_POST['post_id']))->getOne(T_VIDEOS);
-	                if (!empty($post)) {
-	                    StopCloudRecording(array('resourceId' => $post->agora_resource_id,
-	                                             'sid' => $post->agora_sid,
-	                                             'cname' => $post->stream_name,
-	                                             'post_id' => $post->id,
-	                                             'uid' => explode('_', $post->stream_name)[2]));
-	                }
+	            if (!PT_SaveLiveRecording(PT_Secure($_POST['post_id']))) {
+	                PT_DeleteVideo(PT_Secure($_POST['post_id']));
 	            }
-	            if ($pt->config->live_video == 1 && $pt->config->amazone_s3_2 != 1) {
-	                try {
-	                    PT_DeleteVideo(PT_Secure($_POST['post_id']));
-	                    $response_data     = array(
-					        'api_status'   => '200',
-					        'api_version'  => $api_version,
-					        'message'  => 'deleted successfully'
-					    );
-	                } catch (Exception $e) {
-	                	$response_data    = array(
-						    'api_status'  => '400',
-						    'api_version' => $api_version,
-						    'errors' => array(
-					            'error_id' => '6',
-					            'error_text' => 'something went wrong'
-					        )
-						);
-	                }
-	            }
+	            $response_data     = array(
+			        'api_status'   => '200',
+			        'api_version'  => $api_version,
+			        'message'  => 'deleted successfully'
+			    );
 	        }
 	    }
 	    else{

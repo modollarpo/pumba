@@ -14,7 +14,6 @@ if ($if_live > 0) {
 	header('Location: ' . PT_Link('404'));
 	exit;
 }
-include_once 'assets/libs/AgoraDynamicKey/sample/RtcTokenBuilderSample.php';
 $db->where('time',time()-60,'<')->delete(T_LIVE_SUB);
 
 $pt->page_url_ = $pt->config->site_url.'/live';
@@ -22,4 +21,5 @@ $pt->title       = $lang->live . ' | ' . $pt->config->title;
 $pt->page        = "live";
 $pt->description = $pt->config->description;
 $pt->keyword     = @$pt->config->keyword;
+$pt->stream_name = 'stream_' . intval($pt->user->id) . '_' . rand(111111, 999999);
 $pt->content     = PT_LoadPage('live/content');

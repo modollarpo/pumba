@@ -75,79 +75,64 @@ if ($first == 'delete-multi-videos') {
 
 if ($first == 'load-more-youtube')  {
     if (!empty($_POST['query']) && !empty($_POST['pageToken'])) {
-        $query = PT_Secure(urlencode($_POST['query']));
+        $query = PT_Secure($_POST['query']);
         $limit = 50;
         if (!empty($_POST['limit']) && $limit < 51) {
             $limit = (int) PT_Secure($_POST['limit']);
         }
         $token = PT_Secure($_POST['pageToken']);
         try {
-            $youtube = new Madcoda\Youtube\Youtube(array('key' => $pt->config->yt_api));
-            $get_videos = $youtube->searchAdvanced(array(
-                'q'             => $query,
-                'type'          => 'video',
-                'part'          => 'id',
-                'maxResults'    => $limit,
-                'pageToken'     => $token,
-            ), true);
-            if (!empty($get_videos)) {
-                if ($get_videos['info']['totalResults'] > 0) {
-                    $next_token = $get_videos['info']['nextPageToken'];
-                    $ids        = array();
-                    foreach ($get_videos['results'] as $key => $video) {
-                        $check_if_exists = $db->where('youtube', $video->id->videoId)->getValue(T_VIDEOS, 'count(*)');
-                        if ($check_if_exists == 0) {
-                            $ids[] = $video->id->videoId;
+            if (empty($pt->config->yt_api_url)) {
+                throw new Exception('YouTube API URL is not configured.');
+            }
+            $yt_api_url = rtrim(trim((string) $pt->config->yt_api_url), '/');
+            $api_url = $yt_api_url . '/api/videos/search?limit=' . intval($limit) . '&pageToken=' . rawurlencode($token);
+            if (!empty($_POST['channel']) && $_POST['channel'] == 1) {
+                $api_url .= '&channelId=' . rawurlencode($query);
+            } else {
+                $api_url .= '&query=' . rawurlencode($query);
+            }
+            $api_response = connect_to_url($api_url);
+            $get_videos = (!empty($api_response)) ? json_decode($api_response) : null;
+            if (!empty($get_videos) && !empty($get_videos->success) && !empty($get_videos->results)) {
+                $next_token = (!empty($get_videos->token)) ? $get_videos->token : '';
+                $videos_html = '';
+                foreach ($get_videos->results as $key => $video) {
+                    $check_if_exists = $db->where('youtube', $video->id)->getValue(T_VIDEOS, 'count(*)');
+                    if ($check_if_exists == 0) {
+                        $thumb = PT_GetMedia('upload/photos/thumbnail.jpg');
+                        if (!empty($video->thumbnail)) {
+                            $thumb = $video->thumbnail;
                         }
-                    }
-                    $ids_implode = implode(',', $ids);
-                    if (!empty($ids_implode)) {
-                        $youtube_call_url = "https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=$ids_implode&key={$pt->config->yt_api}";
-                        $get_videos = connect_to_url($youtube_call_url);
-                        $get_videos = json_decode($get_videos);
-                        if (!empty($get_videos)) {
-                            $videos_html = '';
-                            foreach ($get_videos->items as $key => $video) {
-                                $thumb = PT_GetMedia('upload/photos/thumbnail.jpg');
-                                if (!empty($video->snippet->thumbnails->maxres->url)) {
-                                    $thumb = $video->snippet->thumbnails->maxres->url;
-                                } else if (!empty($video->snippet->thumbnails->medium->url)) {
-                                    $thumb = $video->snippet->thumbnails->medium->url;
-                                } 
-                                $tags = '';
-                                if (!empty($video->snippet->tags)) {
-                                    $tags_array = array();
-                                    if (is_array($video->snippet->tags)) {
-                                        $tag_count = 0;
-                                        foreach ($video->snippet->tags as $key => $tag) {
-                                            if ($tag_count < 11) {
-                                                $tags_array[] = $tag;
-                                            }
-                                            $tag_count++;
-                                        }
-                                        $tags = implode(',', $tags_array);
-                                    }
+                        $tags = '';
+                        if (!empty($video->tags)) {
+                            $tags_array = array();
+                            foreach ((array) $video->tags as $key => $tag) {
+                                if (count($tags_array) < 11) {
+                                    $tags_array[] = $tag;
                                 }
-                                $duration = '00:00';
-                                if (!empty(covtime($video->contentDetails->duration))) {
-                                    $duration = covtime($video->contentDetails->duration);
-                                }
-                                $array_data = array(
-                                    'ID' => $video->id,
-                                    'TITLE' => $video->snippet->title,
-                                    'DESC' => $video->snippet->description,
-                                    'THUMB' => $thumb,
-                                    'TAGS' => $tags,
-                                    'DURATION' => $duration,
-                                    'open_from_home_folder' => 1
-                                );
-                                $videos_html .= PT_LoadAdminPage('import-from-youtube/list', $array_data);
                             }
-                            if (!empty($videos_html)) {
-                                $data = array('status' => 200, 'html' => $videos_html, 'token' => $next_token);
-                            }
+                            $tags = implode(',', $tags_array);
                         }
+                        $duration = '00:00';
+                        if (!empty($video->duration) && !empty(covtime($video->duration))) {
+                            $duration = covtime($video->duration);
+                        }
+                        $array_data = array(
+                            'ID' => $video->id,
+                            'TITLE' => (!empty($video->title)) ? $video->title : '',
+                            'DESC' => (!empty($video->description)) ? $video->description : '',
+                            'THUMB' => $thumb,
+                            'TAGS' => $tags,
+                            'DURATION' => $duration,
+                            'MAIN_DURATION' => (!empty($video->duration)) ? $video->duration : '',
+                            'open_from_home_folder' => 1
+                        );
+                        $videos_html .= PT_LoadAdminPage('import-from-youtube/list', $array_data);
                     }
+                }
+                if (!empty($videos_html)) {
+                    $data = array('status' => 200, 'html' => $videos_html, 'token' => $next_token);
                 }
             }
         } catch (Exception $e) {

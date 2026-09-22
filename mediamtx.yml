@@ -1,0 +1,45 @@
+# Sample MediaMTX configuration for PlayTube live streaming.
+#
+# No auth is used on purpose: each broadcaster's "stream name" is an
+# unguessable secret (stream_{userid}_{random}), which acts as the access
+# key. Broadcasters publish via WHIP (WebRTC) or RTMP, viewers watch via
+# HLS. Recordings are saved locally under ./recordings and moved to the
+# script's upload/videos folder when the live stream ends (config option
+# "Live Streaming Strorage" must be enabled).
+
+# HLS base URL used by viewers (mediamtx_url setting)
+hlsAddress: :8888
+
+# WHIP (WebRTC ingest) base URL used by broadcasters (mediamtx_whip_url)
+whipAddress: :8889
+
+# Optional RTMP ingest for external encoders such as OBS (mediamtx_rtmp_url)
+rtmpAddress: :1935
+
+# Web panel (optional, disable for production)
+api: no
+
+apiport: 9997
+
+# Log level
+logLevel: info
+
+paths:
+  stream_:
+    source: publisher
+    publishUser: ""
+    publishPass: ""
+
+    # make streams available via HLS for viewers
+    hls: yes
+    # accept WebRTC publish via WHIP
+    whip: yes
+    # accept RTMP publish (format rtmp://host:1935/stream_name)
+    rtmp: yes
+
+    # local recording settings
+    record: yes
+    recordFormat: fmp4
+    recordPath: ./recordings/%path
+    recordOnInit: yes
+    recordPartDuration: 1000ms

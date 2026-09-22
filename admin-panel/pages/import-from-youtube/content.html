@@ -1,5 +1,4 @@
 <?php
-require 'assets/libs/youtube-sdk/vendor/autoload.php';
 $pt->sub_categories_array = array();
 foreach ($pt->sub_categories as $cat_key => $subs) {
     $pt->sub_categories_array["'".$cat_key."'"] = '<option value="0">Sub Category</option>';
@@ -35,61 +34,73 @@ if (!empty($_GET['query']) || !empty($_GET['multi-query'])) {
         $limit = (int) PT_Secure($_GET['limit']);
     }
     $search_made = 1;
+    $get_videos_ = false;
+    $next_token = '';
     try {
-        $youtube = new Madcoda\Youtube\Youtube(array('key' => $pt->config->yt_api));
-        $searchArray = array(
-            'q'             => $query,
-            'type'          => 'video',
-            'part'          => 'id',
-            'maxResults'    => $limit,
-        );
-        if (!empty($_GET['search-type'])) {
-            if ($_GET['search-type'] == 'channel') {
-                $searchArray['channelId'] = $query;
-                $searchArray['q'] = '';
-                $channel = true;
+        if (empty($pt->config->yt_api_url)) {
+            throw new Exception('YouTube API URL is not configured.');
+        }
+        $yt_api_url = rtrim(trim((string) $pt->config->yt_api_url), '/');
+        $api_url = $yt_api_url . '/api/videos/search?limit=' . intval($limit);
+        if (!empty($_GET['search-type']) && $_GET['search-type'] == 'channel') {
+            $api_url .= '&channelId=' . rawurlencode($query);
+            $channel = true;
+        } else {
+            $api_url .= '&query=' . rawurlencode($query);
+        }
+        $ids   = array();
+        $items = array();
+        for ($i = 0; $i < 10; $i++) {
+            $loop_url = $api_url;
+            if ($i > 0 && !empty($next_token)) {
+                $loop_url .= '&pageToken=' . rawurlencode($next_token);
+            }
+            $api_response = connect_to_url($loop_url);
+            if (empty($api_response)) {
+                $respond_error = 1;
+                $error_text = 'Something went wrong, please try again later';
+                break;
+            }
+            $search_data = json_decode($api_response);
+            if (empty($search_data) || empty($search_data->success)) {
+                $respond_error = 1;
+                $error_text = (!empty($search_data->message)) ? $search_data->message : 'Something went wrong, please try again later';
+                break;
+            }
+            $next_token = (!empty($search_data->token)) ? $search_data->token : '';
+            $new_count  = 0;
+            if (!empty($search_data->results)) {
+                foreach ($search_data->results as $key => $video) {
+                    $check_if_exists = $db->where('youtube', $video->id)->getValue(T_VIDEOS, 'count(*)');
+                    if ($check_if_exists == 0) {
+                        $new_count++;
+                        $ids[]    = $video->id;
+                        $thumb    = (!empty($video->thumbnail)) ? $video->thumbnail : '';
+                        $items[]  = (object) array(
+                            'id'             => $video->id,
+                            'snippet'        => (object) array(
+                                'title'       => (!empty($video->title)) ? $video->title : '',
+                                'description' => (!empty($video->description)) ? $video->description : '',
+                                'tags'        => (array) $video->tags,
+                                'thumbnails'  => (object) array(
+                                    'maxres' => (object) array('url' => $thumb),
+                                    'medium' => (object) array('url' => $thumb),
+                                ),
+                            ),
+                            'contentDetails' => (object) array('duration' => (!empty($video->duration)) ? $video->duration : ''),
+                        );
+                    }
+                }
+            }
+            if ($new_count > 0) {
+                break;
+            }
+            if (empty($next_token)) {
+                break;
             }
         }
-        $get_videos = $youtube->searchAdvanced($searchArray, true);
-        if (!empty($get_videos)) {
-            if ($get_videos['info']['totalResults'] > 0) {
-                $next_token = $get_videos['info']['nextPageToken'];
-                $ids        = array();
-                foreach ($get_videos['results'] as $key => $video) {
-                    $check_if_exists = $db->where('youtube', $video->id->videoId)->getValue(T_VIDEOS, 'count(*)');
-                    if ($check_if_exists == 0) {
-                        $ids[] = $video->id->videoId;
-                    }
-                }
-                if (empty($ids)) {
-                    for ($i = 0; $i < 10; $i++) {
-                        if (empty($ids)) {
-                            $searchArray['pageToken'] = $next_token;
-                            $get_videos = $youtube->searchAdvanced($searchArray, true);
-
-                            if (!empty($get_videos['results'])) {
-                                $next_token = $get_videos['info']['nextPageToken'];
-                                foreach ($get_videos['results'] as $key => $video) {
-                                    $check_if_exists = $db->where('youtube', $video->id->videoId)->getValue(T_VIDEOS, 'count(*)');
-                                    if ($check_if_exists == 0) {
-                                        $ids[] = $video->id->videoId;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                $ids_implode = implode(',', $ids);
-                if (!empty($ids_implode)) {
-                    $youtube_call_url = "https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=$ids_implode&key={$pt->config->yt_api}";
-                    $get_videos_      = connect_to_url($youtube_call_url);
-                    if (empty($get_videos_)) {
-                        $respond_error = 1;
-                        $error_text = 'Something went wrong, please try again later';
-                    }
-                    $get_videos_      = json_decode($get_videos_);
-                }
-            }
+        if (!empty($items)) {
+            $get_videos_ = (object) array('items' => $items);
         }
         if (empty($ids) && empty($respond_error)) {
             $keyword_id = (isset($_SESSION['keyword-id'])) ? $_SESSION['keyword-id'] : null;

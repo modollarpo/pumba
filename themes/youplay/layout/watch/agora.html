@@ -61,8 +61,8 @@
    }, 3000);
 
 <?php } ?>
-   <?php if ($pt->config->live_video == 1 && !empty($pt->config->agora_app_id) && !empty($pt->get_video->stream_name) && $pt->get_video->is_still_live) { ?>
-  RunLiveAgora("<?php echo $pt->get_video->stream_name; ?>","post_live_video_<?php echo($pt->get_video->id) ?>","<?php echo($pt->get_video->agora_token) ?>");
+   <?php if ($pt->config->live_video == 1 && !empty($pt->config->mediamtx_whip_url) && !empty($pt->config->mediamtx_url) && !empty($pt->get_video->stream_name) && $pt->get_video->is_still_live && $pt->get_video->live_ended == 0) { ?>
+  RunLiveStream("<?php echo $pt->get_video->stream_name; ?>","post_live_video_<?php echo($pt->get_video->id) ?>","<?php echo(trim($pt->config->mediamtx_url, '/')); ?>/<?php echo $pt->get_video->stream_name; ?>/index.m3u8");
   
 <?php } ?>
 </script>

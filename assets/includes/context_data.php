@@ -167,7 +167,6 @@ $pt->encryptedKeys = [
 	'MailruAppkey',
 	'tiktok_client_secret',
 	'wowonder_app_key',
-	'agora_customer_certificate',
 	'amazone_s3_s_key_2',
 	'paypal_secret',
 	'stripe_secret',

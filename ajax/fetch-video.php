@@ -184,37 +184,33 @@ if (!empty($_POST['link'])) {
 	    		exit();
 	    	}
 	    	try {
-	    		require 'assets/libs/youtube-sdk/vendor/autoload.php';
-	    		$youtube = new Madcoda\Youtube\Youtube(array('key' => $pt->config->yt_api));
-	            $get_videos = $youtube->getVideoInfo($re_data['youtube']);
-	            if (!empty($get_videos)) {
-		    		if (!empty($get_videos->snippet)) {
-		    			
-		    			if (!empty($get_videos->snippet->thumbnails->maxres->url)) {
-	            			$thumbnail = $get_videos->snippet->thumbnails->maxres->url;
-	            		} else if (!empty($get_videos->snippet->thumbnails->standard->url)) {
-	            			$thumbnail = $get_videos->snippet->thumbnails->standard->url;
-	            		} else if (!empty($get_videos->snippet->thumbnails->high->url)) {
-	            			$thumbnail = $get_videos->snippet->thumbnails->high->url;
-	            		} else if (!empty($get_videos->snippet->thumbnails->medium->url)) {
-	            			$thumbnail = $get_videos->snippet->thumbnails->medium->url;
-	            		}
-		    			$info = $get_videos->snippet;
-		    			$title = $info->title;
-		    			if (!empty(covtime($get_videos->contentDetails->duration))) {
-		    				$duration = covtime($get_videos->contentDetails->duration);
+	    		$yt_api_url = trim((isset($pt->config->yt_api_url) && !empty($pt->config->yt_api_url)) ? $pt->config->yt_api_url : '', '/');
+	    		if (empty($yt_api_url)) {
+	    			throw new Exception('YouTube API URL is not configured.');
+	    		}
+	    		$api_response = connect_to_url($yt_api_url . '/api/video/info?id=' . rawurlencode($re_data['youtube']));
+	    		$get_videos = (!empty($api_response)) ? json_decode($api_response) : null;
+	    		if (empty($get_videos) || empty($get_videos->success)) {
+	    			throw new Exception((!empty($get_videos->message)) ? $get_videos->message : 'Could not load video.');
+	    		}
+	    		if (!empty($get_videos->thumbnail)) {
+	    			$thumbnail = $get_videos->thumbnail;
+	    		}
+	    		if (!empty($get_videos->title)) {
+	    			$title = $get_videos->title;
+	    			$description = (!empty($get_videos->description)) ? $get_videos->description : '';
+	    			if (!empty(covtime($get_videos->duration))) {
+	    				$duration = covtime($get_videos->duration);
+	    			}
+	    			if (!empty($get_videos->tags)) {
+	    				if (is_array($get_videos->tags)) {
+		    				foreach ($get_videos->tags as $key => $tag) {
+		    					$tags_array[] = $tag;
+		    				}
+		    				$tags = implode(',', $tags_array);
 		    			}
-		    			$description = $info->description;
-		    			if (!empty($get_videos->snippet->tags)) {
-		    				if (is_array($get_videos->snippet->tags)) {
-			    				foreach ($get_videos->snippet->tags as $key => $tag) {
-			    					$tags_array[] = $tag;
-			    				}
-			    				$tags = implode(',', $tags_array);
-			    			}
-		    			}
-		    		}
-		    	}
+	    			}
+	    		}
 	    	} 
 	    	catch (Exception $e) {
 	    		$error = $error_icon . $e->getMessage();

@@ -1056,7 +1056,9 @@ if (!empty($get_video->stream_name) && !empty($get_video->live_time) && $get_vid
 }
 if (!empty($get_video->stream_name) && !empty($get_video->video_location)) {
 
-    $get_video->video_location = "https://" . $pt->config->bucket_name_2 . ".s3.amazonaws.com/" . substr($get_video->video_location, strpos($get_video->video_location, 'upload/'));
+    if ($pt->config->amazone_s3_2 == 1) {
+        $get_video->video_location = "https://" . $pt->config->bucket_name_2 . ".s3.amazonaws.com/" . substr($get_video->video_location, strpos($get_video->video_location, 'upload/'));
+    }
     $video_type = 'application/x-mpegURL';
 }
 if (!empty($vast_url)) {

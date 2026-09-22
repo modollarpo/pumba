@@ -474,10 +474,10 @@ INSERT INTO `config` (`id`, `name`, `value`) VALUES
 (179, 'post_system', 'on'),
 (180, 'live_video', '0'),
 (181, 'live_video_save', '0'),
-(182, 'agora_live_video', '0'),
-(183, 'agora_app_id', ''),
-(184, 'agora_customer_id', ''),
-(185, 'agora_customer_certificate', ''),
+(182, 'mediamtx_url', ''),
+ (183, 'mediamtx_whip_url', ''),
+ (184, 'mediamtx_recordings_path', './recordings'),
+ (185, 'mediamtx_rtmp_url', ''),
 (186, 'amazone_s3_2', '0'),
 (187, 'bucket_name_2', ''),
 (188, 'amazone_s3_key_2', ''),
@@ -537,8 +537,7 @@ INSERT INTO `config` (`id`, `name`, `value`) VALUES
 (242, 'payu_buyer_gsm_number', ''),
 (243, 'payu_buyer_email', ''),
 (244, 'video_text_system', 'off'),
-(245, 'agora_app_certificate', ''),
-(246, 'p240', 'on'),
+ (246, 'p240', 'on'),
 (247, 'p360', 'on'),
 (248, 'p480', 'on'),
 (249, 'p720', 'on'),
@@ -727,7 +726,9 @@ INSERT INTO `config` (`id`, `name`, `value`) VALUES
 (432, 'braintree_public_key', ''),
 (433, 'braintree_private_key', ''),
 (434, 'switch_account', 'on'),
-(435, 'switch_account_counts', '3');
+(435, 'switch_account_counts', '3'),
+(436, 'yt_api_url', ''),
+(437, 'tiktok_api_url', '');
 
 -- --------------------------------------------------------
 

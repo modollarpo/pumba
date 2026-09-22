@@ -11,7 +11,6 @@ require 'config.php';
 require 'phpMailer_config.php';
 require 'assets/libs/DB/vendor/autoload.php';
 require 'assets/libs/getID3-1.9.14/getid3/getid3.php';
-require 'assets/libs/youtube-sdk/vendor/autoload.php';
 require 'assets/libs/php-rss/vendor/autoload.php';
 
 $pt     = ToObject(array());
