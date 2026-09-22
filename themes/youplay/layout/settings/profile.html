@@ -1,0 +1,107 @@
+<form class="content p-4" id="profile-settings" method="POST">
+    <div class="setting-profile-alert"></div>
+	
+	<div class="row">
+		<div class="col-lg-6">
+			<div class="form-group">
+				<input id="first_name" name="first_name" type="text" placeholder=" " class="form-control" value="{{USER first_name}}">
+				<label for="first_name">{{LANG first_name}}</label>
+			</div>
+		</div>
+
+		<div class="col-lg-6">
+			<div class="form-group">
+				<input id="last_name" name="last_name" type="text" placeholder=" " class="form-control" value="{{USER last_name}}">
+				<label for="last_name">{{LANG last_name}}</label>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<textarea name="about" id="about" cols="20" class="form-control" placeholder=" " rows="5">{{USER about_decoded}}</textarea>
+		<label for="about">{{LANG about_profile}}</label>
+	</div>
+
+	<div class="form-group">
+		<input id="facebook" name="facebook" type="text" placeholder="{{LANG username}}" class="form-control" value="{{USER facebook}}">
+		<label for="facebook">{{LANG facebook}} URL</label>
+	</div>
+
+	<div class="form-group">
+		<input id="google" name="google" type="text" placeholder="{{LANG username}}" class="form-control" value="{{USER google}}">
+		<label for="google">{{LANG google}} URL</label>
+	</div>
+
+	<div class="form-group">
+		<input id="twitter" name="twitter" type="text" placeholder="{{LANG username}}" class="form-control" value="{{USER twitter}}">
+		<label for="twitter">{{LANG twitter}} URL</label>
+	</div>
+
+	<div class="form-group">
+		<input id="instagram" name="instagram" type="text" placeholder="{{LANG username}}" class="form-control" value="{{USER instagram}}">
+		<label for="instagram">{{LANG instagram}} URL</label>
+	</div>
+	
+	<div class="form-group">
+		<select class="form-control" multiple name="fav_category[]">
+			<?php 
+			foreach ($pt->categories as $key => $name): 
+			if($key != 'other'){
+				?>
+				<option value="<?php echo($key); ?>" <?php if (in_array($key, $pt->settings->fav_category)) {echo "selected";} ?>><?php echo($name); ?></option>
+			<?php } ?>
+			<?php endforeach; ?>
+		</select>
+		<label for="geo_blocking">{{LANG fav_category}}</label>
+		<small class="form-text text-muted">{{LANG choose_which_categories}}</small>
+    </div>
+	
+    <?php if ($pt->config->pro_google == 'on' && $pt->settings->is_pro) { ?>
+		<div class="form-group">
+			<input id="google_tracking_code" name="google_tracking_code" type="text" placeholder=" " class="form-control" value="{{USER google_tracking_code}}">
+			<label for="google_tracking_code">{{LANG google_tracking_id}}</label>
+			<small class="form-text text-muted">{{LANG track_your_own_profile}}</small>
+		</div>
+	<?php } ?>
+
+	{{CUSTOM_FIELDS}}
+	<input type="hidden" name="hash_id" value="<?php echo PT_CreateSession()?>">
+	<input type="hidden" name="user_id" value="{{USER id}}">
+	<input type="hidden" name="cf" value="{{CUSTOM_DATA}}">
+	<!-- Button (Double) -->
+	<div class="pt-2">
+		<button id="submit" name="submit" class="btn btn-main btn-lg">{{LANG save}}</button>
+	</div>
+</form>
+
+<script>
+    $(function() {
+    	$('.show-tick').selectpicker({});
+        var form = $('form#profile-settings');
+        form.ajaxForm({
+            url: '{{LINK aj/user/profile}}?hash=' + $('.main_session').val(),
+            beforeSend: function() {
+                //form.find('button').text("{{LANG please_wait}}");
+                // FL_progressIconLoader(form.find('button'));
+                $('#profile-settings').find('button').text("{{LANG please_wait}}");
+            },
+            success: function(data) {
+                scrollToTop();
+                if (data.status == 200) {
+                    $('.setting-profile-alert').html('<div class="alert alert-success">' + data.message + '</div>');
+                    $('.alert-success').fadeIn('fast', function() {
+                        $(this).delay(2500).slideUp(500, function() {
+                            $(this).remove();
+                        });
+                    });
+                } else if (data.errors) {
+                    var errors = data.errors.join("<br>");
+                    $('.setting-profile-alert').html('<div class="alert alert-danger">' + errors + '</div>');
+                    $('.alert-danger').fadeIn(300);
+                }
+                $('#profile-settings').find('button').html('{{LANG save}}');
+                // FL_progressIconLoader(form.find('button'));
+            }
+        });
+    });
+</script>

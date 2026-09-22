@@ -1,0 +1,37 @@
+<div class="py-4 container">
+	<h2 class="mt-0 mb-3 display-4">{{LANG withdrawals}}</h2>
+	
+	<div class="mb-5 d-flex align-items-center justify-content-between tag_vid_page_nav">
+		<div class="d-flex align-items-center py-1 tag_vid_page_sub_nav">
+			<a href="{{LINK }}" data-load="?link1=home" class="btn back px-0 d-none d-md-inline-flex">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.57 5.92993L3.5 11.9999L9.57 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5 12H3.67004" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG home}}
+			</a>
+			<a href="{{LINK wallet}}" data-load="?link1=wallet" class="btn content">{{LANG wallet}}</a>
+			<?php if (($pt->config->usr_v_mon == 'on' && $pt->config->sell_videos_system == 'on') || ($pt->config->usr_v_mon == 'off' && $pt->config->sell_videos_system == 'on') || ($pt->config->usr_v_mon == 'on' && $pt->config->sell_videos_system == 'off') ) { ?>
+				<a href="{{LINK settings/balance/<?php echo $pt->settings->username; ?>}}" data-load="?link1=settings&page=balance&user=<?php echo $pt->settings->username; ?>" class="btn content btn-main">{{LANG balance_}}</a>
+			<?php } ?>
+			<?php if ($pt->config->point_level_system == 1): ?>  
+				<a href="{{LINK settings/points/<?php echo $pt->settings->username; ?>}}" data-load="?link1=settings&page=points&user=<?php echo $pt->settings->username; ?>" class="btn content">{{LANG points}}</a>
+			<?php endif ?>
+			<?php if ($pt->config->usr_v_mon == 'on' || $pt->config->payed_subscribers == 'on'): ?>
+				<a href="{{LINK settings/monetization/<?php echo $pt->settings->username; ?>}}" data-load="?link1=settings&page=monetization&user=<?php echo $pt->settings->username; ?>" class="btn content">{{LANG monetization}}</a>
+			<?php endif; ?>
+		</div>
+	</div>
+
+	<div class="content p-4">
+		<div class="table-responsive">
+			<table id="withdrawal-requests" class="table table-borderless m-0">
+				<thead>
+					<th>ID</th>
+					<th>{{LANG requested_at}}</th>
+					<th>{{LANG amount}}</th>
+					<th>{{LANG status}}</th>
+				</thead>
+				<tbody>
+					{{WITHDRAWAL_HISTORY_LIST}}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

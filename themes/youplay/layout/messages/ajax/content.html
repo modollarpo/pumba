@@ -1,0 +1,183 @@
+<div class="d-flex pt-2 pb-4 empty_state_center">
+    <div class="w-100">
+		<div class="row h-100 msg_row">
+			<div class="col-lg-4 col-md-5 mobilerightpane">
+				{{SIDEBAR}}
+			</div>
+			
+			<div class="col-lg-8 col-md-7 mobileleftpane">
+				<div class="content h-100 pt_msg_main">
+					<div class="content shadow-none">
+						<div class="p-4 d-flex align-items-center justify-content-between gap-15 pt_msg_header">
+							<h5 class="m-0 d-inline-flex align-items-center gap-10 mw-0 text-truncate">
+								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="d-inline-flex d-md-none flex-0 mobilemsgclose"><path d="M15 6L9.70711 11.2929C9.37377 11.6262 9.20711 11.7929 9.20711 12C9.20711 12.2071 9.37377 12.3738 9.70711 12.7071L15 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+								<?php echo (!empty($pt->chat_user->name)) ? "<a class='black black-hover mw-0' href='" . $pt->chat_user->url . "'>" . $pt->chat_user->name . "</a>" : "<a class='black black-hover mw-0 user-link'></a>";?>
+							</h5>
+							<?php echo (!empty($pt->chat_user->name)) ? '<button class="btn btn-danger shadow-none rounded-circle border-0 p-2 flex-0 my-1" id="delete-conversation" onclick="DeleteConversation()" title="{{LANG clear_chat}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.5 5.5L18.8803 15.5251C18.7219 18.0864 18.6428 19.3671 18.0008 20.2879C17.6833 20.7431 17.2747 21.1273 16.8007 21.416C15.8421 22 14.559 22 11.9927 22C9.42312 22 8.1383 22 7.17905 21.4149C6.7048 21.1257 6.296 20.7408 5.97868 20.2848C5.33688 19.3626 5.25945 18.0801 5.10461 15.5152L4.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M21 5.5H3" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M9 11.7349H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M16.0575 5.5L15.3748 4.09173C14.9213 3.15626 14.6946 2.68852 14.3035 2.39681C14.2167 2.3321 14.1249 2.27454 14.0288 2.2247C13.5957 2 13.0759 2 12.0363 2C10.9706 2 10.4377 2 9.99745 2.23412C9.89986 2.28601 9.80675 2.3459 9.71906 2.41317C9.3234 2.7167 9.10239 3.20155 8.66037 4.17126L8.05469 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M10.5 15.6543H13.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></button>' : '';?>
+						</div>
+					</div>
+					
+					<button id="load-more-messages" title="Load more messages" class="d-none mx-4 position-absolute btn btn-light shadow-none rounded-circle border-0 p-2">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 15C18 15 13.5811 9.00001 12 9C10.4188 8.99999 6 15 6 15" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					</button>
+					
+					<div class="pt_msg_joint">
+						<div class="d-flex user-messages px-4 pt_msg_area">
+							{{HTML}}
+						</div>
+						<div class="user-send-message px-4 pt-3 pb-4">
+							<form action="#" method="POST" id="new-message-form" <?php if (empty($_GET['id'])) { ?> style="visibility: hidden;" <?php } ?>>
+								<div class="d-flex align-items-center justify-content-between gap-15">
+									<textarea name="new-message" id="new-message" class="flex-1 px-3 tag_live_title tag_msg_search r-none" rows="1" placeholder="{{LANG write_message}}"></textarea>
+									<button type="submit" id="send-button" class="flex-0 btn btn-main rounded-circle p-2">
+										<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.0693 8.50867L9.50929 4.22867C3.75929 1.34867 1.39929 3.70867 4.27929 9.45867L5.14929 11.1987C5.39929 11.7087 5.39929 12.2987 5.14929 12.8087L4.27929 14.5387C1.39929 20.2887 3.74929 22.6487 9.50929 19.7687L18.0693 15.4887C21.9093 13.5687 21.9093 10.4287 18.0693 8.50867ZM14.8393 12.7487H9.43929C9.02929 12.7487 8.68929 12.4087 8.68929 11.9987C8.68929 11.5887 9.02929 11.2487 9.43929 11.2487H14.8393C15.2493 11.2487 15.5893 11.5887 15.5893 11.9987C15.5893 12.4087 15.2493 12.7487 14.8393 12.7487Z" fill="currentColor"></path></svg>
+									</button>
+								</div>
+								<input type="hidden" id="user-id" name="id" value="<?php echo $pt->chat_id; ?>">
+								<input type="hidden" id="user-avatar" value="<?php echo ($pt->chat_user->avatar) ? $pt->chat_user->avatar : "";?>">
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+$('.mobilemsgclose').on('click',function (){
+	$('.mobileleftpane').fadeOut(100);
+	$('.mobilerightpane').fadeIn(100);
+});
+var messagesInterval = <?php echo (!empty($pt->extra_config->ajax_message_update_interval)) ? $pt->extra_config->ajax_message_update_interval : 3000 ?>;
+
+$(function() {
+    window.UpdateChatU = setTimeout(function () {
+        fetchMessages();
+    }, messagesInterval);
+});
+
+function fetchMessages() {
+    clearTimeout(window.UpdateChatU);
+    $.post('{{LINK aj/messages/fetch}}', {id: $('#user-id').val(), last_id: $('.message:last').attr('data-id')}, function(data, textStatus, xhr) {
+        if (data.status == 200) {
+            if (data.message.length > 0) {
+                $('.messages').append(data.message);
+                 $('.user-messages').scrollTop($('.user-messages')[0].scrollHeight);
+            }
+            if ($('#search-list').val() == 0) {
+                $('.messages-sidebar .list-group').html(data.users);
+            }
+        }
+        window.UpdateChatU = setTimeout(function () {
+            fetchMessages();
+        }, messagesInterval);
+    });
+}
+$(document).on('click', '.messages-sidebar .user-list', function(event) {
+    clearTimeout(window.UpdateChatU);
+    /* Act on the event */
+});
+$(document).on('click', '#load-more-messages', function(event) {
+  event.preventDefault();
+  $('#load-more-messages i').removeClass('fa-angle-up');
+  $('#load-more-messages i').addClass('fa-spinner fa-spin');
+  $.post('{{LINK aj/messages/fetch}}', {id: $('#user-id').val(), first_id: $('.message:first').attr('data-id')}, function(data, textStatus, xhr) {
+        $('#load-more-messages i').removeClass('fa-spinner fa-spin');
+        $('#load-more-messages i').addClass('fa-angle-up');
+        if (data.status == 200) {
+            if (data.message.length > 0) {
+                $('.messages').prepend(data.message);
+            } else {
+                $('#load-more-messages').animate({
+                    top: "-50",
+                }, 200, function() {
+                    $('#load-more-messages').hide();
+                    $('#load-more-messages').css('top', '60px');
+                });
+            }
+            $('.user-messages').scrollTop(0);
+        }
+        $('#load-more-messages i').removeClass('fa-spinner fa-spin');
+        $('#load-more-messages i').addClass('fa-angle-up');
+    });
+});
+
+function DeleteConversation() {
+    if (!confirm("{{LANG are_you_sure_you_want_delete_chat}}")) {
+        return false;
+    }
+    $(this).find('i').toggleClass('fa-trash fa-spinner fa-spin');
+    $.post('{{LINK aj/messages/delete_chat}}', {id: $('#user-id').val()}, function(data, textStatus, xhr) {
+        $('#delete-conversation').find('i').removeClass('fa-spinner fa-spin');
+        $('#delete-conversation').find('i').addClass('fa-trash');
+        $('.messages').empty();
+        location.href = "{{CONFIG site_url}}/messages";
+    });
+}
+
+$(function() {
+        
+        $('.user-messages').scrollTop($('.user-messages')[0].scrollHeight);
+        var $id = makeid();
+    	var form = $('form#new-message-form');
+
+        $('#search-list').on('keyup', function(event) {
+            $('#search-icon').toggleClass('fa-search fa-spinner fa-spin');
+            $.post('{{LINK aj/messages/search}}', {keyword: $(this).val()}, function(data, textStatus, xhr) {
+                $('#search-icon').toggleClass('fa-spinner fa-spin fa-search ');
+                if (data.status == 200) {
+                    $('.messages-sidebar .list-group').html(data.users);
+                }
+            });
+        });
+
+    	$('#new-message').on('keyup', function(event) {
+    		if (event.keyCode == 13 && !event.shiftKey) {
+                $id = makeid();
+                if ($(this).val().length > 1) {
+                    form.submit();
+                } else {
+                    $('#new-message').val('');
+                }
+    		}
+    	});
+
+        form.ajaxForm({
+            url: '{{LINK aj/messages/new}}?hash=' + $('.main_session').val(),
+            data: {message_id: $('#message_id').val()},
+            beforeSubmit: function(formData, jqForm, options) {
+                if ($('.messages').length == 0) {
+                    $('.user-messages').html('<div class="messages"></div>');
+                }
+                if ($('#new-message').val().length >= 1) {
+                    $id = makeid();
+                    formData.push({ name: 'message_id', value: $id });
+                    $('.messages').append('<div class="data_message" data-id="' + $id + '"><div class="d-flex justify-content-end message to-user mb-3" data-id=""><div class="user-message btn-main d-inline-block">' + nl2br(escapeHTML($('#new-message').val())) + '</div></div></div>');
+                    $('#new-message').val('');
+                    $('.user-messages').scrollTop($('.user-messages')[0].scrollHeight);
+                } else {
+                    $('#new-message').val('');
+                } 
+            },
+            success: function(data,rew,rr) {
+                if (data.status == 400) {
+                    $('.data_message[data-id="' + $id + '"]').remove();
+                    swal({
+                       title: '{{LANG error}}',
+                       text: data.message,
+					   showCancelButton: true,
+					   confirmButtonText: 'OK',
+					   cancelButtonText: '{{LANG cancel}}',
+					   buttonsStyling:false,
+					   confirmButtonClass:'btn btn-main',
+					   cancelButtonClass:"btn btn-link",
+                    });
+                }
+                else{
+                    $('.data_message[data-id="' + data.message_id + '"]').html(data.message);
+                }
+            }
+        });
+    });
+</script>

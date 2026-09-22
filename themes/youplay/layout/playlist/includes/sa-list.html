@@ -1,0 +1,45 @@
+<div class="add-topl-cont">
+	<div class="modal-header px-0 pt-0">
+		<h5 class="modal-title">{{LANG add_to}}</h5>
+	</div>
+	
+	<div class="content p-3 playlist-item" type="button" onclick="PT_WLToggle('<?php echo $pt->video_id; ?>',this);">
+		<div class="d-flex align-items-center justify-content-between gap-15">
+			<div class="d-inline-flex align-items-center gap-10">
+				<div class="pt-plist-tgl_btn flex-0">
+					<?php if ($pt->wlater_exists): ?>
+						<svg xmlns="http://www.w3.org/2000/svg" class="main" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 2c-.218 0 -.432 .002 -.642 .005l-.616 .017l-.299 .013l-.579 .034l-.553 .046c-4.785 .464 -6.732 2.411 -7.196 7.196l-.046 .553l-.034 .579c-.005 .098 -.01 .198 -.013 .299l-.017 .616l-.004 .318l-.001 .324c0 .218 .002 .432 .005 .642l.017 .616l.013 .299l.034 .579l.046 .553c.464 4.785 2.411 6.732 7.196 7.196l.553 .046l.579 .034c.098 .005 .198 .01 .299 .013l.616 .017l.642 .005l.642 -.005l.616 -.017l.299 -.013l.579 -.034l.553 -.046c4.785 -.464 6.732 -2.411 7.196 -7.196l.046 -.553l.034 -.579c.005 -.098 .01 -.198 .013 -.299l.017 -.616l.005 -.642l-.005 -.642l-.017 -.616l-.013 -.299l-.034 -.579l-.046 -.553c-.464 -4.785 -2.411 -6.732 -7.196 -7.196l-.553 -.046l-.579 -.034a28.058 28.058 0 0 0 -.299 -.013l-.616 -.017l-.318 -.004l-.324 -.001zm2.293 7.293a1 1 0 0 1 1.497 1.32l-.083 .094l-4 4a1 1 0 0 1 -1.32 .083l-.094 -.083l-2 -2a1 1 0 0 1 1.32 -1.497l.094 .083l1.293 1.292l3.293 -3.292z" fill="currentColor" stroke-width="0"></path></svg>
+					<?php else: ?>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9 -9 9s-9 -1.8 -9 -9s1.8 -9 9 -9z"></path></svg>
+					<?php endif;?>	
+				</div>
+				{{LANG watch_later}}
+			</div>
+			
+			<svg xmlns="http://www.w3.org/2000/svg" height="15" viewBox="0 -960 960 960" width="15" class="flex-0"><path fill="currentColor" d="M259.717-52Q218-52 190-80.15T162-150v-392q0-41.7 28.15-69.85Q218.3-640 260-640v-96q0-92.68 64.416-157.34T480.226-958q91.394 0 155.584 64.66T700-736v96q41.7 0 69.85 28.15Q798-583.7 798-542v392q0 41.7-28.162 69.85Q741.676-52 699.96-52H259.717Zm220.655-206Q516-258 541-283.372q25-25.371 25-61Q566-380 540.628-405q-25.371-25-61-25Q444-430 419-404.628q-25 25.371-25 61Q394-308 419.372-283q25.371 25 61 25ZM358-640h244v-96q0-51-35.618-87.5-35.617-36.5-86.5-36.5Q429-860 393.5-823.5 358-787 358-736v96Z"/></svg>
+		</div>
+	</div>
+	
+	<?php foreach ($pt->user_list as $list): ?>
+		<div class="content p-3 playlist-item mt-3" type="button" id="<?php echo  $list->list_id?>" onclick="PT_PLVToggle('<?php echo $pt->video_id; ?>',this);">
+			<div class="d-flex align-items-center justify-content-between gap-15">
+				<div class="d-inline-flex align-items-center gap-10">
+					<div class="pt-plist-tgl_btn flex-0" id="<?php echo $list->list_id?>">
+						<?php if ($list->exists): ?>
+							<svg xmlns="http://www.w3.org/2000/svg" class="main" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 2c-.218 0 -.432 .002 -.642 .005l-.616 .017l-.299 .013l-.579 .034l-.553 .046c-4.785 .464 -6.732 2.411 -7.196 7.196l-.046 .553l-.034 .579c-.005 .098 -.01 .198 -.013 .299l-.017 .616l-.004 .318l-.001 .324c0 .218 .002 .432 .005 .642l.017 .616l.013 .299l.034 .579l.046 .553c.464 4.785 2.411 6.732 7.196 7.196l.553 .046l.579 .034c.098 .005 .198 .01 .299 .013l.616 .017l.642 .005l.642 -.005l.616 -.017l.299 -.013l.579 -.034l.553 -.046c4.785 -.464 6.732 -2.411 7.196 -7.196l.046 -.553l.034 -.579c.005 -.098 .01 -.198 .013 -.299l.017 -.616l.005 -.642l-.005 -.642l-.017 -.616l-.013 -.299l-.034 -.579l-.046 -.553c-.464 -4.785 -2.411 -6.732 -7.196 -7.196l-.553 -.046l-.579 -.034a28.058 28.058 0 0 0 -.299 -.013l-.616 -.017l-.318 -.004l-.324 -.001zm2.293 7.293a1 1 0 0 1 1.497 1.32l-.083 .094l-4 4a1 1 0 0 1 -1.32 .083l-.094 -.083l-2 -2a1 1 0 0 1 1.32 -1.497l.094 .083l1.293 1.292l3.293 -3.292z" fill="currentColor" stroke-width="0"></path></svg>
+						<?php else: ?>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9 -9 9s-9 -1.8 -9 -9s1.8 -9 9 -9z"></path></svg>
+						<?php endif;?>	
+					</div>
+					<?php echo  $list->name?>
+				</div>
+				
+				<?php if ($list->privacy  == 0): ?>
+					<svg xmlns="http://www.w3.org/2000/svg" height="15" viewBox="0 -960 960 960" width="15" class="flex-0"><path fill="currentColor" d="M259.717-52Q218-52 190-80.15T162-150v-392q0-41.7 28.15-69.85Q218.3-640 260-640v-96q0-92.68 64.416-157.34T480.226-958q91.394 0 155.584 64.66T700-736v96q41.7 0 69.85 28.15Q798-583.7 798-542v392q0 41.7-28.162 69.85Q741.676-52 699.96-52H259.717Zm220.655-206Q516-258 541-283.372q25-25.371 25-61Q566-380 540.628-405q-25.371-25-61-25Q444-430 419-404.628q-25 25.371-25 61Q394-308 419.372-283q25.371 25 61 25ZM358-640h244v-96q0-51-35.618-87.5-35.617-36.5-86.5-36.5Q429-860 393.5-823.5 358-787 358-736v96Z"/></svg>
+				<?php else: ?>
+					
+				<?php endif; ?>
+			</div>
+		</div>
+	<?php endforeach; ?>
+</div>

@@ -1,0 +1,9 @@
+<div class="form-group">
+	<?php if ($pt->field->type == 'textbox'): ?>
+		<input name="fid_{{ID}}" id="{{ID}}" type="text" class="form-control" placeholder=" " value="{{FID}}">
+	<?php elseif($pt->field->type == 'textarea'): ?>
+		<textarea class="form-control" id="{{ID}}" name="fid_{{ID}}" rows="3" placeholder=" ">{{FID}}</textarea>
+	<?php endif; ?>
+	<label>{{NAME}}</label>
+	<small class="form-text text-muted">{{DESC}}</small>
+</div>

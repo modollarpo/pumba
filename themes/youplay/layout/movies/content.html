@@ -1,0 +1,117 @@
+<div class="pt-4 pb-5 container">
+	<h2 class="mt-0 mb-3 display-4">{{LANG movies}}</h2>
+	
+	<div class="mb-5 d-flex align-items-center justify-content-between tag_vid_page_nav">
+		<div class="dropdown">
+			<a href="javascript:void(0);" role="button" data-toggle="dropdown" data-display="static" class="btn btn-main full">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 11.5C2 7.02166 2 4.78249 3.39124 3.39124C4.78249 2 7.02166 2 11.5 2C15.9783 2 18.2175 2 19.6088 3.39124C21 4.78249 21 7.02166 21 11.5C21 15.9783 21 18.2175 19.6088 19.6088C18.2175 21 15.9783 21 11.5 21C7.02166 21 4.78249 21 3.39124 19.6088C2 18.2175 2 15.9783 2 11.5Z" stroke="currentColor" stroke-width="1.5"/><path d="M8.5 11.5L14.5001 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 15H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.5 8H15.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG filter_by}}
+			</a>
+			<div class="dropdown-menu p-0" onclick="event.stopPropagation();">
+				<form class="" method="GET" action="{{LINK movies}}">
+					<div class="p-3 scroll_search">
+						<div class="form-group">
+							<input type="text" class="form-control" id="search-bar" name="keyword" placeholder=" " autocomplete="off" value="<?php echo(!empty($_GET['keyword']) ? $_GET['keyword'] : '') ?>">
+							<label for="">{{LANG search}}</label>
+							<small class="form-text text-muted">{{LANG movies_page_search}}</small>
+						</div>
+						
+						<div class="form-group">
+							<input type="number" id="rating" name="rating" class="form-control" min="1" max="10" step="0.1" placeholder="{{LANG rating}}" value="<?php echo(!empty($_GET['rating']) ? $_GET['rating'] : '') ?>">
+							<label for="rating">{{LANG rating}}</label>
+						</div>
+						
+						<div class="form-group">
+							<input id="release" name="release" type="number" placeholder="{{LANG release}}" class="form-control"  min="1960" max="<?php echo date('Y') ?>" value="<?php echo(!empty($_GET['release']) ? $_GET['release'] : '') ?>">
+							<label for="release">{{LANG release}}</label>
+						</div>
+						
+						<div class="form-group">
+							<select class="form-control" id="country" name="country">
+								<?php foreach ($countries_name as $key => $value) { $selected = (!empty($_GET['country']) && $_GET['country'] == $key) ? 'selected' : '';  ?>
+									<option value="<?php echo $key; ?>" <?php echo $selected?>><?php echo $value; ?></option>
+								<?php  } ?>
+							</select>
+							<label for="country">{{LANG country}}</label>
+						</div>
+						
+						<div class="form-group mb-0">
+							<select class="form-control" id="category_" name="category_">
+								<option value="all" <?php echo !empty($_GET['category_']) && $_GET['category_'] == 'all' ? 'selected' : '' ?>>{{LANG all}}</option>
+								<?php foreach ($pt->movies_categories as $key => $category) { $selected = (!empty($_GET['category_']) && $_GET['category_'] == $key) ? 'selected' : '';  ?>
+									<option value="<?php echo $key; ?>" <?php echo $selected?>><?php echo $category; ?></option>
+								<?php  } ?>
+							</select>
+							<label for="category_">{{LANG category}}</label>
+						</div>
+					</div>
+					
+					<div class="p-3">
+						<button id="submit" class="btn btn-main btn-block">{{LANG search}}</button>
+					</div>
+					<input type="hidden" name="page_id" value="1" id="page_id">
+					<input type="hidden" name="last_page" value="" id="last_page">
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<?php if (count($pt->videos) == 0) { ?>
+		<div class="empty_state">
+			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path opacity="0.32" d="M1.25 6.25V14.75C1.25 17.5503 1.25 18.9504 1.79497 20.02C2.27433 20.9608 3.03924 21.7257 3.98005 22.205C5.04961 22.75 6.44974 22.75 9.25 22.75H14.75C17.5503 22.75 18.9504 22.75 20.02 22.205C20.9608 21.7257 21.7257 20.9608 22.205 20.02C22.75 18.9504 22.75 17.5503 22.75 14.75V6.25H1.25Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M10.4863 1.25011H6.54545C3.62086 1.25011 1.25 3.62097 1.25 6.54557C1.25 7.21082 1.78929 7.75011 2.45455 7.75011H8H13.5H19H21.5455C22.2107 7.75011 22.75 7.21082 22.75 6.54557C22.75 3.62097 20.3791 1.25011 17.4545 1.25011H10.5123C10.5036 1.24996 10.495 1.24996 10.4863 1.25011ZM10.0754 2.75011L12.1754 6.25011H8.4413L6.49703 2.75042C6.51314 2.75021 6.52929 2.75011 6.54545 2.75011H10.0754ZM4.97047 3.09131C3.74529 3.65083 2.86967 4.84302 2.76133 6.25011H6.72536L4.97047 3.09131ZM13.9246 6.25011L11.8246 2.75011H15.5927C15.6092 2.79657 15.6305 2.84208 15.6569 2.88599L17.6754 6.25011H13.9246ZM19.4246 6.25011H21.2387C21.0879 4.29202 19.4513 2.75011 17.4545 2.75011H17.3246L19.4246 6.25011ZM5.75 17.0001C5.75 16.3098 6.30964 15.7501 7 15.7501C7.69036 15.7501 8.25 16.3098 8.25 17.0001C8.25 17.6905 7.69036 18.2501 7 18.2501C6.30964 18.2501 5.75 17.6905 5.75 17.0001Z" fill="currentColor"/></svg> {{LANG no_movies_found}}
+		</div>
+	<?php } else { ?>
+		<div class="row tag_video_grid pt_movie_list">
+			{{VIDEOS}}
+		</div>
+	<?php } ?>
+	
+	<?php if ($pt->total_pages > 1) { ?>
+		<!--<div class="showing_pages">
+			<?php echo "Showing $pt->page_number out of " . $pt->total_pages; ?>
+		</div>-->
+
+		<nav class="d-flex align-items-center justify-content-center mb-5 showing_nav">
+			<a href="javascript:void(0)" class="btn position-relative p-0" title='First Page' onclick="GoToPage(1)">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg>
+			</a>
+			
+			<ul class="m-0 position-relative main pagination">
+				<?php if ($pt->page_number > 1) {  ?>
+					<li>
+						<a href="javascript:void(0)" onclick="GoToPage(<?php echo($pt->page_number - 1) ?>)" class="d-inline-flex align-items-center justify-content-center" title='Previous Page'>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" /></svg>
+						</a>
+					</li>
+				<?php } ?>
+				<?php 
+				$nums = 0;
+				$nums_pages = ($pt->page_number > 3) ? ($pt->page_number - 3) : $pt->page_number;
+				for ($i=$nums_pages; $i <= $pt->total_pages; $i++) { 
+					if ($nums < 4) {
+					?>
+					<li class="<?php echo ($pt->page_number == $i) ? 'active' : ''; ?>">
+						<a href="javascript:void(0)" onclick="GoToPage(<?php echo($i); ?>)" class="d-inline-flex align-items-center justify-content-center"><?php echo $i ?></a>
+					</li>
+				<?php } $nums++; } ?>
+				<?php if ($pt->total_pages > $pt->page_number) { ?>
+					<li>
+						<a href="javascript:void(0)" onclick="GoToPage(<?php echo ($pt->page_number + 1); ?>)" class="d-inline-flex align-items-center justify-content-center" title="Next Page">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" /></svg>
+						</a>
+					</li>
+				<?php } ?>
+			</ul>
+			<a href="javascript:void(0)" onclick="GoToPage(<?php echo($pt->total_pages) ?>,1)" class="btn position-relative p-0" title='Last Page'>
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" /></svg>
+			</a>
+		</nav>
+	<?php } ?>
+</div>
+
+<script type="text/javascript">
+function GoToPage(page_id,last_page = '') {
+	$('#page_id').val(page_id);
+	$('#last_page').val(last_page);
+	$('#submit').click();
+}
+</script>

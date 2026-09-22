@@ -1,0 +1,858 @@
+<div class="pt-4 pb-5 container">
+	<h2 class="mt-0 mb-3 display-4"><?php if ($pt->is_short) { ?>{{LANG upload}} {{LANG shorts}}<?php } else { ?>{{LANG upload_new_video}}<?php } ?></h2>
+	
+	<div class="mb-5 d-flex align-items-center justify-content-between tag_vid_page_nav">
+		<div class="d-flex align-items-center py-1 tag_vid_page_sub_nav">
+			<a href="{{LINK }}" data-load="?link1=home" class="btn back px-0 d-none d-md-inline-flex">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.57 5.92993L3.5 11.9999L9.57 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5 12H3.67004" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG home}}
+			</a>
+			
+			<?php if (($pt->config->who_upload == 'admin' && PT_IsAdmin()) || $pt->config->who_upload == 'all') { ?>
+				<?php if ($pt->config->upload_system == 'on' && !$pt->user->suspend_upload) { ?> 
+					<a href="{{LINK upload-video}}" data-load="?link1=upload-video" class="btn <?php if ($pt->is_short) { ?>content<?php } else { ?>btn-main<?php } ?>">{{LANG upload}}</a>
+				<?php } ?>
+			<?php } ?>
+			
+			<?php if ($pt->config->import_system == 'on' && !$pt->user->suspend_import) { ?> 
+				<a href="{{LINK import-video}}" data-load="?link1=import-video" class="btn content">{{LANG import}}</a>
+			<?php } ?>
+			
+			<?php if ($pt->config->live_video == 1 && ($pt->config->who_use_live == 'all' || ($pt->config->who_use_live == 'admin' && PT_IsAdmin()) || ($pt->config->who_use_live == 'pro' && $pt->user->is_pro > 0))) { ?>
+				<a href="{{LINK live}}" data-load="?link1=live" class="btn content">{{LANG live}}</a>
+			<?php } ?>
+			
+			<?php if ( $pt->config->shorts_system == 'on' && !$pt->user->suspend_upload) { ?> 
+				<a href="{{LINK upload-video}}?type=shorts" data-load="?link1=upload-video&type=shorts" class="btn <?php if ($pt->is_short) { ?>btn-main<?php } else { ?>content<?php } ?>">{{LANG shorts}}</a>
+			<?php } ?>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col-lg-3 d-none d-lg-block">
+			<div class="pt_upload_vdo_step step-one-active">
+				<div class="d-flex align-items-center gap-15 justify-content-between one mb-4">
+					<p class="d-inline-flex align-items-center gap-10 m-0">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9 9.51001L12 6.51001L15 9.51001" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 6.51001V14.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6 16.51C9.89 17.81 14.11 17.81 18 16.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>{{LANG upload}}
+					</p>
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-0 main"> <path opacity="0.4" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="currentColor"/> <path d="M10.5795 15.5801C10.3795 15.5801 10.1895 15.5001 10.0495 15.3601L7.21945 12.5301C6.92945 12.2401 6.92945 11.7601 7.21945 11.4701C7.50945 11.1801 7.98945 11.1801 8.27945 11.4701L10.5795 13.7701L15.7195 8.6301C16.0095 8.3401 16.4895 8.3401 16.7795 8.6301C17.0695 8.9201 17.0695 9.4001 16.7795 9.6901L11.1095 15.3601C10.9695 15.5001 10.7795 15.5801 10.5795 15.5801Z" fill="currentColor"/> </svg>
+				</div>
+				<div class="d-flex align-items-center gap-15 justify-content-between two mb-4">
+					<p class="d-inline-flex align-items-center gap-10 m-0">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z" stroke="currentColor" stroke-width="1.5"/><path d="M12.2422 17V12C12.2422 11.5286 12.2422 11.2929 12.0957 11.1464C11.9493 11 11.7136 11 11.2422 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.992 8H12.001" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>{{LANG upload_details}}
+					</p>
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-0 main"> <path opacity="0.4" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="currentColor"/> <path d="M10.5795 15.5801C10.3795 15.5801 10.1895 15.5001 10.0495 15.3601L7.21945 12.5301C6.92945 12.2401 6.92945 11.7601 7.21945 11.4701C7.50945 11.1801 7.98945 11.1801 8.27945 11.4701L10.5795 13.7701L15.7195 8.6301C16.0095 8.3401 16.4895 8.3401 16.7795 8.6301C17.0695 8.9201 17.0695 9.4001 16.7795 9.6901L11.1095 15.3601C10.9695 15.5001 10.7795 15.5801 10.5795 15.5801Z" fill="currentColor"/> </svg>
+				</div>
+				<div class="d-flex align-items-center gap-15 justify-content-between three mb-4">
+					<p class="d-inline-flex align-items-center gap-10 m-0">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 8L13 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2 11C2 7.70017 2 6.05025 3.02513 5.02513C4.05025 4 5.70017 4 9 4H10C13.2998 4 14.9497 4 15.9749 5.02513C17 6.05025 17 7.70017 17 11V13C17 16.2998 17 17.9497 15.9749 18.9749C14.9497 20 13.2998 20 10 20H9C5.70017 20 4.05025 20 3.02513 18.9749C2 17.9497 2 16.2998 2 13V11Z" stroke="currentColor" stroke-width="1.5"/><path d="M17 8.90585L17.1259 8.80196C19.2417 7.05623 20.2996 6.18336 21.1498 6.60482C22 7.02628 22 8.42355 22 11.2181V12.7819C22 15.5765 22 16.9737 21.1498 17.3952C20.2996 17.8166 19.2417 16.9438 17.1259 15.198L17 15.0941" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>{{LANG upload_elements}}
+					</p>
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-0 main"> <path opacity="0.4" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="currentColor"/> <path d="M10.5795 15.5801C10.3795 15.5801 10.1895 15.5001 10.0495 15.3601L7.21945 12.5301C6.92945 12.2401 6.92945 11.7601 7.21945 11.4701C7.50945 11.1801 7.98945 11.1801 8.27945 11.4701L10.5795 13.7701L15.7195 8.6301C16.0095 8.3401 16.4895 8.3401 16.7795 8.6301C17.0695 8.9201 17.0695 9.4001 16.7795 9.6901L11.1095 15.3601C10.9695 15.5001 10.7795 15.5801 10.5795 15.5801Z" fill="currentColor"/> </svg>
+				</div>
+				<div class="d-flex align-items-center gap-15 justify-content-between four mb-4">
+					<p class="d-inline-flex align-items-center gap-10 m-0">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z" stroke="currentColor" stroke-width="1.5"/><path d="M20 5.69899C19.0653 5.76636 17.8681 6.12824 17.0379 7.20277C15.5385 9.14361 14.039 9.30556 13.0394 8.65861C11.5399 7.6882 12.8 6.11636 11.0401 5.26215C9.89313 4.70542 9.73321 3.19045 10.3716 2" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 11C2.7625 11.6621 3.83046 12.2682 5.08874 12.2682C7.68843 12.2682 8.20837 12.7649 8.20837 14.7518C8.20837 16.7387 8.20837 16.7387 8.72831 18.2288C9.06651 19.1981 9.18472 20.1674 8.5106 21" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M22 13.4523C21.1129 12.9411 20 12.7308 18.8734 13.5405C16.7177 15.0898 15.2314 13.806 14.5619 15.0889C13.5765 16.9775 17.0957 17.5711 14 22" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>{{LANG upload_visibility}}
+					</p>
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-0 main"> <path opacity="0.4" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="currentColor"/> <path d="M10.5795 15.5801C10.3795 15.5801 10.1895 15.5001 10.0495 15.3601L7.21945 12.5301C6.92945 12.2401 6.92945 11.7601 7.21945 11.4701C7.50945 11.1801 7.98945 11.1801 8.27945 11.4701L10.5795 13.7701L15.7195 8.6301C16.0095 8.3401 16.4895 8.3401 16.7795 8.6301C17.0695 8.9201 17.0695 9.4001 16.7795 9.6901L11.1095 15.3601C10.9695 15.5001 10.7795 15.5801 10.5795 15.5801Z" fill="currentColor"/> </svg>
+				</div>
+			</div>
+		</div>
+		
+		<div class="col-lg-9">
+			<div class="content p-4 pt_upvid_one">
+				<p class="text-muted mb-1">01 / 04</p>
+				<h4 class="title mb-4">{{LANG upload}}</h4>
+				
+				<div class="d-flex align-items-center justify-content-center w-100 flex-column text-center py-5 px-3 position-relative upload tag_vid_upload" type="button" data-block="video-drop-zone">
+					<svg width="70" height="70" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="position-relative"><path d="M18.5 17.1463L18.563 17.1009C19.6208 16.3371 20.1498 15.9552 20.5749 16.1396C21 16.324 21 16.9353 21 18.1579V18.8421C21 20.0647 21 20.676 20.5749 20.8604C20.1498 21.0448 19.6208 20.6629 18.563 19.8991L18.5 19.8537M14.5 22H15C16.6499 22 17.4749 22 17.9874 21.5515C18.5 21.103 18.5 20.3812 18.5 18.9375V18.0625C18.5 16.6188 18.5 15.897 17.9874 15.4485C17.4749 15 16.6499 15 15 15H14.5C12.8501 15 12.0251 15 11.5126 15.4485C11 15.897 11 16.6188 11 18.0625V18.9375C11 20.3812 11 21.103 11.5126 21.5515C12.0251 22 12.8501 22 14.5 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M20 12.0142V7.82643C20 6.13079 20 5.28297 19.732 4.60583C19.3012 3.51725 18.3902 2.65858 17.2352 2.25256C16.5168 2 15.6173 2 13.8182 2C10.6698 2 9.09563 2 7.83836 2.44198C5.81714 3.15252 4.22281 4.65518 3.46894 6.56021C3 7.7452 3 9.22888 3 12.1963V14.7453C3 17.819 3 19.3559 3.8477 20.4232C4.09058 20.729 4.37862 21.0005 4.70307 21.2294C5.46329 21.7658 6.44806 21.9421 8 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 12C3 10.1591 4.49238 8.66667 6.33333 8.66667C6.99912 8.66667 7.78404 8.78333 8.43137 8.60988C9.00652 8.45576 9.45576 8.00652 9.60988 7.43136C9.78333 6.78404 9.66667 5.99912 9.66667 5.33333C9.66667 3.49238 11.1591 2 13 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					<h4 class="mt-5 mb-2 position-relative">{{LANG darg_drop_to_upload}}</h4>
+					<p class="mb-5 position-relative">{{LANG videos_will_private}}</p>
+					<button class="btn btn-main btn_upld_vid_next">{{LANG select_media}}</button>
+				</div>
+				
+				<div class="progress_process d-none">
+					<div class="progress mb-4">
+						<div class="upload-progress-bar progress-bar bg-success" role="progressbar"></div>
+					</div>
+					<div class="text-center pt_prcs_vdo"></div>
+				</div>
+			
+				<?php if ($pt->user->admin == 1) { ?>
+					<div class="alert alert-info upload_msg mb-0 mt-4">
+						<h5>Just admins can see this message</h5>
+						<div>Note: Your server max upload size is: <?php echo ini_get('upload_max_filesize')?>, means you can't upload files that are larger than: <?php echo ini_get('upload_max_filesize')?></div>
+						<div class="mt-1">If you want to increase the limit or If you can't upload large files, go to Admin Settings > Settings > Site Settings > Max upload size and increase the value, if you still can't upload large files, please contact your host provider and let them increase the upload limit and max_execution_time.</div>
+					</div>
+				<?php } ?>
+				<?php if ($pt->is_short) { ?>
+					<div class="alert alert-warning mb-0 mt-4">
+					   <?php echo(str_replace('{X}', $pt->config->shorts_duration, $pt->all_lang->shorts_maximum_duration_allow)); ?>
+					</div>
+				<?php } ?>
+			</div>
+
+			<div id="upload-video" style="visibility: hidden;">
+				<input type="file" name="video" accept="video/*" class="d-none upload-video-file" id="pick-files">
+			</div>
+
+			<div id="upload-form">
+				<form action="" class="" method="POST">
+					<!-- Second Step -->
+					<div class="content p-4 pt_upvid_two" style="display: none;">
+						<p class="text-muted mb-1">02 / 04</p>
+						<h4 class="title mb-4">{{LANG upload_details}}</h4>
+				
+						<p class="pt_vdo_upld_dn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mt-n1"><path d="M12 2C6.49 2 2 6.49 2 12C2 17.51 6.49 22 12 22C17.51 22 22 17.51 22 12C22 6.49 17.51 2 12 2ZM16.78 9.7L11.11 15.37C10.97 15.51 10.78 15.59 10.58 15.59C10.38 15.59 10.19 15.51 10.05 15.37L7.22 12.54C6.93 12.25 6.93 11.77 7.22 11.48C7.51 11.19 7.99 11.19 8.28 11.48L10.58 13.78L15.72 8.64C16.01 8.35 16.49 8.35 16.78 8.64C17.07 8.93 17.07 9.4 16.78 9.7Z" fill="currentColor"></path></svg> {{LANG no_video_issue}}</p>
+						
+						<div class="form-group">
+							<input id="title" name="title" type="text" class="form-control" placeholder="{{LANG video_title}}" required>
+							<label for="title">{{LANG video_title}}</label>
+							<small class="form-text text-muted">{{LANG video_title_help}}</small>
+						</div>
+						
+						<div class="form-group">
+							<textarea name="description" id="description" rows="5" class="form-control description" placeholder=" " required></textarea>
+							<label for="description">{{LANG video_descritpion}}</label>
+						</div>
+						
+						<h6 class="mb-1">{{LANG thumbnail}}</h6>
+						<p>{{LANG upload_video_thumb_desc}}</p>
+						<div class="d-flex gap-10 align-items-center mb-4 pt_uv_thumbs_innr <?php if ($pt->is_short) { ?>short_thumb<?php } ?>">
+							<div class="flex-0 upload-image-content d-flex align-items-center justify-content-center flex-column text-center p-3 position-relative tag_vid_upload" type="button" onclick="document.getElementById('thumbnail').click(); return false">
+								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-3"><path d="M17 4.5C17.4915 3.9943 18.7998 2 19.5 2M22 4.5C21.5085 3.9943 20.2002 2 19.5 2M19.5 2V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.9999 13C20.998 17.147 20.9472 19.2703 19.6088 20.6088C18.2175 22 15.9783 22 11.5 22C7.02166 22 4.78249 22 3.39124 20.6088C2 19.2175 2 16.9783 2 12.5C2 8.02166 2 5.78249 3.39124 4.39124C4.78249 3 7.02166 3 11.5 3C11.6699 3 14 3.00008 14 3.00008" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2 14.1354C2.61902 14.0455 3.24484 14.0011 3.87171 14.0027C6.52365 13.9466 9.11064 14.7729 11.1711 16.3342C13.082 17.7821 14.4247 19.7749 15 22" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M21 16.8962C19.8246 16.3009 18.6088 15.9988 17.3862 16.0001C15.5345 15.9928 13.7015 16.6733 12 18" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>{{LANG upload}} {{LANG thumbnail}}
+							</div>
+
+							<div class="d-flex gap-10 flex-wrap align-items-center" id="vidimage-holder"></div>
+						</div>
+						<input id="thumbnail" name="thumbnail" type="file" class="d-none" accept="image/*">
+
+						<div class="pt-2">
+							<button type="button" class="btn btn-main btn-lg btn_upld_vid_next next_step_button">{{LANG next_step}}</button>
+						</div>
+					</div>
+					
+					<!-- Third Step -->
+					<div class="content p-4 pt_upvid_three" style="display: none;">
+						<p class="text-muted mb-1">03 / 04</p>
+						<h4 class="title mb-4">{{LANG upload_elements}}</h4>
+						
+						<?php if (PT_IsAdmin() && $pt->config->movies_videos == 'on' && !$pt->is_short) { ?>
+							<p class="mb-n2">{{LANG what_you_uploading}}</p>
+							<div class="row cus_cont">
+								<div class="col-md-6">
+									<div class="custom-control custom-radio border rounded-lg mt-4">
+										<input type="radio" name="is_movie" id="is_movie-0" class="custom-control-input" value="0" onchange="ShowForm(this)">
+										<label class="custom-control-label d-block p-3" for="is_movie-0">
+											<b>{{LANG video}}</b>
+											<p class="mb-0">{{LANG upload_normal_video_text}}</p>
+										</label>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="custom-control custom-radio border rounded-lg mt-4">
+										<input type="radio" name="is_movie" id="is_movie-1" class="custom-control-input" value="1" onchange="ShowForm(this)">
+										<label class="custom-control-label d-block p-3" for="is_movie-1">
+											<b>{{LANG movie}}</b>
+											<p class="mb-0">{{LANG upload_normal_movie_text}}</p>
+										</label>
+									</div>
+								</div>
+							</div>
+						<?php } else { ?>
+							<p class="mb-n2">{{LANG what_you_uploading}}</p>
+							<div class="row cus_cont">
+								<div class="col-md-6">
+									<div class="custom-control custom-radio border rounded-lg mt-4">
+										<input type="radio" name="is_movie" id="is_movie-0" class="custom-control-input" value="0" onchange="ShowForm(this)">
+										<label class="custom-control-label d-block p-3" for="is_movie-0">
+											<b>{{LANG video}}</b>
+											<p class="mb-0">{{LANG upload_normal_stock_video_text}}</p>
+										</label>
+									</div>
+								</div>
+							</div>
+						<?php } ?>
+						
+						<div class="mt-4">
+							<div class="movie_fields" style="display: none;">
+								<?php if (PT_IsAdmin() && $pt->config->movies_videos == 'on' && !$pt->is_short) { ?>
+									<div class="row">
+										<?php if (PT_IsAdmin() && $pt->config->movies_videos == 'on') { ?>
+											<?php if ($pt->config->trailer_system == 'on') { ?>
+												<div class="col-lg-12">
+													<div type="button" class="d-flex align-items-center mb-4 tag_point_earn" onclick="$('#trailer').trigger('click');">
+														<div class="d-inline-flex align-items-center justify-content-center position-relative main icon">
+															<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z"></path></svg>
+														</div>
+														<div>
+															<div class="h6 mb-0">{{LANG upload_trailer}}</div>
+															<small class="form-text text-muted">{{LANG upload_video_trailer_desc}}</small>
+															<div><small class="mt-1 form-text text-muted d-none text-truncate" id="movie_trailer"></small></div>
+														</div>
+													</div>
+													
+													<input type="file" class="trailer d-none" id="trailer" name="trailer" accept="video/*">
+												</div>
+											<?php } ?>
+										<?php } ?>
+										
+										<div class="col-lg-6">
+											<div class="form-group">
+												<select class="form-control" id="country" name="country">
+													<?php foreach ($countries_name as $key => $value) : ?>
+														<option value="<?php echo $key; ?>"><?php echo $value; ?></option>
+													<?php endforeach; ?>
+												</select>
+												<label>{{LANG country}}</label>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="form-group">
+												<select class="form-control" id="quality" name="quality">
+													<option value="" disabled>{{LANG quality}}</option>
+													<option value="CAMRip">CAMRip</option>
+													<option value="TS">TS</option>
+													<option value="VHSRip">VHSRip</option>
+													<option value="WP">WP</option>
+													<option value="SCR (VHSScr)">SCR (VHSScr)</option>
+													<option value="DVDScr">DVDScr</option>
+													<option value="TC">TC</option>
+													<option value="LDRip">LDRip</option>
+													<option value="TVRip">TVRip</option>
+													<option value="SATRip">SATRip</option>
+													<option value="DVBRip">DVBRip</option>
+													<option value="DTVRip">DTVRip</option>
+													<option value="DVD">DVD</option>
+													<option value="HDRip">HDRip</option>
+													<option value="WEB-DL">WEB-DL</option>
+													<option value="HD-TV">HD-TV</option>
+													<option value="HD DVD">HD DVD</option>
+												</select>
+												<label>{{LANG quality}}</label>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="form-group">
+												<input id="stars" name="stars" type="text" class="form-control" placeholder="{{LANG stars}} {{LANG by_comma}}">
+												<label for="stars">{{LANG stars}}</label>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="form-group">
+												<input id="producer" name="producer" type="text" class="form-control" placeholder="{{LANG producer}}">
+												<label for="producer">{{LANG producer}}</label>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="form-group">
+												<input id="release" name="release" type="number" class="form-control" placeholder="{{LANG release}}" min="1910" max="<?php echo date('Y') ?>">
+												<label for="release">{{LANG release}}</label>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="form-group">
+												<input type="number" id="rating" name="rating" min="1" max="10" step="0.1" class="form-control" placeholder=" ">
+												<label for="rating">{{LANG rating}} {{LANG rating_btween}}</label>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<?php if ($pt->config->sell_videos_system == 'on') { ?>
+												<div class="form-group">
+													<input id="buy_price" name="buy_price" type="text" class="form-control" placeholder=" ">
+													<label for="buy_price">{{LANG set_p_v}}</label>
+													<small class="form-text text-muted"><?php if($pt->config->admin_com_sell_videos > 0 && $pt->config->com_type != 1){ ?>{{LANG p_m_than_}} <?php echo($pt->config->admin_com_sell_videos) ?><?php }?></small>
+												</div>
+											<?php } ?>
+										</div>
+										<div class="col-lg-6">
+											<?php if ($pt->config->rent_videos_system == 'on') { ?>
+												<div class="form-group">
+													<input id="mySingleFieldTags_movie" name="movie_rent_price" type="text" class="form-control" placeholder="{{LANG rent_price}}">
+													<label for="movie_rent_price">{{LANG rent_price}}</label>
+													<small class="form-text text-muted"><?php if($pt->config->admin_com_rent_videos > 0){ ?>{{LANG p_m_than_}} {{CURRENCY}}<?php echo($pt->config->com_type == 0 ? $pt->config->admin_com_rent_videos : 0) ?> <?php }?></small>
+												</div>
+											<?php } ?>
+										</div>
+									</div>
+								<?php } ?>
+							</div>
+
+							<?php if (!$pt->is_short) { ?>
+								<div class="video_fields" style="display: none;">
+									<?php if ($pt->config->geo_blocking == 'on') { ?>
+										<div class="form-group" id="geo_blocking">
+											<select class="form-control selectpicker" multiple name="continents-list[]" data-live-search="true" title="{{LANG geo_blocking}}" data-actions-box="true">
+												<?php foreach ($pt->continents as $key => $name): ?>
+													<option value="<?php echo($name); ?>"><?php echo($name); ?></option>
+												<?php endforeach; ?>
+											</select>
+										</div>
+									<?php } ?>
+									
+									<?php if (($pt->config->sell_videos_system == 'on' && $pt->config->who_sell == 'pro_users' && ($pt->user->is_pro || $pt->user->admin)) || ($pt->config->sell_videos_system == 'on' && $pt->config->who_sell == 'users') ) { ?>
+										<div class="form-group">
+											<input name="set_p_v" type="text" class="form-control" placeholder=" ">
+											<label for="set_p_v">{{LANG set_p_v}}</label>
+											<small class="form-text text-muted"><?php if($pt->config->admin_com_sell_videos > 0 && $pt->config->com_type != 1){ ?>{{LANG p_m_than_}} <?php echo($pt->config->admin_com_sell_videos) ?><?php }?></small>
+										</div>
+									<?php } ?>
+									
+									<?php if ($pt->config->rent_videos_system == 'on') { ?>
+										<div class="form-group">
+											<input name="rent_price" type="text" class="form-control" placeholder=" ">
+											<label for="rent_price">{{LANG rent_price}}</label>
+											<small class="form-text text-muted"><?php if($pt->config->admin_com_rent_videos > 0){ ?>{{LANG p_m_than_}} {{CURRENCY}}<?php echo($pt->config->com_type == 0 ? $pt->config->admin_com_rent_videos : 0) ?> <?php }?></small>
+										</div>
+									<?php } ?>
+								</div>
+							<?php } ?>
+						
+							<div class="vid_extra_opts" style="display: none;">
+								<?php if (!$pt->is_short) { ?>
+									<?php if ($pt->config->restrict_embedding_system == 'on') { ?>
+										<div class="mb-4">
+											<label class="bold">{{LANG restrict_embedding}}</label>
+											<div class="custom-control custom-radio mb-1">
+												<input type="radio" id="embeddingno" name="embedding" value="no" class="custom-control-input">
+												<label class="custom-control-label" for="embeddingno">{{LANG no}}</label>
+											</div>
+											<div class="custom-control custom-radio">
+												<input type="radio" id="embeddingyes" name="embedding" value="yes" class="custom-control-input">
+												<label class="custom-control-label" for="embeddingyes">{{LANG yes}}</label>
+											</div>
+										</div>
+									<?php } ?>
+									
+									<?php if ((($pt->config->usr_v_mon == 'on' && $pt->config->user_mon_approve == 'off') || ($pt->config->usr_v_mon == 'on' && $pt->config->user_mon_approve == 'on' && $pt->user->monetization == '1')) && $pt->user->video_mon == '1') { ?>
+										<div class="mb-4">
+											<label class="bold">{{LANG monetization}}</label>
+											<div class="custom-control custom-radio mb-1">
+												<input type="radio" id="monetization1" class="custom-control-input" name="monetization" value="1" checked>
+												<label class="custom-control-label" for="monetization1">{{LANG enable}}</label>
+											</div>
+											<div class="custom-control custom-radio">
+												<input type="radio" id="monetization0" class="custom-control-input" name="monetization" value="0">
+												<label class="custom-control-label" for="monetization0">{{LANG disable}}</label>
+											</div>
+										</div>
+									<?php } ?>
+								<?php } ?>
+								
+								<div class="pt-2">
+									<button type="button" class="btn btn-main btn-lg btn_upld_vid_next next_step_button2">{{LANG next_step}}</button>&nbsp;&nbsp;
+									<button type="button" class="btn btn-link btn-lg main btn_upld_vid_next" onclick="$('.pt_upvid_two').slideDown();	$('.pt_upvid_three').slideUp();$('.pt_upload_vdo_step').removeClass('step-three-active');">{{LANG go_back}}</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Fourth Step -->
+					<div class="content p-4 pt_upvid_four" style="display: none;">
+						<p class="text-muted mb-1">04 / 04</p>
+						<h4 class="title mb-4">{{LANG upload_visibility}}</h4>
+						
+						<div class="movie_fields" style="display: none;">
+							<?php if (PT_IsAdmin() && $pt->config->movies_videos == 'on' && !$pt->is_short) { ?>
+								<div class="form-group">
+									<select class="form-control" name="category" id="category">
+										<option value="" disabled>{{LANG category}}</option>
+										<?php foreach ($pt->movies_categories as $cat_id => $category): ?>
+											<option value="<?php echo $cat_id;?>"><?php echo $category;?></option>
+										<?php endforeach;?>
+									</select>
+									<label for="category">{{LANG category}}</label>
+								</div>
+							<?php } ?>
+						</div>
+							
+						<div class="video_fields" style="display: none;">
+							<?php if (!$pt->is_short) { ?>
+								<div class="form-group">
+									<select class="form-control" name="category_id" id="category_id">
+										<?php foreach($pt->categories as $key => $category) {?>
+											<option value="<?php echo $key?>"><?php echo $category?></option>
+										<?php } ?>
+									</select>
+									<label for="category">{{LANG category}}</label>
+									<small class="form-text text-muted">{{LANG add_category_to_your_video}}</small>
+								</div>
+								
+								<div class="form-group" <?php if (empty($pt->sub_categories_array["'1'"])) { ?> style="display: none;"<?php } ?> id="sub_category_div">
+									<select class="form-control" name="sub_category_id" id="sub_category_id">
+										<option value="" disabled>{{LANG sub_category}}</option>
+										<?php echo $pt->sub_categories_array["'1'"]; ?>
+									</select>
+									<label>{{LANG sub_category}}</label>
+									<small class="form-text text-muted">{{LANG add_sub_category_to_your_video}}</small>
+								</div>
+							<?php } ?>
+							
+							<div class="form-group">
+								<input id="mySingleFieldTags" name="tags" type="text" class="form-control" placeholder=" ">
+								<label for="tags">{{LANG tags}}</label>
+								<small class="form-text text-muted">{{LANG add_tags_to_your_video}}</small>
+							</div>
+
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="mb-4">
+										<label class="bold">{{LANG privacy}}</label>
+										<div class="custom-control custom-radio mb-1">
+											<input type="radio" id="privacy0" class="custom-control-input" name="privacy" value="0" checked>
+											<label class="custom-control-label" for="privacy0">{{LANG public}}</label>
+										</div>
+										<div class="custom-control custom-radio mb-1">
+											<input type="radio" id="privacy1" class="custom-control-input" name="privacy" value="1">
+											<label class="custom-control-label" for="privacy1">{{LANG private}}</label>
+										</div>
+										<div class="custom-control custom-radio mb-1">
+											<input type="radio" id="privacy2" class="custom-control-input" name="privacy" value="2">
+											<label class="custom-control-label" for="privacy2">{{LANG unlisted}}</label>
+										</div>
+										<div class="custom-control custom-radio mb-1">
+											<input type="radio" id="privacy3" class="custom-control-input" name="privacy" value="3">
+											<label class="custom-control-label" for="privacy3">{{LANG scheduled}}</label>
+										</div>
+									</div>
+								</div>
+								<?php if (!$pt->is_short) { ?>
+									<div class="col-lg-6">
+										<div class="mb-4">
+											<label class="bold">{{LANG age_restriction}}</label>
+											<div class="custom-control custom-radio mb-1">
+												<input type="radio" id="age_restriction0" class="custom-control-input" name="age_restriction" value="1" checked>
+												<label class="custom-control-label" for="age_restriction0">{{LANG all_ages}}</label>
+											</div>
+											<div class="custom-control custom-radio">
+												<input type="radio" id="age_restriction1" class="custom-control-input" name="age_restriction" value="2">
+												<label class="custom-control-label" for="age_restriction1">{{LANG only_18}}</label>
+											</div>
+										</div>
+									</div>
+								<?php } ?>
+							</div>
+							
+							<div class="scheduled d-none">
+								<div class="row">
+									<div class="col-sm-7">
+										<div class="form-group">
+											<input id="date" name="date" type="text" class="form-control" placeholder=" ">
+											<label>{{LANG publication_date}} {{LANG utc_timezone}}</label>
+										</div>
+									</div>
+									<div class="col-sm-5">
+										<div class="form-group">
+											<select name="hour" id="hour" class="form-control">
+												<?php foreach ($pt->config->hours as $key => $value) { ?>
+													<option value="<?php echo($key) ?>"><?php echo $value; ?></option>
+												<?php } ?>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="pt-2">
+							<button type="submit" id="submit-btn" class="btn btn-main btn-lg btn_upld_vid_next" disabled>{{LANG publish}}</button>&nbsp;&nbsp;
+							<button type="button" class="btn btn-link btn-lg main btn_upld_vid_next" onclick="$('.pt_upvid_three').slideDown();	$('.pt_upvid_four').slideUp();$('.pt_upload_vdo_step').removeClass('step-four-active');">{{LANG go_back}}</button>
+						</div>
+					</div>
+					
+					<input type="hidden" name="video-location" id="video-location" value="">
+					<input type="hidden" name="uploaded_id" id="uploaded_id" value="">
+					<?php if ($pt->is_short) { ?>
+						<input type="hidden" name="is_short" value="yes">
+					<?php } ?>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+<?php if ($pt->config->trailer_system == 'on') { ?>
+var inputs = document.querySelectorAll('.movie-file-input')
+
+for (var i = 0, len = inputs.length; i < len; i++) {
+  customInput(inputs[i])
+}
+
+function customInput (el) {
+  const fileInput = el.querySelector('.movie-file-input [type="file"]')
+  const label = el.querySelector('[data-js-label]')
+
+  fileInput.onchange =
+  fileInput.onmouseout = function () {
+    if (!fileInput.value) return
+
+    var value = fileInput.value.replace(/^.*[\\\/]/, '')
+    label.innerText = value
+  }
+};
+
+	$("#trailer").change(function () {
+		var filename = $(this).val().replace(/C:\\fakepath\\/i, '');
+		$("#movie_trailer").text(filename).removeClass('d-none');
+	});
+<?php } ?>
+
+	$(document).on('change', '[name="privacy"]', function(event) {
+      event.preventDefault();
+      if ($(this).val() == 3) {
+         $('.scheduled').removeClass('d-none');
+      }
+      else{
+         $('.scheduled').addClass('d-none');
+      }
+   });
+   $(document).ready(function() {
+   $( "#date" ).datepicker({ dateFormat: 'yy-mm-dd', minDate: 'today',prevText: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" /></svg>',nextText: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" /></svg>'});
+   });
+
+function ShowForm(self) {
+	$(".vid_extra_opts").show();
+	if ($(self).val() == 1) {
+		$(".video_fields").hide();
+		$(".movie_fields").show();
+	}
+	else if($(self).val() == 0){
+		$(".video_fields").show();
+		$(".movie_fields").hide();
+	}
+}
+
+jQuery(document).ready(function($) {
+	$('.selectpicker').selectpicker({});
+});
+	
+<?php
+$js_array = json_encode($pt->sub_categories_array);
+echo "var sub_categories_array = ". $js_array . ";\n";
+?>
+$(document).on('change', '#category_id', function(event) {
+   event.preventDefault();
+   id = $(this).val();
+   if (typeof(sub_categories_array["'"+id+"'"]) == 'undefined') {
+   	$('#sub_category_div').hide();
+    $('#sub_category_id').html('');
+   }
+   else{
+   	$('#sub_category_div').show();
+    $('#sub_category_id').html(sub_categories_array["'"+id+"'"]);
+  }
+  $('.selectpicker').selectpicker('refresh');
+});
+
+
+$(document).ready(function() {
+	$(document).on('click', '.next_step_button', function(event) {
+   		event.preventDefault();
+   		if ($('#title').val() != '' && $('#description').val() != '' && $('#vidimage-holder').html().length != 0) {
+   			ShowForm($('input[name="is_movie"]'));
+			<?php if ($pt->is_short) { ?>
+   			$(".video_fields").show();
+		    $(".movie_fields").hide();
+   			$('.pt_upvid_two').slideUp();
+   			$('.pt_upvid_three').slideUp();
+			$('.pt_upvid_four').slideDown();
+			$('.pt_upload_vdo_step').addClass('step-four-active');
+			<?php }else{ ?>
+				$('.pt_upvid_two').slideUp();
+		   		$('.pt_upvid_three').slideDown();
+		   		$('.pt_upload_vdo_step').addClass('step-three-active');
+		   	<?php } ?>
+   		}
+   		else{
+   			if ($('#title').val() == '') {
+   				$('#title').addClass('border_class');
+   			}
+   			if ($('#description').val() == '') {
+   				$('.description').addClass('border_class');
+   			}
+   			if ($('#vidimage-holder').html().length == 0) {
+   				$('.upload-image-content').addClass('border_class');
+   			}
+   		}
+   	});
+   	$(document).on('click', '.next_step_button2', function(event) {
+   		event.preventDefault();
+   		if ($(".movie_fields").is(":visible")) {
+   			$(".movie_fields").find('.border_class').removeClass('border_class');
+   			if ($('#stars').val() != '' && $('#producer').val() != '' && $('#release').val() != '' && $('#rating').val() != '' && $('#rating').val() < 11 && $('#rating').val() > 0 && $('#country').val() != 0) {
+   				$('.pt_upvid_three').slideUp();
+   				$('.pt_upvid_four').slideDown();
+   				$('.pt_upload_vdo_step').addClass('step-four-active');
+   			}
+   			else{
+   				if ($('#stars').val() == '') {
+	   				$('#stars').addClass('border_class');
+	   			}
+   				if ($('#producer').val() == '') {
+	   				$('#producer').addClass('border_class');
+	   			}
+   				if ($('#release').val() == '') {
+	   				$('#release').addClass('border_class');
+	   			}
+   				if ($('#rating').val() == '' || $('#rating').val() < 1 || $('#rating').val() > 10) {
+	   				$('#rating').addClass('border_class');
+	   			}
+   				if ($('#country').val() == 0) {
+	   				$('#country').addClass('border_class');
+	   			}
+   			}
+   		}
+   		else{
+   			$('.pt_upvid_three').slideUp();
+			$('.pt_upvid_four').slideDown();
+			$('.pt_upload_vdo_step').addClass('step-four-active');
+   		}
+   	});
+	$("#thumbnail").on('change', function() {
+	//Get count of selected files
+	var product_countFiles = $(this)[0].files.length;
+	var product_imgPath = $(this)[0].value;
+	var extn = product_imgPath.substring(product_imgPath.lastIndexOf('.') + 1).toLowerCase();
+	var product_image_holder = $("#vidimage-holder");
+	product_image_holder.empty();
+	if (extn == "gif" || extn == "png" || extn == "jpg" || extn == "jpeg") {
+		if (typeof(FileReader) != "undefined") {
+		//loop for each file selected for uploaded.
+		for (var i = 0; i < product_countFiles; i++)
+		{
+			var product_reader = new FileReader();
+			product_reader.onload = function(e) {
+				$("<img />", {
+                    "src": e.target.result,
+                    "class": "thumb-image",
+                  }).appendTo(product_image_holder);
+                }
+                product_image_holder.show();
+                product_reader.readAsDataURL($(this)[0].files[i]);
+              }
+            } else {
+              product_image_holder.html("<p>This browser does not support FileReader.</p>");
+            }
+         }
+	});
+});
+
+function SelectThis(event) {
+	$('#image-renderer').html(this);
+}
+
+$(function () {
+	$("#mySingleFieldTags").tagit({
+		allowSpaces: true
+	});
+	var video_drop_block = $("[data-block='video-drop-zone']");
+   if (typeof(window.FileReader)){
+      video_drop_block[0].ondragover = function() {
+         video_drop_block.addClass('hover');
+         return false;
+      };
+
+      video_drop_block[0].ondragleave = function() {
+         video_drop_block.removeClass('hover');
+         return false;
+      };
+
+      video_drop_block[0].ondrop = function(event) {
+         event.preventDefault();
+         video_drop_block.removeClass('hover');
+         var file = event.dataTransfer.files;
+         $('#upload-video').find('input').prop('files', file);
+         $('#upload-video').find('input').trigger("change");;
+      };
+   }
+
+   var bar         = $('.progress-bar');
+   var percent     = $('.percent');
+   var prcsvdo    = $('.pt_prcs_vdo');
+   var is_uploaded = false;
+
+   var path = "plupload/js/`";
+   var uploader = new plupload.Uploader({
+       browse_button: 'pick-files',
+       container: document.getElementById('upload-video'),
+       drop_element: document.getElementById('upload-video'),
+       url: '{{LINK aj/upload-video}}?hash=' + $('.main_session').val(),
+       chunk_size: '<?php echo $pt->config->chunk_size; ?>',
+       max_retries: 2,
+       file_data_name: "video",
+       multi_selection: false,
+       unique_names: true,
+       <?php if ($pt->is_short) { ?>
+       multipart_params: {
+         is_short: 'yes',
+       },
+       <?php } ?>
+       filters: {
+       	<?php if ($pt->config->max_upload > 0) { ?>
+           max_file_size: "<?php echo pt_size_format($pt->config->max_upload); ?>",
+           <?php } ?>
+           mime_types : [
+             { title : "Video files", extensions : "mp4,mov,webm,mpeg" },
+           ],
+       },
+       init: {
+           Error: function (up, err) {
+               if (err.code == "-600") {
+                     swal({
+                        title: '{{LANG error}}',
+                        text:  "{{LANG file_is_too_big}} <?php echo pt_size_format($pt->config->max_upload); ?>",
+                        confirmButtonText: 'OK',
+						buttonsStyling:false,
+		  confirmButtonClass:'btn btn-main',
+		  cancelButtonClass:"btn btn-link",
+                     }).then(function(){
+                        swal.close();
+                        $('.upload-video-file').val('');
+                     },
+                     function() {
+                        swal.close();
+                        $('.upload-video-file').val('');
+                     });
+                     return false;
+               }
+           },
+           beforeUpload: function (up, file) {
+               $('.progress_process').removeClass('d-none');
+               var percentVal = '0%';
+               bar.width(percentVal);
+               $('.upload').addClass('d-none');
+               <?php if ($pt->user->admin == 1) { ?>$('.upload_msg').addClass('d-none');<?php } ?>
+           },
+           FilesAdded: function (up, files) {
+               uploader.start();
+           },
+           UploadProgress: function (up, file) {
+               percentComplete = file.percent;
+               var percentVal = percentComplete + '%';
+               bar.width(percentVal);
+
+               if (percentComplete == 100) {
+                  prcsvdo.html('<svg width="30" height="10" viewBox="0 0 120 30" class="mt-n1" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><circle cx="15" cy="15" r="15"><animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite" /><animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite" /></circle><circle cx="60" cy="15" r="9" fill-opacity="0.3"><animate attributeName="r" from="9" to="9" begin="0s" dur="0.8s" values="9;15;9" calcMode="linear" repeatCount="indefinite" /><animate attributeName="fill-opacity" from="0.5" to="0.5" begin="0s" dur="0.8s" values=".5;1;.5" calcMode="linear" repeatCount="indefinite" /></circle><circle cx="105" cy="15" r="15"><animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite" /><animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite" /></circle></svg> {{LANG porcessing_video}}');
+                  $('.progress').find('.progress-bar').removeClass('upload-progress-bar');
+               }
+           },
+           FileUploaded: function(up, file, result){ 
+               console.log(result);
+               var filename = $('.upload').val().split('\\').pop();
+               $('#title').val(filename);
+               <?php if (PT_IsAdmin()) { ?>
+               $('#movie_title').val(filename);
+               <?php } ?>
+               $('#upload-form').removeClass('d-none');
+               $('.upload').addClass('d-none');
+               $('#upload-video').submit();
+               data = JSON.parse(result.response);
+               percentVal = '0%';
+   	    	bar.width(percentVal);
+            $('.progress_process').addClass('d-none');
+            if (data.status == 200) {
+            	$('.upload').addClass('d-none');
+            	$(".pt_upvid_one").slideUp();
+			    $(".pt_upvid_two").slideDown();
+			    $('.pt_upload_vdo_step').addClass('step-two-active');
+            	$('#video-location').val(data.file_path);
+            	$('#uploaded_id').val(data.uploaded_id);
+				Snackbar.show({showAction: false, pos: 'bottom-center', text: data.file_name + ' {{LANG successfully_uplaoded}}'});
+            	$('#submit-btn').attr('disabled', false);
+            	$('.upload-video-file').val('');
+                $('#title').val(data.file_name);
+                <?php if (PT_IsAdmin()) { ?>
+		         $('#movie_title').val(data.file_name);
+		         <?php } ?>
+            }
+            else if(data.status == 401){
+               swal({
+                  title: '{{LANG oops}}!',
+                  text: "{{LANG upload_limit_reached}}!",
+                  showCancelButton: true,
+                  confirmButtonText: '{{LANG upgrade_now}}',
+                  cancelButtonText: '{{LANG cancel}}',
+                  buttonsStyling: false,
+				confirmButtonClass:'btn btn-main',
+				cancelButtonClass:"btn btn-link",
+               }).then(function(){
+                  //Go pro
+                  window.location.href = '{{LINK go_pro}}';
+               },
+               function() {
+                  window.location.href = '{{LINK }}';
+               });
+            }
+            else if(data.status == 402){
+               swal({
+                  title: '{{LANG error}}',
+                  text: data.message,
+                  confirmButtonText: 'OK',
+				  buttonsStyling:false,
+		  confirmButtonClass:'btn btn-main',
+		  cancelButtonClass:"btn btn-link",
+               }).then(function(){
+                  swal.close();
+                  $('.upload-video-file').val('');
+               },
+               function() {
+                  swal.close();
+                  $('.upload-video-file').val('');
+               });
+            }
+            else {
+				Snackbar.show({showAction: false,backgroundColor: '#e22e40',text: '<div>'+ data.error +'</div>'});
+            }
+       }
+   }
+   });
+   uploader.init();
+
+	$('#upload-form form').ajaxForm({
+	    url: '{{LINK aj/submit-video}}?hash=' + $('.main_session').val(),
+	    beforeSend: function() {
+	    	$('#submit-btn').attr('disabled', true);
+	    	$('#submit-btn').val("{{LANG please_wait}}");
+	    },
+	    success: function(data) {
+	    	if (data.status == 200) {
+	    		window.location.href = data.link;
+	    	}
+         else if(data.status == 402){
+            swal({
+               title: '{{LANG error}}',
+               text: data.message,
+               confirmButtonText: 'OK',
+			   buttonsStyling:false,
+		  confirmButtonClass:'btn btn-main',
+		  cancelButtonClass:"btn btn-link",
+            }).then(function(){
+               window.location.href = '{{LINK upload-video}}';
+            },
+            function() {
+               window.location.href = '{{LINK }}';
+            });
+         }
+         else {
+	    		$('#submit-btn').attr('disabled', false);
+	    	    $('#submit-btn').val('{{LANG publish}}');
+				Snackbar.show({text: '<div>'+ data.message +'</div>'});
+	    	}
+	    }
+	});
+
+	$('.upload-video-file').on('change', function() {
+   	$('#upload-video').submit();
+	});
+});
+
+function PT_OpenUploadForm() {
+	$('#upload-video').find('input').trigger('click');
+}
+
+jQuery(function($) {
+	$(document).ready(function() {
+		$( '.upload' ).on('click', function(e) {
+			$( '.upload-video-file' ).trigger("click");
+		});
+	});
+});
+</script>

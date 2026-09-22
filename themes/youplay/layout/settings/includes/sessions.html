@@ -1,0 +1,49 @@
+<div class="col-lg-6">
+	<div class="rounded-lg border p-4 mb-4" id="session_<?php echo $pt->session->id?>">
+		<div class="d-flex align-items-center mb-2">
+			<div class="flex-0">
+				<?php 
+				$icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#666" d="M15.07,11.25L14.17,12.17C13.45,12.89 13,13.5 13,15H11V14.5C11,13.39 11.45,12.39 12.17,11.67L13.41,10.41C13.78,10.05 14,9.55 14,9C14,7.89 13.1,7 12,7A2,2 0 0,0 10,9H8A4,4 0 0,1 12,5A4,4 0 0,1 16,9C16,9.88 15.64,10.67 15.07,11.25M13,19H11V17H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z"></path></svg>';
+				switch (strtolower($pt->session->platform)) {
+					case 'windows':
+						$icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21,15 L23,15 L23,18 C23,19.1045695 22.1045695,20 21,20 L3,20 C1.8954305,20 1,19.1045695 1,18 L1,15 L3,15 L3,6 C3,4.8954305 3.8954305,4 5,4 L19,4 C20.1045695,4 21,4.8954305 21,6 L21,15 Z M19,15 L19,6 L5,6 L5,15 L19,15 Z M3,17 L3,18 L21,18 L21,17 L3,17 Z"/></svg>';
+						break;
+					case 'linux':
+						$icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21,15 L23,15 L23,18 C23,19.1045695 22.1045695,20 21,20 L3,20 C1.8954305,20 1,19.1045695 1,18 L1,15 L3,15 L3,6 C3,4.8954305 3.8954305,4 5,4 L19,4 C20.1045695,4 21,4.8954305 21,6 L21,15 Z M19,15 L19,6 L5,6 L5,15 L19,15 Z M3,17 L3,18 L21,18 L21,17 L3,17 Z"/></svg>';
+						break;
+					case 'mac':
+						$icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21,15 L23,15 L23,18 C23,19.1045695 22.1045695,20 21,20 L3,20 C1.8954305,20 1,19.1045695 1,18 L1,15 L3,15 L3,6 C3,4.8954305 3.8954305,4 5,4 L19,4 C20.1045695,4 21,4.8954305 21,6 L21,15 Z M19,15 L19,6 L5,6 L5,15 L19,15 Z M3,17 L3,18 L21,18 L21,17 L3,17 Z"/></svg>';
+						break;
+					case 'iphone web':
+						$icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7,1 L17,1 C18.1045695,1 19,1.8954305 19,3 L19,21 C19,22.1045695 18.1045695,23 17,23 L7,23 C5.8954305,23 5,22.1045695 5,21 L5,3 C5,1.8954305 5.8954305,1 7,1 Z M10,3 L7,3 L7,21 L17,21 L17,3 L14,3 C14,3.55228475 13.5522847,4 13,4 L11,4 C10.4477153,4 10,3.55228475 10,3 Z"/></svg>';
+						break;
+					case 'android web':
+						$icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7,1 L17,1 C18.1045695,1 19,1.8954305 19,3 L19,21 C19,22.1045695 18.1045695,23 17,23 L7,23 C5.8954305,23 5,22.1045695 5,21 L5,3 C5,1.8954305 5.8954305,1 7,1 Z M10,3 L7,3 L7,21 L17,21 L17,3 L14,3 C14,3.55228475 13.5522847,4 13,4 L11,4 C10.4477153,4 10,3.55228475 10,3 Z"/></svg>';
+						break;
+					case 'mobile':
+						$icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7,2 L17,2 C18.1045695,2 19,2.8954305 19,4 L19,20 C19,21.1045695 18.1045695,22 17,22 L7,22 C5.8954305,22 5,21.1045695 5,20 L5,4 C5,2.8954305 5.8954305,2 7,2 Z M7,4 L7,20 L17,20 L17,4 L7,4 Z M12,19 C11.4477153,19 11,18.5522847 11,18 C11,17.4477153 11.4477153,17 12,17 C12.5522847,17 13,17.4477153 13,18 C13,18.5522847 12.5522847,19 12,19 Z"/></svg>';
+						break;
+					case 'phone':
+						$icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7,2 L17,2 C18.1045695,2 19,2.8954305 19,4 L19,20 C19,21.1045695 18.1045695,22 17,22 L7,22 C5.8954305,22 5,21.1045695 5,20 L5,4 C5,2.8954305 5.8954305,2 7,2 Z M7,4 L7,20 L17,20 L17,4 L7,4 Z M12,19 C11.4477153,19 11,18.5522847 11,18 C11,17.4477153 11.4477153,17 12,17 C12.5522847,17 13,17.4477153 13,18 C13,18.5522847 12.5522847,19 12,19 Z"/></svg>';
+						break;
+					case 'unknown':
+						$icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21,7 C22.1045695,7 23,7.8954305 23,9 L23,18 C23,19.1045695 22.1045695,20 21,20 L16,20 L3,20 C1.8954305,20 1,19.1045695 1,18 L1,15 L3,15 L3,6 C3,4.8954305 3.8954305,4 5,4 L19,4 C20.1045695,4 21,4.8954305 21,6 L21,7 Z M19,7 L19,6 L5,6 L5,15 L14,15 L14,9 C14,7.8954305 14.8954305,7 16,7 L19,7 Z M14,18 L14,17 L3,17 L3,18 L14,18 Z M16,9 L16,18 L21,18 L21,9 L16,9 Z"/></svg>';
+						break;
+				}
+				echo $icon;
+				?>
+			</div>&nbsp;&nbsp;&nbsp;
+			<h5 class="m-0"><?php echo $pt->session->platform ?></h5>
+		</div>
+
+		<div class="d-flex align-items-center mb-3 flex-wrap text-muted small">
+			<div><?php echo $pt->session->browser; ?><span class="mx-1">•</span></div>
+
+			<div><?php echo $pt->session->time; ?><span class="mx-1">•</span></div>
+			
+			<div><?php if ($pt->session->ip_address) { ?><?php echo $pt->session->ip_address; ?><?php } else { ?>N/A<?php } ?></div>
+		</div>
+
+		<button class="btn btn-danger btn-sm log_out_session" onclick="logOutSession(<?php echo $pt->session->id ?>)">{{LANG delete}}</button>
+	</div>
+</div>

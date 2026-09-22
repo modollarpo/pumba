@@ -1,0 +1,38 @@
+<div class="pt-4 pb-5 container">
+	<h2 class="mt-0 mb-4 display-4">{{LANG affiliates}}</h2>
+	
+	<div class="content p-4">
+		<div class="row">
+			<?php
+				if($pt->config->amount_ref > 0 && $pt->config->affiliate_type->affiliate_new_user == 1){
+					$earn_users = str_replace('{amount}', $pt->config->amount_ref, $lang_array['earn_users']);
+					echo "<div class='col'><div class='text-center empty_state px-4 lead'><img src='{{CONFIG theme_url}}/img/aff-user.svg' width='140' height='150' class='d-block mx-auto mb-4'/> ".str_replace('$', $pt->config->currency_symbol_array[$pt->config->payment_currency], $earn_users)."</div></div>";
+				}
+				if($pt->config->amount_percent_ref > 0 && $pt->config->affiliate_type->affiliate_pro == 1){
+					$earn_users_pro = str_replace('{amount}', $pt->config->amount_percent_ref, $lang_array['earn_users_pro']);
+					echo "<div class='col'><div class='text-center empty_state px-4 lead'><img src='{{CONFIG theme_url}}/img/aff-pro.svg' height='150' class='d-block mx-auto mb-4'/> ".str_replace('$', '%', $earn_users_pro)."</div></div>";
+				}
+				if($pt->config->amount_percent_subscribe > 0 && $pt->config->affiliate_type->affiliate_subscribe == 1){
+					$earn_users_pro = str_replace('{amount}', '%'.$pt->config->amount_percent_subscribe, $lang_array['earn_users_subscribe']);
+					echo "<div class='col'><div class='text-center empty_state px-4 lead'><img src='{{CONFIG theme_url}}/img/aff-channel.svg' height='150' class='d-block mx-auto mb-4'/> ".$earn_users_pro."</div></div>";
+				}
+				if($pt->config->amount_percent_buy_rent > 0 && $pt->config->affiliate_type->affiliate_buy_rent == 1){
+					$earn_users_pro = str_replace('{amount}', '%'.$pt->config->amount_percent_buy_rent, $lang_array['earn_users_buy_rent']);
+					echo "<div class='col'><div class='text-center empty_state px-4 lead'><img src='{{CONFIG theme_url}}/img/aff-video.svg' height='150' class='d-block mx-auto mb-4'/> ".$earn_users_pro."</div></div>";
+				}
+				
+			?>
+			<?php 
+				$link = PT_Link('login?red='.PT_Link('settings/my_affiliates/'));
+				$link_load = '';
+				if (IS_LOGGED) {
+					$link = PT_Link('settings/my_affiliates/'.$pt->user->username);
+					$link_load = '?link1=settings&page=my_affiliates&user='.$pt->user->username;
+				} 
+			?>
+		</div>
+		<div class="pb-5 text-center">
+			<a href="<?php echo $link; ?>" <?php if(IS_LOGGED){ ?>data-load="<?php echo $link_load; ?>"<?php } ?> class="btn btn-main btn-lg">{{LANG join_now}}</a>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,61 @@
+{
+    "packages": [
+        {
+            "name": "nicolab/php-ftp-client",
+            "version": "v2.0.2",
+            "version_normalized": "2.0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Nicolab/php-ftp-client.git",
+                "reference": "a1d007c8b203895611f68b0da314281d4a5c3d49"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Nicolab/php-ftp-client/zipball/a1d007c8b203895611f68b0da314281d4a5c3d49",
+                "reference": "a1d007c8b203895611f68b0da314281d4a5c3d49",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ftp": "*",
+                "php": ">=5.4"
+            },
+            "time": "2022-08-10T11:09:32+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "FtpClient": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Tallefourtane",
+                    "email": "dev@nicolab.net",
+                    "homepage": "http://nicolab.net"
+                }
+            ],
+            "description": "A flexible FTP and SSL-FTP client for PHP. This lib provides helpers easy to use to manage the remote files.",
+            "homepage": "https://github.com/Nicolab/php-ftp-client",
+            "keywords": [
+                "file",
+                "ftp",
+                "helper",
+                "lib",
+                "server",
+                "sftp",
+                "ssl",
+                "ssl-ftp"
+            ],
+            "support": {
+                "source": "https://github.com/Nicolab/php-ftp-client/tree/v2.0.2"
+            },
+            "install-path": "../nicolab/php-ftp-client"
+        }
+    ],
+    "dev": false,
+    "dev-package-names": []
+}

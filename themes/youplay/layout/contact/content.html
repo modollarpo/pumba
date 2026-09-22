@@ -1,0 +1,71 @@
+<div class="container">
+	<div class="d-flex align-items-center justify-content-center empty_state_center">
+		<div class="content flex-1 my-5 w-100 position-relative tag_auth">
+			<div class="content shadow-none bg-transparent overflow-hidden w-100 position-relative">
+				<div class="d-md-flex">
+					<div class="p-4 p-md-5 flex-1 w-100 tag_auth_main">
+						<h3 class="mt-0 mb-4 mb-md-5 h2">{{LANG contact_us}}</h3>
+						
+						<form class="contact-us-form" method="POST">
+							<div class="contact-us-alert"></div>
+
+							<div class="form-group">
+								<input id="first_name" name="first_name" type="text" class="form-control" placeholder=" " <?php if (IS_LOGGED) { ?>value="{{ME first_name}}"<?php } ?> required>
+								<label for="first_name">{{LANG first_name}}</label>  
+							</div>
+
+							<div class="form-group">
+								<input id="last_name" name="last_name" type="text" class="form-control" placeholder=" " <?php if (IS_LOGGED) { ?>value="{{ME last_name}}"<?php } ?>>
+								<label for="last_name">{{LANG last_name}}</label>  
+							</div>
+						
+							<div class="form-group">
+								<input name="email" id="email" type="email" class="form-control" placeholder=" " <?php if (IS_LOGGED) { ?>value="{{ME email}}"<?php } ?> required>
+								<label for="email">{{LANG email}}</label>  
+							</div>
+						
+							<div class="form-group">
+								<textarea name="message" id="message" rows="5" class="form-control" placeholder=" " required></textarea>
+								<label for="message">{{LANG message}}</label>  
+							</div>
+						
+							<div class="pt-4">
+								<button type="submit" name="send" id="send" class="btn btn-main btn-lg">{{LANG submit}}</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(function() {
+		var form = $('form.contact-us-form');
+		form.ajaxForm({
+			url: '{{LINK aj/contact_us}}?hash=' + $('.main_session').val(),
+			dataTyep:'json',
+			beforeSend: function() {
+				form.find('button').text("{{LANG please_wait}}");
+			},
+			success: function(data) {
+				if (data.status == 200) {
+					$('.contact-us-alert').html($('<div>',{
+						class: "alert alert-success",
+						html: data.message
+					}));
+
+					$('.alert-success').fadeIn(300);
+				} 
+				else {
+					$('.contact-us-alert').html($('<div>',{
+						class: "alert alert-danger",
+						html: data.message
+					}));
+				}
+				form.find('button').html('{{LANG submit}}');
+			}
+		});
+	});
+</script>

@@ -1,0 +1,276 @@
+<link href="{{CONFIG theme_url}}/js/lib/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.min.css" rel="stylesheet">
+<script src="{{CONFIG theme_url}}/js/lib/jquery-datatable/jquery.dataTables.js"></script>
+<script src="{{CONFIG theme_url}}/js/lib/jquery-datatable/skin/bootstrap/js/dataTables.bootstrap.js"></script>
+
+<div class="pt-4 pb-5 container">
+	<h2 class="mt-0 mb-3 display-4">{{LANG add_card}}</h2>
+	
+	<div class="mb-5 d-flex align-items-center justify-content-between tag_vid_page_nav">
+		<div class="d-flex align-items-center py-1 tag_vid_page_sub_nav">
+			<a href="{{LINK edit-video/{{ID}}}}" data-load="?link1=edit-video&id=category&id={{ID}}" class="btn back px-0">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.57 5.92993L3.5 11.9999L9.57 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5 12H3.67004" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG go_back}}
+			</a>
+		</div>
+	</div>
+
+	<div class="content p-4 mb-4">
+		<div class="row">
+			<div class="col-md-5">
+				<div class="pt_vid_card_prvw">
+					<div class="embed-responsive embed-responsive-16by9 mb-4 w-100 overflow-hidden responsive">
+						<div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-white wait"><svg width="60" height="20" viewBox="0 0 120 30" class="mt-n1" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><circle cx="15" cy="15" r="15"><animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite" /><animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite" /></circle><circle cx="60" cy="15" r="9" fill-opacity="0.3"><animate attributeName="r" from="9" to="9" begin="0s" dur="0.8s" values="9;15;9" calcMode="linear" repeatCount="indefinite" /><animate attributeName="fill-opacity" from="0.5" to="0.5" begin="0s" dur="0.8s" values=".5;1;.5" calcMode="linear" repeatCount="indefinite" /></circle><circle cx="105" cy="15" r="15"><animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite" /><animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite" /></circle></svg></div>
+						<canvas class="embed-responsive-item align-middle" id="main_canvas"></canvas>
+					</div>
+					<input class="d-block w-100 bg-transparent" id="my-input" type="range" min="0" max="72" value="0" disabled />
+				</div>
+			</div>
+			
+			<div class="col-md-7" id="edit-form">
+				<div class="video-player pt_video_player">
+					<video id="my-video" class="d-none">
+					   <?php if (!empty($pt->video->video_location)) { ?>
+					   <source src="<?php echo($pt->video->video_location) ?>">
+					   <?php } ?>
+					   Your browser does not support HTML5 video.
+					</video>
+				</div>
+				<form action="" class="form-horizontal pt_forms pt_vid_card_form" method="POST">
+					<div id="video-success"></div>
+					<div class="form-group">
+						<select name="part" id="part" class="form-control" disabled>
+							<option value="top_left">{{LANG top_left}}</option>
+							<option value="top_right">{{LANG top_right}}</option>
+							<option value="bottom_left">{{LANG bottom_left}}</option>
+							<option value="bottom_right">{{LANG bottom_right}}</option>
+							<option value="center">{{LANG center}}</option>
+						</select>
+						<label for="part">{{LANG placement}}</label>
+					</div>
+					
+					<div class="form-group">
+						<select name="type" id="typedd" class="form-control" disabled>
+							<option value="text">{{LANG text}}</option>
+							<option value="video">{{LANG video}}</option>
+							<option value="subscribe">{{LANG subscribe}}</option>
+						</select>
+						<label for="type">{{LANG type}}</label>
+					</div>
+					
+					<div class="text_card">
+						<div class="form-group">
+							<input type="text" id="url" name="url" class="form-control" placeholder=" " disabled>
+							<label for="url">URL</label>
+						</div>
+						<div class="form-group">
+							<input type="text" id="title" name="title" class="form-control" placeholder=" " disabled>
+							<label for="title">{{LANG title}}</label>
+						</div>
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									<input type="color" class="form-control" id="color" name="color" placeholder=" " disabled>
+									<label for="color">{{LANG color}}</label>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<input type="color" class="form-control" id="background_color" name="background_color" placeholder=" " disabled>
+									<label for="background_color">{{LANG background_color}}</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="video_card" style="display: none;">
+						<div class="form-group">
+							<input type="text" id="video_search" name="video_search" class="form-control" placeholder=" " disabled>
+							<label for="video_search">{{LANG search_keyword}}</label>
+							<div class="dropdown-menu d-block w-100 m-0 video_dropdown"></div>
+						</div>
+						<div class="form-group">
+							<input type="text" id="video_selected" name="video_selected" class="form-control" placeholder=" " readonly>
+							<label for="video_selected">{{LANG video}}</label>
+						</div>
+					</div>
+					
+					<div class="pt-2">
+						<button type="submit" id="submit-btn" class="btn btn-main btn-lg" disabled>{{LANG publish}}</button>
+					</div>
+					<input type="hidden" name="video_id" class="video_id" value="{{ID}}">
+					<input type="hidden" name="ref_video" class="ref_video" value="0">
+					<input type="hidden" name="duration" class="duration">
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<div class="content mt-4 p-4">
+		<h4 class="title mb-3 text-capitalize">{{LANG can_use_video_text}}</h4>
+		<div class="table-responsive">
+			<table class="table" id="video_cards_table"> 
+				<thead>
+					<th>{{LANG id}}</th>
+					<th>{{LANG type}}</th>
+					<th>{{LANG name}}</th>
+					<th>{{LANG part}}</th>
+					<th>{{LANG action}}</th>
+				</thead>
+				<tbody>{{CARDS_LIST}}</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div id="frames" class="d-none"></div>
+</div>
+
+<script>
+const rangeToPercent = slider => {
+  const value = slider.value;
+  const max = slider.getAttribute('max') || 10;
+  const percent = value / max * 100;
+
+  return `${parseInt(percent)}%`;
+};
+
+const sliders = document.querySelectorAll('.pt_vid_card_prvw input[type="range"]');
+
+sliders.forEach(slider => {
+  slider.style.setProperty('--track-fill', rangeToPercent(slider));
+
+  slider.addEventListener('input', e => {
+    e.target.style.setProperty('--track-fill', rangeToPercent(e.target));
+  });
+});
+
+function DeleteCard(id) {
+	$.post('{{LINK aj/cards/delete}}', {id: id}, function(data, textStatus, xhr) {
+		$("[data-card-list="+id+"]").remove();
+	});
+}
+function SelectVideo(id,self) {
+	$('.ref_video').val(id);
+	$('#video_selected').val($(self).text());
+	var search_dropdown = $('.video_dropdown');
+	search_dropdown.addClass('d-none');
+	search_dropdown.empty();
+}
+$('#video_search').keyup(function(event) {
+	var search_value = $(this).val();
+	var search_dropdown = $('.video_dropdown');
+	if (search_value == '') {
+		search_dropdown.addClass('d-none');
+		search_dropdown.empty();
+		return false;
+	} else {
+		search_dropdown.removeClass('d-none');
+	}
+    $.post('{{LINK aj/cards/search}}', {search_value: search_value}, function(data, textStatus, xhr) {
+    	if (data.status == 200) {
+    		search_dropdown.html(data.html);
+    	} else {
+	       search_dropdown.addClass('d-none');
+		   search_dropdown.empty();
+		   return false;
+    	}
+    });
+});
+$(document).on('change', '#typedd', function(event) {
+	event.preventDefault();
+	if ($(this).val() == 'text') {
+		$('.text_card').slideDown();
+		$('.video_card').slideUp();
+		$('#my-input').removeAttr('disabled');
+	}
+	if ($(this).val() == 'video') {
+		$('.video_card').slideDown();
+		$('.text_card').slideUp();
+		$('#my-input').attr('disabled', 'true');
+	}
+	if ($(this).val() == 'subscribe') {
+		$('.video_card').slideUp();
+		$('.text_card').slideUp();
+		$('#my-input').attr('disabled', 'true');
+	}
+});
+
+var main_canvas = document.getElementById("main_canvas");
+
+jQuery(document).ready(function($) {
+	video = document.querySelector('video');
+	
+	video.addEventListener('loadeddata', function() {
+		$('.wait').remove();
+    $('input').removeAttr('disabled');
+    $('select').removeAttr('disabled');
+    $('#submit-btn').removeAttr('disabled');
+		var input = document.getElementById("my-input");
+		input.min = 0;
+		input.max = parseInt(video.duration);
+		$('#video_cards_table').DataTable({
+			ordering: false,
+			searching: false,
+			lengthChange: false
+		});
+	});
+});
+	
+	
+
+$("#my-input").on("input", function(event) {
+	video.currentTime = event.target.value;
+	main_canvas.width = video.videoWidth;
+  main_canvas.height = video.videoHeight;
+  var context = main_canvas.getContext("2d");
+  context.drawImage(video, 0, 0);
+  $('.duration').val(event.target.value);
+});
+jQuery(document).ready(function($) {
+	const video = document.querySelector('video');
+	video.addEventListener('seeked', (event) => {
+		$('.duration').val(video.currentTime);
+	    var minutes = parseInt(video.duration / 60, 10);
+	    var seconds = video.duration % 60;
+	});
+
+	$('.pt_forms').ajaxForm({
+      url: '{{LINK aj/cards/create}}?hash=' + $('.main_session').val(),
+      dataType:"json",
+      beforeSend: function() {
+
+        $('#submit-btn').attr('disabled', true).find('span').text("{{LANG please_wait}}");
+        
+      },
+      uploadProgress: function(event, position, total, percentComplete) {
+          if(percentComplete > 50) {
+            percent.addClass('white');
+          }
+          var percentVal = percentComplete + '%';
+          bar.width(percentVal);
+          percent.html(percentVal);
+
+          if (percentComplete == 100) {
+            $("#video-success").empty();
+          }
+      },
+      success: function(data) {
+        scrollToTop();
+        if (data.status == 200){
+          $("#video-success").html('<div class="alert alert-success">'+
+            data.message
+            +'</div>');
+          PT_Delay(function(){
+            location.reload();
+          },2000);
+          
+        }
+        else {
+          $('#submit-btn').removeAttr('disabled').find('span').text('{{LANG publish}}');
+          $("#video-success").html('<div class="alert alert-danger">'+
+            data.message
+            +'</div>');
+        }
+      }
+    });
+
+});
+</script>
