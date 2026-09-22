@@ -715,7 +715,6 @@ INSERT INTO `config` (`id`, `name`, `value`) VALUES
 (421, 'qiwi_private_key', ''),
 (422, 'm3u8_import', 'off'),
 (423, 'who_can_m3u8_import', 'all'),
-(424, 'rapid_api', ''),
 (425, 'payfast_payment', 'no'),
 (426, 'payfast_mode', 'sandbox'),
 (427, 'payfast_merchant_id', ''),

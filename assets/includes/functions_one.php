@@ -3192,68 +3192,29 @@ function GetTiktokVideoDownloadLink($url='')
                     'message' => $lang->error_msg);
 
     $tiktok_api_url = trim((isset($pt->config->tiktok_api_url) && !empty($pt->config->tiktok_api_url)) ? $pt->config->tiktok_api_url : '', '/');
-    if (!empty($tiktok_api_url)) {
-        $api_response = connect_to_url($tiktok_api_url . '/api/tiktok/info?video_url=' . rawurlencode($url));
-        if (!empty($api_response)) {
-            $json = json_decode($api_response, true);
-            if (!empty($json['success']) && !empty($json['video_url'])) {
-                $result = array(
-                    'status' => 200,
-                    'video_url' => $json['video_url'],
-                    'cover' => (!empty($json['cover'])) ? $json['cover'] : '',
-                    'id' => (!empty($json['id'])) ? $json['id'] : '',
-                    'title' => (!empty($json['title'])) ? $json['title'] : '',
-                    'desc' => (!empty($json['desc'])) ? $json['desc'] : '',
-                );
-                return $result;
-            }
-        }
+    if (empty($tiktok_api_url)) {
+        return $result;
     }
 
-    // Fallback to RapidAPI if configured
-    if (!empty($pt->config->rapid_api)) {
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL => "https://tiktok-video-no-watermark2.p.rapidapi.com/?url=".$url."&hd=1",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => [
-                "X-RapidAPI-Host: tiktok-video-no-watermark2.p.rapidapi.com",
-                "X-RapidAPI-Key: ".$pt->config->rapid_api
-            ],
-        ]);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        if (!empty($response)) {
-            $json = json_decode($response,true);
-            if (!empty($json) && !empty($json['data'])) {
-                $video = $json['data'];
-                $author = $json['data']['author'];
-                $result =    array(
-                                    'status' => 200,
-                                    'video_url' => $video['play'],
-                                    'cover' => $video['cover'],
-                                    'id' => $video['id'],
-                                    'title' => $author['nickname'],
-                                    'desc' => $video['title'],
-                                );
-                return $result;
-            }
-            elseif (!empty($json) && !empty($json['message']) && strpos($json['message'], 'not subscribed to this') !== false) {
-                $result = array('status' => 400,
-                                'message' => 'please use rapidapi valid key and subscribe to https://rapidapi.com/yi005/api/tiktok-video-no-watermark2');
-            }
+    $api_response = connect_to_url($tiktok_api_url . '/api/tiktok/info?video_url=' . rawurlencode($url));
+    if (!empty($api_response)) {
+        $json = json_decode($api_response, true);
+        if (!empty($json['success']) && !empty($json['video_url'])) {
+            $result = array(
+                'status' => 200,
+                'video_url' => $json['video_url'],
+                'cover' => (!empty($json['cover'])) ? $json['cover'] : '',
+                'id' => (!empty($json['id'])) ? $json['id'] : '',
+                'title' => (!empty($json['title'])) ? $json['title'] : '',
+                'desc' => (!empty($json['desc'])) ? $json['desc'] : '',
+            );
         }
     }
 
     return $result;
 }
 
-// function GetTiktokVideoDownloadLink($url='')
+//
 // {
 //     global $pt,$db,$lang;
 

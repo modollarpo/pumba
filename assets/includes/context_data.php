@@ -146,7 +146,6 @@ $pt->notif_data = array(
 $pt->encryptedKeys = [
 	'authy_token',
 	'yt_api',
-	'rapid_api',
 	'fb_api_sc',
 	'twitch_api',
 	'amazone_s3_s_key',
