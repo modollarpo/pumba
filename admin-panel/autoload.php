@@ -5,7 +5,7 @@ $page = 'dashboard';
 if (!empty($_GET['page'])) {
     $page = PT_Secure($_GET['page']);
 }
-if (!in_array($page, ['import-from-youtube','import-from-dailymotion','import-from-twitch'])) {
+if (!in_array($page, ['import-from-youtube','import-from-dailymotion','import-from-twitch','import-from-tiktok'])) {
     cleanConfigData();
 }
 else{
@@ -29,6 +29,7 @@ $pages = array(
     'import-from-youtube',
     'import-from-dailymotion',
     'import-from-twitch',
+    'import-from-tiktok',
     'manage-video-ads',
     'create-video-ad',
     'edit-video-ad',
@@ -757,16 +758,16 @@ $old_notifications = $db->where('recipient_id',0)->where('admin',1)->where('seen
                     <?php } ?>
 
 
-                    <?php if ($pt->user->admin == 1 || CheckHaveMultiPermission(['manage-videos','manage-comments','import-from-youtube','import-from-dailymotion','import-from-twitch'])) { ?>
+                    <?php if ($pt->user->admin == 1 || CheckHaveMultiPermission(['manage-videos','manage-comments','import-from-youtube','import-from-dailymotion','import-from-twitch','import-from-tiktok'])) { ?>
 
-                    <li <?php echo ($page == 'manage-videos' || $page == 'manage-comments' || $page == 'import-from-youtube' || $page == 'import-from-dailymotion' || $page == 'sold_videos_analytics' || $page == 'import-from-twitch') ? 'class="open"' : ''; ?>>
+                    <li <?php echo ($page == 'manage-videos' || $page == 'manage-comments' || $page == 'import-from-youtube' || $page == 'import-from-dailymotion' || $page == 'sold_videos_analytics' || $page == 'import-from-twitch' || $page == 'import-from-tiktok') ? 'class="open"' : ''; ?>>
                         <a href="#">
                             <span class="nav-link-icon">
                                 <i class="material-icons">video_library</i>
                             </span>
                             <span>Videos</span>
                         </a>
-                        <ul <?php echo ($page == 'manage-videos' || $page == 'import-from-youtube' || $page == 'import-from-dailymotion' || $page == 'sold_videos_analytics' || $page == 'import-from-twitch') ? 'style="display: block;"' : ''; ?>>
+                        <ul <?php echo ($page == 'manage-videos' || $page == 'import-from-youtube' || $page == 'import-from-dailymotion' || $page == 'sold_videos_analytics' || $page == 'import-from-twitch' || $page == 'import-from-tiktok') ? 'style="display: block;"' : ''; ?>>
                             <?php if ($pt->user->admin == 1 || CheckHavePermission('manage-videos')) { ?>
                             <li>
                                 <a <?php echo ($page == 'manage-videos') ? 'class="active"' : ''; ?> href="<?php echo PT_LoadAdminLinkSettings('manage-videos'); ?>" data-ajax="?path=manage-videos">Manage Videos</a>
@@ -777,12 +778,12 @@ $old_notifications = $db->where('recipient_id',0)->where('admin',1)->where('seen
                                 <a <?php echo ($page == 'manage-comments') ? 'class="active"' : ''; ?> href="<?php echo PT_LoadAdminLinkSettings('manage-comments'); ?>" data-ajax="?path=manage-comments">Manage Video Comments</a>
                             </li>
                             <?php } ?>
-                            <?php if ($pt->user->admin == 1 || CheckHaveMultiPermission(['import-from-youtube','import-from-dailymotion','import-from-twitch'])) { ?>
-                            <li <?php echo ($page == 'import-from-youtube' || $page == 'import-from-dailymotion' || $page == 'import-from-twitch') ? 'class="open"' : ''; ?>>
+                            <?php if ($pt->user->admin == 1 || CheckHaveMultiPermission(['import-from-youtube','import-from-dailymotion','import-from-twitch','import-from-tiktok'])) { ?>
+                            <li <?php echo ($page == 'import-from-youtube' || $page == 'import-from-dailymotion' || $page == 'import-from-twitch' || $page == 'import-from-tiktok') ? 'class="open"' : ''; ?>>
                                 <a href="#">
                                     <span>Import Videos</span>
                                 </a>
-                                <ul <?php echo ($page == 'import-from-youtube' || $page == 'import-from-dailymotion' || $page == 'sold_videos_analytics' || $page == 'import-from-twitch') ? 'style="display: block;"' : ''; ?>>
+                                <ul <?php echo ($page == 'import-from-youtube' || $page == 'import-from-dailymotion' || $page == 'sold_videos_analytics' || $page == 'import-from-twitch' || $page == 'import-from-tiktok') ? 'style="display: block;"' : ''; ?>>
                                     <?php if ($pt->user->admin == 1 || CheckHavePermission('import-from-youtube')) { ?>
                                     <li>
                                         <a <?php echo ($page == 'import-from-youtube') ? 'class="active"' : ''; ?> href="<?php echo PT_LoadAdminLinkSettings('import-from-youtube'); ?>" data-ajax="?path=import-from-youtube">Import From YouTube</a>
@@ -796,6 +797,11 @@ $old_notifications = $db->where('recipient_id',0)->where('admin',1)->where('seen
                                     <?php if ($pt->user->admin == 1 || CheckHavePermission('import-from-twitch')) { ?>
                                     <li>
                                         <a <?php echo ($page == 'import-from-twitch') ? 'class="active"' : ''; ?> href="<?php echo PT_LoadAdminLinkSettings('import-from-twitch'); ?>" data-ajax="?path=import-from-twitch">Import From Twitch</a>
+                                    </li>
+                                    <?php } ?>
+                                    <?php if ($pt->user->admin == 1 || CheckHavePermission('import-from-tiktok')) { ?>
+                                    <li>
+                                        <a <?php echo ($page == 'import-from-tiktok') ? 'class="active"' : ''; ?> href="<?php echo PT_LoadAdminLinkSettings('import-from-tiktok'); ?>" data-ajax="?path=import-from-tiktok">Import From TikTok</a>
                                     </li>
                                     <?php } ?>
                                 </ul>

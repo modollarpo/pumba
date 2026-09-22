@@ -3203,4 +3203,40 @@ $pages_search = array (
     'title' => 'Renting Commission ',
     'page_title' => '',
   ),
+  532 => 
+  array (
+    'link' => 'import-from-tiktok',
+    'title' => 'Import From TikTok',
+    'page_title' => '',
+  ),
+  533 => 
+  array (
+    'link' => 'import-from-tiktok',
+    'title' => 'Import Videos From TikTok',
+    'page_title' => '',
+  ),
+  534 => 
+  array (
+    'link' => 'import-from-tiktok',
+    'title' => 'TikTok Username',
+    'page_title' => '',
+  ),
+  535 => 
+  array (
+    'link' => 'import-from-tiktok',
+    'title' => 'Keyword To Import',
+    'page_title' => '',
+  ),
+  536 => 
+  array (
+    'link' => 'import-from-tiktok',
+    'title' => 'Import as (Username)',
+    'page_title' => '',
+  ),
+  537 => 
+  array (
+    'link' => 'import-from-tiktok',
+    'title' => 'Import successfully completed!',
+    'page_title' => '',
+  ),
 );

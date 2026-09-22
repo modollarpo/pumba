@@ -327,6 +327,95 @@ if ($first == 'import-youtube-videos') {
     }
 }
 
+if ($first == 'import-tiktok-videos') {
+    if (!empty($_POST['videos'])) {
+        $category_id = 0;
+        if (!empty($_POST['category_id'])) {
+            if (in_array($_POST['category_id'], array_keys(ToArray($pt->categories)))) {
+                $category_id = $_POST['category_id'];
+            }
+        }
+        foreach ($_POST['videos'] as $key => $data_fro_ajax) {
+            $video_id   = PT_GenerateKey(15, 15);
+            $video_id_  = $data_fro_ajax['video_id'];
+            $title      = $data_fro_ajax['title'];
+            $description = $data_fro_ajax['description'];
+            $duration   = $data_fro_ajax['duration'];
+            $thumb      = $data_fro_ajax['thumb'];
+            $tags       = $data_fro_ajax['tags'];
+            $author     = (!empty($data_fro_ajax['author'])) ? $data_fro_ajax['author'] : '';
+            $insert     = false;
+            if (strpos($thumb, 'upload/photos/thumbnail')) {
+                $thumb = 'upload/photos/thumbnail.jpg';
+            }
+            $check_for_video = $db->where('video_id', $video_id)->getValue(T_VIDEOS, 'count(*)');
+            if ($check_for_video > 0) {
+                $video_id = PT_GenerateKey(15, 15);
+            }
+            $link_regex = '/(http\:\/\/|https\:\/\/|www\.)([^\ ]+)/i';
+            $i          = 0;
+            preg_match_all($link_regex, PT_Secure($description), $matches);
+            foreach ($matches[0] as $match) {
+                $match_url           = strip_tags($match);
+                $syntax              = '[a]' . urlencode($match_url) . '[/a]';
+                $description = str_replace($match, $syntax, $description);
+            }
+            $user_id = $user->id;
+            if (!empty($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0) {
+                $user_id = PT_Secure($_POST['user_id']);
+            }
+            $video_url = '';
+            if (!empty($author) && !empty($video_id_)) {
+                $links = GetTiktokVideoDownloadLink('https://www.tiktok.com/@'.$author.'/video/'.$video_id_);
+                if (!empty($links) && !empty($links['status']) && $links['status'] == 200) {
+                    $video_url = SaveTiktokVideo($links['video_url']);
+                }
+            }
+            if (!empty($video_url)) {
+                $new_thumbnail = 'upload/photos/' . date('Y') . '/' . date('m').'/' .PT_GenerateKey() . ".jpg";
+                if (!empty($thumb) && filter_var($thumb, FILTER_VALIDATE_URL) !== FALSE && @file_put_contents($new_thumbnail, file_get_contents($thumb))) {
+                    PT_UploadToS3($new_thumbnail);
+                    $thumb = $new_thumbnail;
+                }
+                $data_insert = array(
+                    'video_id' => $video_id,
+                    'user_id' => $user_id,
+                    'title' => PT_Secure($title),
+                    'description' => PT_Secure($description),
+                    'tags' => PT_Secure($tags),
+                    'duration' => $duration,
+                    'category_id' => $category_id,
+                    'video_location' => $video_url,
+                    'converted' => 1,
+                    'is_short' => 1,
+                    'thumbnail' => $thumb,
+                    'time' => time(),
+                    'registered' => date('Y') . '/' . intval(date('m'))
+                );
+                if (!empty($_POST['sub_category_id'])) {
+                    $is_found = $db->where('type',PT_Secure($_POST['category_id']))->where('lang_key',PT_Secure($_POST['sub_category_id']))->getValue(T_LANGS,'COUNT(*)');
+                    if ($is_found > 0) {
+                        $data_insert['sub_category'] = PT_Secure($_POST['sub_category_id']);
+                    }
+                }
+                $insert = $db->insert(T_VIDEOS, $data_insert);
+            }
+            if ($insert) {
+                if (empty($_SESSION['imported-videos'])) {
+                    $_SESSION['imported-videos'] = 1;
+                } else {
+                    $_SESSION['imported-videos']++;
+                }
+            }
+        }
+        if ($insert) {
+            $data = array('status' => 200);
+        } else {
+            $data = array('status' => 400, 'message' => 'Could not import the videos.');
+        }
+    }
+}
+
 if ($first == 'create-ads') {
     if (!empty($_POST['type'])) {
         if (empty($_POST['name']) || empty($_POST['link']) || empty($_POST['ad_link']) || empty($_POST['type'])) {
