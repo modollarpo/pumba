@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // +------------------------------------------------------------------------+
 // | @author Deen Doughouz (DoughouzForest)
 // | @author_url 1: http://www.playtubescript.com
@@ -3213,64 +3213,6 @@ function GetTiktokVideoDownloadLink($url='')
 
     return $result;
 }
-
-//
-// {
-//     global $pt,$db,$lang;
-
-//     $result = array('status' => 400,
-//                     'message' => $lang->error_msg);
-
-//     $ch = curl_init();
-//     $options = array(
-//         CURLOPT_URL            => $url,
-//         CURLOPT_RETURNTRANSFER => true,
-//         CURLOPT_HEADER         => false,
-//         CURLOPT_FOLLOWLOCATION => true,
-//         CURLOPT_USERAGENT => 'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Mobile Safari/537.36',
-//         CURLOPT_ENCODING       => "utf-8",
-//         CURLOPT_AUTOREFERER    => false,
-//         CURLOPT_COOKIEJAR      => 'cookie.txt',
-//         CURLOPT_COOKIEFILE     => 'cookie.txt',
-//         CURLOPT_REFERER        => 'https://www.tiktok.com/',
-//         CURLOPT_CONNECTTIMEOUT => 30,
-//         CURLOPT_SSL_VERIFYHOST => false,
-//         CURLOPT_SSL_VERIFYPEER => false,
-//         CURLOPT_TIMEOUT        => 30,
-//         CURLOPT_MAXREDIRS      => 10,
-//     );
-//     curl_setopt_array( $ch, $options );
-//     $data = curl_exec($ch);
-//     $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-//     curl_close($ch);
-
-//     $srt2 = strval($data);
-//     for ($i=0; $i < 1000; $i++) { 
-        
-//         $f = strpos($srt2, '<script');
-//         $s = strpos(substr($srt2, strpos($srt2, '<script')), '>');
-//         $d = $f + ($s + 1);
-//         $srt2 = substr($srt2, $d);
-//         $f = strpos($srt2, '</script>');
-//         $result = substr($srt2, 0,$f);
-//         if (!empty(json_decode($result))) {
-//             $js = json_decode($result,true);
-//             if (!empty($js['SharingVideoModule']) && !empty($js['SharingVideoModule']['videoData']) && !empty($js['SharingVideoModule']['videoData']['itemInfo']) && !empty($js['SharingVideoModule']['videoData']['itemInfo']['itemStruct']) && !empty($js['SharingVideoModule']['videoData']['itemInfo']['itemStruct']['video']) && !empty($js['SharingVideoModule']['videoData']['itemInfo']['itemStruct']['video']['downloadAddr'])) {
-//                 return array('status' => 200,
-//                              'video_url' => $js['SharingVideoModule']['videoData']['itemInfo']['itemStruct']['video']['downloadAddr'],
-//                              'cover' => $js['SharingVideoModule']['videoData']['itemInfo']['itemStruct']['video']['cover'],
-//                              'id' => $js['SharingVideoModule']['videoData']['itemInfo']['itemStruct']['video']['id'],
-//                              'title' => $js['SharingVideoModule']['videoData']['itemInfo']['itemStruct']['author']['nickname'],
-//                              'desc' => $js['SharingVideoModule']['videoData']['itemInfo']['itemStruct']['desc'],
-//                             );
-//             }
-            
-//         }
-
-//         $srt2 = substr($srt2, ($f + 9));
-//     }
-//     return $result;
-// }
 
 function SaveTiktokVideo($url='')
 {
