@@ -1,0 +1,119 @@
+<div class="py-4 container">
+	<h2 class="mt-0 mb-3 display-4">{{LANG search_results}}: "{{KEYWORD}}"</h2>
+	
+	<div class="mb-5 d-flex align-items-center justify-content-between tag_vid_page_nav">
+		<div class="dropdown">
+			<?php echo (empty($_POST['date']) && empty($_POST['category'])) ? '': '<div class="position-absolute rounded-circle search_filter_dot"></div>'?>
+			<a href="javascript:void(0);" role="button" data-toggle="dropdown" data-display="static" class="btn btn-main full">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 11.5C2 7.02166 2 4.78249 3.39124 3.39124C4.78249 2 7.02166 2 11.5 2C15.9783 2 18.2175 2 19.6088 3.39124C21 4.78249 21 7.02166 21 11.5C21 15.9783 21 18.2175 19.6088 19.6088C18.2175 21 15.9783 21 11.5 21C7.02166 21 4.78249 21 3.39124 19.6088C2 18.2175 2 15.9783 2 11.5Z" stroke="currentColor" stroke-width="1.5"/><path d="M8.5 11.5L14.5001 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 15H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.5 8H15.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG filter_by}}
+			</a>
+			<div class="dropdown-menu p-3" onclick="event.stopPropagation();">
+				<form class="search_filter_form " method="POST" action="">
+					<div class="scroll_search">
+						<p class="h6">{{LANG upload_date}}</p>
+						<div class="custom-control custom-radio mb-2">
+							<input onchange="ChangePage()" class="custom-control-input" type="radio" name="date" id="date_last_hour" value="last_hour" <?php echo (isset($_POST['date']) && $_POST['date'] == 'last_hour') ? 'checked': ''?>>
+							<label class="custom-control-label" for="date_last_hour">{{LANG last_hour}}</label>
+						</div>
+						<div class="custom-control custom-radio mb-2">
+							<input onchange="ChangePage()" class="custom-control-input" type="radio" name="date" id="date_today" value="today" <?php echo (isset($_POST['date']) && $_POST['date'] == 'today') ? 'checked': ''?>>
+							<label class="custom-control-label" for="date_today">{{LANG today}}</label>
+						</div>
+						<div class="custom-control custom-radio mb-2">
+							<input onchange="ChangePage()" class="custom-control-input" type="radio" name="date" id="date_this_week" value="this_week" <?php echo (isset($_POST['date']) && $_POST['date'] == 'this_week') ? 'checked': ''?>>
+							<label class="custom-control-label" for="date_this_week">{{LANG this_week}}</label>
+						</div>
+						<div class="custom-control custom-radio mb-2">
+							<input onchange="ChangePage()" class="custom-control-input" type="radio" name="date" id="date_this_month" value="this_month" <?php echo (isset($_POST['date']) && $_POST['date'] == 'this_month') ? 'checked': ''?>>
+							<label class="custom-control-label" for="date_this_month">{{LANG this_month}}</label>
+						</div>
+						<div class="custom-control custom-radio mb-4">
+							<input onchange="ChangePage()" class="custom-control-input" type="radio" name="date" id="date_this_year" value="this_year" <?php echo (isset($_POST['date']) && $_POST['date'] == 'this_year') ? 'checked': ''?>>
+							<label class="custom-control-label" for="date_this_year">{{LANG this_year}}</label>
+						</div>
+
+						<p class="h6" for="type">{{LANG categories}}</p>
+						<?php foreach($pt->categories as $key => $category) { ?>
+							<div class="custom-control custom-checkbox mb-2">
+								<input onchange="ChangePage()" type="checkbox" class="custom-control-input" name="category[]" id="category_<?php echo $key; ?>" value="<?php echo $key; ?>" <?php echo (isset($_POST['category']) && in_array($key, $_POST['category'])) ? 'checked': ''?>>
+								<label class="custom-control-label" for="category_<?php echo $key; ?>"><?php echo $category; ?></label>
+							</div>
+						<?php } ?>
+					</div>
+
+					<div class="pt-2">
+						<button id="submit" name="submit" class="btn btn-main btn-block">{{LANG search}}</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<div class="row tag_video_grid author-list videos-latest-list">
+		{{VIDEOS}}
+	</div>
+
+	<?php if ($pt->total_pages > 1) { ?>
+		<!--<div class="showing_pages">
+			<?php echo "Showing $pt->page_number out of " . $pt->total_pages; ?>
+		</div>-->
+		<nav class="d-flex align-items-center justify-content-center mb-5 showing_nav">
+			<a href="javascript:void(0)" class="btn position-relative p-0" title='First Page' onclick="GoToPage(1)">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg>
+			</a>
+			<ul class="m-0 position-relative main pagination">
+				<?php if ($pt->page_number > 1) {  ?>
+					<li>
+						<a href="javascript:void(0)" onclick="GoToPage(<?php echo($pt->page_number - 1) ?>)" class="d-inline-flex align-items-center justify-content-center" title='Previous Page'>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" /></svg>
+						</a>
+					</li>
+				<?php  } ?>
+				<?php 
+					$nums = 0;
+					$nums_pages = ($pt->page_number > 3) ? ($pt->page_number - 3) : $pt->page_number;
+					for ($i=$nums_pages; $i <= $pt->total_pages; $i++) { 
+						if ($nums < 4) {
+					?>
+						<li class="<?php echo ($pt->page_number == $i) ? 'active' : ''; ?>">
+							<a href="javascript:void(0)" onclick="GoToPage(<?php echo($i); ?>)" class="d-inline-flex align-items-center justify-content-center"><?php echo $i ?></a>
+						</li>
+				<?php } $nums++; } ?>
+				<?php if ($pt->total_pages > $pt->page_number) { ?>
+					<li>
+						<a href="javascript:void(0)" onclick="GoToPage(<?php echo ($pt->page_number + 1); ?>)" class="d-inline-flex align-items-center justify-content-center" title="Next Page">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" /></svg>
+						</a>
+					</li>
+				<?php } ?>
+			</ul>
+			<a href="javascript:void(0)" onclick="GoToPage(<?php echo($pt->total_pages) ?>,'&last_page=1')" class="btn position-relative p-0" title='Last Page'>
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" /></svg>
+			</a>
+		</nav>
+	<?php } ?>
+	
+	<?php if (count($pt->videos) > 0 && empty($_GET['is_channel'])) { ?>
+		<!-- <div class="watch-video-show-more desc load-more" data-type="search" data-keyword="{{KEYWORD}}" data-by-category="{{CAT}}" data-by-date="<?php echo($_POST['date']); ?>">
+			{{LANG show_more}}
+		</div> -->
+	<?php } ?>
+
+	<?php if (!empty($pt->users )) { ?>
+		<h2 class="mt-0 mb-4 display-4">{{LANG channels}}</h2>
+
+		<div class="row">
+			{{USERS}}
+		</div>
+	<?php } ?>
+</div>
+
+<script type="text/javascript">
+	function ChangePage() {
+		$('.search_filter_form').attr('action', "{{LINK search}}<?php echo(!empty($_GET['keyword']) ? '?keyword='.$_GET['keyword'] : '') ?>&page_id=1");
+	}
+	function GoToPage(page_id,last='') {
+		$('.search_filter_form').attr('action', "{{LINK search}}<?php echo(!empty($_GET['keyword']) ? '?keyword='.$_GET['keyword'] : '') ?>&page_id="+page_id+last);
+		$('#submit').click();
+	}
+</script>

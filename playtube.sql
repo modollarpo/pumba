@@ -293,7 +293,7 @@ CREATE TABLE `config` (
 --
 
 INSERT INTO `config` (`id`, `name`, `value`) VALUES
-(1, 'theme', 'youplay'),
+(1, 'theme', 'playtag'),
 (2, 'censored_words', ''),
 (3, 'title', 'PlayTube'),
 (4, 'name', 'PlayTube'),

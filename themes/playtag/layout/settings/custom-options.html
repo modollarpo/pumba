@@ -1,0 +1,13 @@
+<div class="form-group">
+	<?php 
+		$options = @explode(',', $pt->field->options);
+	?>
+	<select name="<?php echo $pt->field->fid;?>" class="form-control">
+		<?php foreach ($options as $key => $value): ?>  
+		<?php $selected = (($key + 1) == $pt->fid) ? 'selected' : ''; ?>
+		<option value="<?php echo $key + 1;?>" <?php echo $selected;?>><?php echo $value;?></option>    
+		<?php endforeach; ?>
+	</select>
+	<label>{{NAME}}</label>
+	<small class="form-text text-muted">{{DESC}}</small>
+</div>

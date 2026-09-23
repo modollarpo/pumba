@@ -1,0 +1,337 @@
+<form class="content p-4" id="two-factor" method="POST">
+    <p class="lead mb-4">{{LANG two_factor_description}}</p>
+	
+	<div class="two-factor-alert"></div>
+	
+	<?php if ($pt->settings->two_factor == '0') { ?>
+        <?php if ($pt->methodCount > 1) { ?>
+            <div class="form-group">
+				<select id="two_factor_method" name="two_factor_method" class="form-control" onchange="showMethod(this)">
+					<?php if ($pt->config->two_factor_setting == 'on') { ?>
+						<option value="two_factor" <?php echo ($pt->settings->two_factor_method == 'two_factor') ? 'selected': '';?>>{{LANG email}}</option>
+					<?php } ?>
+					<?php if ($pt->config->google_authenticator == 'on') { ?>
+					<option value="google" <?php echo ($pt->settings->two_factor_method == 'google') ? 'selected': '';?>>{{LANG google_authenticator}}</option>
+					<?php } ?>
+					<?php if ($pt->config->authy_settings == 'on') { ?>
+					<option value="authy" <?php echo ($pt->settings->two_factor_method == 'authy') ? 'selected': '';?>>{{LANG authy_app}}</option>
+					<?php } ?>
+				</select>
+				<label for="two_factor_method">{{LANG two_factor_method}}</label>
+            </div>
+        <?php }else{
+            $method = '';
+            if ($pt->config->two_factor_setting == 'on') {
+                $method = 'two_factor';
+            }
+            elseif ($pt->config->google_authenticator == 'on') {
+                $method = 'google';
+            }
+            elseif ($pt->config->authy_settings == 'on') {
+                $method = 'authy';
+            } ?>
+            <input type="hidden" id="two_factor_method" name="two_factor_method" value="<?php echo $method; ?>">
+        <?php } ?>
+        <?php if ($pt->config->google_authenticator == 'on') { ?>
+			<div class="google_authenticator" <?php if ($pt->settings->two_factor_method != 'google') { ?>style="display:none;"<?php } ?>>
+				<div class="row align-items-center">
+					<div class="col-lg-4 text-center mb-4">
+						<img class="img-thumbnail" src="{{googleQR}}">
+					</div>
+				
+					<div class="col-lg-8">
+						<div class="form-group mb-4">
+							<input id="verify_google_code" class="form-control shop_input" type="text" placeholder=" ">
+							<label for="verify_google_code">{{LANG confirm_code}}</label>
+						</div>
+					</div>
+				</div>
+
+				<ol class="px-4">
+					<li>
+						{{LANG authenticator_download}}
+					</li>
+					<li class="mt-2">
+						{{LANG authenticator_set}}
+					</li>
+					<li class="mt-2">
+						{{LANG authenticator_verify}}
+					</li>
+					<li class="mt-2">
+						{{LANG authenticator_otp}}
+					</li>
+				</ol>
+			</div>
+        <?php } ?>
+        <?php if ($pt->config->authy_settings == 'on') { ?>
+            <?php //if (!empty($pt->settings->authy_id)) { ?>
+                <div class="authy_auth" <?php if ($pt->settings->two_factor_method != 'authy') { ?>style="display:none;"<?php } ?>>
+                    <div class="text-center">
+						<img class="img-thumbnail" src="{{authyQR}}">
+					</div>
+                </div>
+            <?php //} ?>
+        <?php } ?>
+    <?php }else{ ?>
+        <div class="text-center empty_state">
+			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path opacity="0.4" d="M19.7906 4.22007C16.8306 1.27007 12.0306 1.27007 9.09063 4.22007C7.02063 6.27007 6.40063 9.22007 7.20063 11.8201L2.50063 16.5201C2.17063 16.8601 1.94063 17.5301 2.01063 18.0101L2.31063 20.1901C2.42063 20.9101 3.09063 21.5901 3.81063 21.6901L5.99063 21.9901C6.47063 22.0601 7.14063 21.8401 7.48063 21.4901L8.30063 20.6701C8.50063 20.4801 8.50063 20.1601 8.30063 19.9601L6.36063 18.0201C6.07063 17.7301 6.07063 17.2501 6.36063 16.9601C6.65063 16.6701 7.13063 16.6701 7.42063 16.9601L9.37063 18.9101C9.56063 19.1001 9.88063 19.1001 10.0706 18.9101L12.1906 16.8001C14.7806 17.6101 17.7306 16.9801 19.7906 14.9301C22.7406 11.9801 22.7406 7.17007 19.7906 4.22007ZM14.5006 12.0001C13.1206 12.0001 12.0006 10.8801 12.0006 9.50007C12.0006 8.12007 13.1206 7.00007 14.5006 7.00007C15.8806 7.00007 17.0006 8.12007 17.0006 9.50007C17.0006 10.8801 15.8806 12.0001 14.5006 12.0001Z" fill="currentColor"/><path d="M14.5 12C15.8807 12 17 10.8807 17 9.5C17 8.11929 15.8807 7 14.5 7C13.1193 7 12 8.11929 12 9.5C12 10.8807 13.1193 12 14.5 12Z" fill="currentColor"/></svg> <?php echo(str_replace('{method}', $pt->factor_used, $lang_array['two_auth_currenly_enabled'])) ?>
+            <input type="hidden" name="two_factor" value="0">
+        </div>
+    <?php } ?>
+
+	<input type="hidden" name="hash_id" value="<?php echo PT_CreateSession()?>">
+	<input type="hidden" name="user_id" value="{{USER id}}">
+	
+	<div class="pt-2">
+		<?php if ($pt->settings->two_factor == '0') { ?>
+			<button type="button" id="request_code" class="btn btn-main btn-lg" onclick="requestCode()">{{LANG save}}</button>
+		<?php }else{ ?>
+			<?php if ($pt->config->authy_settings == 'on' || $pt->config->google_authenticator == 'on') { ?>
+               <button type="button" class="btn btn-main btn-lg" id="download_backup_codes_btn" onclick="downloadBackup()">{{LANG download_backup_codes}}</button>
+            <?php } ?>
+			<button id="submit" name="submit" class="btn btn-secondary btn-lg">{{LANG deactivate}}</button>
+		<?php } ?>
+	</div>
+</form>
+
+<div class="modal fade" id="verify_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">{{LANG confirm_code}}</h5>
+			</div>
+
+			<form id="verify_form" method="post">
+				<div class="modal-body">
+					<div id="verify_alert"></div>
+                
+                    <div class="authy_qr"></div>
+					
+                    <div class="form-group mb-0">
+                        <input id="verify_code" class="form-control" type="text" placeholder="{{LANG confirm_code}}">
+						<label for="verify_code">{{LANG confirm_code}}</label>
+                    </div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-link" data-dismiss="modal">{{LANG cancel}}</button>
+					<button type="button" class="btn btn-main" onclick="verifyCode()" id="verify_code_button">{{LANG save}}</button>
+				</div>
+			</form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="authy_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">{{LANG authy_register}}</h5>
+			</div>
+			
+			<form id="authy_form" method="post">
+				<div class="modal-body">
+					<div id="authy_alert"></div>
+                
+                    <div class="form-group">
+                        <input id="authy_email" class="form-control" type="text" placeholder="{{LANG email}}" value="{{USER email}}">
+						<label for="authy_email">{{LANG email}}</label>
+                    </div>
+					
+                    <div class="row">
+                        <div class="col-4">
+							<div class="form-group mb-0">
+								<select id="country_code" name="country_code" class="form-control">
+									<?php foreach ($pt->countries_codes as $key => $value) { ?>
+										<option value="<?php echo($key) ?>"><?php echo($value) ?></option>
+									<?php } ?>
+								</select>
+								<label for="country_code">{{LANG country_code}}</label>
+							</div>
+                        </div>
+                        <div class="col-8">
+							<div class="form-group mb-0">
+								<input id="authy_phone" class="form-control" type="text" placeholder="{{LANG phone_number}}" value="{{USER phone_number}}">
+								<label for="authy_phone">{{LANG phone_number}}</label>
+							</div>
+                        </div>
+                    </div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-link" data-dismiss="modal">{{LANG cancel}}</button>
+					<button type="button" class="btn btn-main" onclick="authyRegister()" id="authy_button">{{LANG send}}</button>
+				</div>
+			</form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function downloadBackup() {
+        $('#download_backup_codes_btn').text("{{LANG please_wait}}");
+        $.post('{{LINK aj/user/backup_codes}}?hash=' + $('.main_session').val(), {user_id: "<?php echo $pt->settings->id;?>"}, function(data, textStatus, xhr) {
+            $('#download_backup_codes_btn').text("{{LANG download_backup_codes}}");
+
+            var blob = new Blob([data], {type: 'text/plain'});
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'backup-codes.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    }
+    <?php if ($pt->settings->two_factor == '0') { ?>
+		var submitgooogle = document.getElementById("verify_google_code");
+		submitgooogle.addEventListener("keydown", function (e) {
+			if (e.code === "Enter") {  //checks whether the pressed key is "Enter"
+				event.preventDefault();
+				verifyGoogleCode();
+				return false;
+			}
+		});
+		
+    function verifyGoogleCode() {
+        $('#request_code').text("{{LANG please_wait}}");
+        $.post('{{LINK aj/user/verify_code}}?hash=' + $('.main_session').val(), {user_id: "{{USER id}}", code: $('#verify_google_code').val(), factor_method: $('#two_factor_method').val()}, function(data, textStatus, xhr) {
+            $('#request_code').text("{{LANG save}}");
+            if (data.status == 200) {
+                $('.two-factor-alert').html('<div class="alert alert-success">' + data.message + '</div>');
+                setTimeout(() => {
+                    $('.two-factor-alert').html('');
+                    window.location.reload();
+                },2000);
+            }
+            else{
+                $('.two-factor-alert').html('<div class="alert alert-danger">' + data.message + '</div>');
+                setTimeout(() => {
+                    $('.two-factor-alert').html('');
+                },2000);
+            }
+        });
+    }
+    function authyRegister() {
+        $('#authy_button').text("{{LANG please_wait}}");
+        $.post('{{LINK aj/user/authy_register}}?hash=' + $('.main_session').val(), {user_id: "{{USER id}}", email: $('#authy_email').val(), phone: $('#authy_phone').val(), country_code: $('#country_code').val()}, function(data, textStatus, xhr) {
+            $('#authy_button').text("{{LANG send}}");
+            if (data.status == 200) {
+                $('#authy_alert').html('<div class="alert alert-success">' + data.message + '</div>');
+                setTimeout(() => {
+                    $('#authy_alert').html('');
+                    $('#authy_modal').modal('hide');
+                    
+                    if (typeof data.qr != 'undefined' && data.qr != '') {
+                        $('#verify_modal').modal({
+                         show: true
+                        });
+                        $('.authy_qr').html('<img src="'+data.qr+'">');
+                    }
+                    else{
+                        window.location.reload();
+                    }
+                },2000);
+            }
+            else{
+                $('#authy_alert').html('<div class="alert alert-danger">' + data.message + '</div>');
+                setTimeout(() => {
+                    $('#authy_alert').html('');
+                },2000);
+            }
+        });
+    }
+    function verifyCode() {
+        $('#verify_code_button').text("{{LANG please_wait}}");
+        $.post('{{LINK aj/user/verify_code}}?hash=' + $('.main_session').val(), {user_id: "{{USER id}}", code: $('#verify_code').val(), factor_method: $('#two_factor_method').val()}, function(data, textStatus, xhr) {
+            $('#verify_code_button').text("{{LANG send}}");
+            if (data.status == 200) {
+                $('#verify_alert').html('<div class="alert alert-success">' + data.message + '</div>');
+                setTimeout(() => {
+                    $('#verify_alert').html('');
+                    window.location.reload();
+                },2000);
+            }
+            else{
+                $('#verify_alert').html('<div class="alert alert-danger">' + data.message + '</div>');
+                setTimeout(() => {
+                    $('#verify_alert').html('');
+                },2000);
+            }
+        });
+    }
+    function requestCode() {
+        if ($('#two_factor_method').val() == 'google') {
+            verifyGoogleCode();
+            return false;
+        }
+        <?php if (empty($pt->settings->authy_id)) { ?>
+        if ($('#two_factor_method').val() == 'authy') {
+            $('#authy_modal').modal({
+             show: true
+            });
+            return false;
+        }
+        <?php } ?>
+        if ($('#two_factor_method').val() == 'two_factor') {
+            $('#verify_modal').modal({
+             show: true
+            });
+        }
+        $('#request_code').text("{{LANG please_wait}}");
+        $.post('{{LINK aj/user/request_code}}?hash=' + $('.main_session').val(), {user_id: "{{USER id}}", factor_method: $('#two_factor_method').val()}, function(data, textStatus, xhr) {
+            $('#request_code').text("{{LANG save}}");
+            if (data.status == 200) {
+                $('.two-factor-alert').html('<div class="alert alert-success">' + data.message + '</div>');
+                $('.alert-success').fadeIn(300);
+            }
+            else{
+                $('.two-factor-alert').html('<div class="alert alert-danger">' + data.message + '</div>');
+                $('.alert-danger').fadeIn(300);
+            }
+        });
+    }
+    function showMethod(self) {
+        if ($(self).val() == 'google') {
+            $('.google_authenticator').slideDown();
+            $('.authy_auth').slideUp();
+        }
+        else if($(self).val() == 'authy') {
+            $('.authy_auth').slideDown();
+            $('.google_authenticator').slideUp();
+        }
+        else{
+            $('.google_authenticator').slideUp();
+            $('.authy_auth').slideUp();
+        }
+    }
+    <?php }else{ ?>
+    $(function() {
+        var form = $('form#two-factor');
+
+        form.ajaxForm({
+            url: '{{LINK aj/user/two_factor}}?hash=' + $('.main_session').val(),
+            beforeSend: function() {
+                form.find('button').text("{{LANG please_wait}}");
+            },
+            success: function(data) {
+                scrollToTop();
+                if (data.status == 200) {
+                    $('.two-factor-alert').html('<div class="alert alert-success">' + data.message + '</div>');
+                    $('.alert-success').fadeIn('fast', function() {
+                        $(this).delay(2500).slideUp(500, function() {
+                            $(this).remove();
+                            window.location.reload();
+                        });
+                    });
+                } else if (data.errors) {
+                    var errors = data.errors.join("<br>");
+                    $('.two-factor-alert').html('<div class="alert alert-danger">' + errors + '</div>');
+                    $('.alert-danger').fadeIn(300);
+                }
+                form.find('button').html('{{LANG deactivate}}');
+                // FL_progressIconLoader(form.find('button'));
+            }
+        });
+    });
+    <?php } ?>
+</script>

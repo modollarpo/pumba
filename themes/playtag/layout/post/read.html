@@ -1,0 +1,270 @@
+<div class="pt-4 pb-5 container">
+	<div class="row">
+		<div class="col-xl-2 col-lg-1"></div>
+		<div class="col-xl-8 col-lg-10">
+			<div class="content p-3">
+				<div class="d-flex align-items-start gap-15 mb-3">
+					<div class="flex-0">
+						<a href="{{USER url}}"><img src="{{USER avatar}}" alt="{{USER name}}" class="rounded-circle" width="48" height="48"></a>
+					</div>
+					<div>
+						<h5 class="mb-0"><a href="{{USER url}}" class="black black-hover">{{USER name}}</a></h5>
+						<time class="text-muted small">{{TIME}}</time>
+					</div>
+				</div>
+				
+				<p class="mb-3">{{DESC}}</p>
+				
+				<div class="mx-n3 mb-3">
+					<div class="embed-responsive embed-responsive-4by3">
+						<img class="embed-responsive-item" src="{{IMAGE}}" />
+					</div>
+				</div>
+				
+				<div class="d-flex align-items-center bold tag_point_earn tag_blog_action">
+					<div type="button" class="d-inline-flex align-items-center gap-10" onclick="PT_LikePost(this,'up');" data-post-likes="{{LIKES}}">
+						<div class="d-inline-flex align-items-center justify-content-center position-relative icon {{LIKED}}">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 12C2 10.8954 2.89543 10 4 10C5.65685 10 7 11.3431 7 13V17C7 18.6569 5.65685 20 4 20C2.89543 20 2 19.1046 2 18V12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15.4787 7.30626L15.2124 8.16634C14.9942 8.87111 14.8851 9.22349 14.969 9.5018C15.0369 9.72695 15.1859 9.92102 15.389 10.0487C15.64 10.2065 16.0197 10.2065 16.7791 10.2065H17.1831C19.7532 10.2065 21.0382 10.2065 21.6452 10.9673C21.7145 11.0542 21.7762 11.1467 21.8296 11.2437C22.2965 12.0921 21.7657 13.2351 20.704 15.5211C19.7297 17.6189 19.2425 18.6678 18.338 19.2852C18.2505 19.3449 18.1605 19.4013 18.0683 19.4541C17.116 20 15.9362 20 13.5764 20H13.0646C10.2057 20 8.77628 20 7.88814 19.1395C7 18.2789 7 16.8939 7 14.1239V13.1503C7 11.6946 7 10.9668 7.25834 10.3006C7.51668 9.63441 8.01135 9.08664 9.00069 7.99112L13.0921 3.46056C13.1947 3.34694 13.246 3.29012 13.2913 3.25075C13.7135 2.88328 14.3652 2.92464 14.7344 3.34235C14.774 3.3871 14.8172 3.44991 14.9036 3.57554C15.0388 3.77205 15.1064 3.87031 15.1654 3.96765C15.6928 4.83913 15.8524 5.87436 15.6108 6.85715C15.5838 6.96692 15.5488 7.0801 15.4787 7.30626Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+						</div>
+						<span>{{LIKES}}</span>
+					</div>&nbsp;
+					<div type="button" class="d-inline-flex align-items-center gap-10" onclick="PT_LikePost(this,'down');" data-post-dislikes="{{DIS_LIKES}}">
+						<div class="d-inline-flex align-items-center justify-content-center position-relative icon {{DIS_LIKED}}">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 11C2 12.1046 2.89543 13 4 13C5.65685 13 7 11.6569 7 10V6C7 4.34315 5.65685 3 4 3C2.89543 3 2 3.89543 2 5V11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15.4787 15.6937L15.2124 14.8337C14.9942 14.1289 14.8851 13.7765 14.969 13.4982C15.0369 13.2731 15.1859 13.079 15.389 12.9513C15.64 12.7935 16.0197 12.7935 16.7791 12.7935H17.1831C19.7532 12.7935 21.0382 12.7935 21.6452 12.0327C21.7145 11.9458 21.7762 11.8533 21.8296 11.7563C22.2965 10.9079 21.7657 9.76487 20.704 7.4789C19.7297 5.38111 19.2425 4.33222 18.338 3.71485C18.2505 3.65508 18.1605 3.5987 18.0683 3.54586C17.116 3 15.9362 3 13.5764 3H13.0646C10.2057 3 8.77628 3 7.88814 3.86053C7 4.72106 7 6.10607 7 8.87607V9.84966C7 11.3054 7 12.0332 7.25834 12.6994C7.51668 13.3656 8.01135 13.9134 9.00069 15.0089L13.0921 19.5394C13.1947 19.6531 13.246 19.7099 13.2913 19.7493C13.7135 20.1167 14.3652 20.0754 14.7344 19.6577C14.774 19.6129 14.8172 19.5501 14.9036 19.4245C15.0388 19.228 15.1064 19.1297 15.1654 19.0323C15.6928 18.1609 15.8524 17.1256 15.6108 16.1429C15.5838 16.0331 15.5488 15.9199 15.4787 15.6937Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+						</div>
+						<span>{{DIS_LIKES}}</span>
+					</div>
+				</div>
+				
+				<div class="comments-content">
+					<h4 class="title mb-3">{{COMMENTS_COUNT}} {{LANG comments}}</h4>
+					
+					<form class="form submit-article-commet mb-4">
+						<div class="d-flex align-items-start gap-15">
+							<?php if (IS_LOGGED): ?>
+								<img class="flex-0 rounded-circle d-none d-md-block" width="58" height="58" src="{{ME avatar}}" alt="{{ME name}} avatar">
+							<?php endif; ?>
+							<div class="form-group mb-0 flex-1">
+								<textarea name="text" class="form-control" placeholder=" " rows="1"></textarea>
+								<label>{{LANG write_your_comment}}</label>
+							</div>
+
+							<button class="btn flex-0 btn-main p-3 rounded-circle" type="submit" title="{{LANG publish}}">
+								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.0693 8.50867L9.50929 4.22867C3.75929 1.34867 1.39929 3.70867 4.27929 9.45867L5.14929 11.1987C5.39929 11.7087 5.39929 12.2987 5.14929 12.8087L4.27929 14.5387C1.39929 20.2887 3.74929 22.6487 9.50929 19.7687L18.0693 15.4887C21.9093 13.5687 21.9093 10.4287 18.0693 8.50867ZM14.8393 12.7487H9.43929C9.02929 12.7487 8.68929 12.4087 8.68929 11.9987C8.68929 11.5887 9.02929 11.2487 9.43929 11.2487H14.8393C15.2493 11.2487 15.5893 11.5887 15.5893 11.9987C15.5893 12.4087 15.2493 12.7487 14.8393 12.7487Z" fill="currentColor"></path></svg>
+							</button>
+						</div>
+					</form>
+
+					<div class="user-comments" id="post-comments">
+						{{COMMENTS}}
+					</div>
+					
+					<?php if ($pt->count_cmt > 0): ?>
+						<div class="pt-2 text-center">
+							<div class="btn btn-main load-comments">{{LANG show_more}}</div>
+						</div>
+					<?php endif; ?>
+				</div>
+			</div>
+		</div>
+		<div class="col-xl-2 col-lg-1"></div>
+	</div>
+</div>
+
+<script>
+  jQuery(window).ready(function($) {
+      $.fn.scrollTo = function (speed) {
+        if (typeof(speed) === 'undefined')
+            speed = 500;
+
+        $('html, body').animate({
+            scrollTop: ($(this).offset().top - 100)
+        }, speed);
+
+        return $(this);
+      };
+
+      <?php if (!empty($_GET['cl']) && is_numeric($_GET['cl'])): ?>
+        if ($('#comment-<?php echo($_GET['cl']); ?>').length) {
+          var comment = $('#comment-<?php echo($_GET['cl']); ?>');
+          comment.scrollTo().find('p').addClass('active');
+          PT_Delay(function(){
+            comment.find('p').removeClass('active')
+          },2000);
+        }
+      <?php elseif(!empty($_GET['rl']) && is_numeric($_GET['rl'])): ?>
+        if ($('#reply-<?php echo($_GET['rl']); ?>').length) {
+          var reply  = $('#reply-<?php echo($_GET['rl']); ?>');
+          reply.scrollTo().find('p').addClass('active');
+          PT_Delay(function(){
+            reply.find('p').removeClass('active');
+          },2000);
+        }
+      <?php endif; ?>
+  });
+
+  jQuery(document).ready(function($) {
+      $(".load-comments").click(function(event) {
+        var self    = $(this);
+        var last_id = ($(".article-comments").length > 0) ? $(".article-comments:last").attr('data-id') : 0;
+        $.ajax({
+          url: '{{LINK aj/load-more-comments}}',
+          type: 'POST',
+          dataType: 'json',
+          data: {last_id: last_id,activity_id:'{{ID}}'},
+        })
+        .done(function(data) {
+          if (data.status == 200) {
+            $('#post-comments').append(data.comments);
+          }
+          else{
+            self.text(data.message);
+          }
+        })
+        .fail(function() {
+          console.log("error");
+        })
+      });
+
+      var post = '{{ID}}';
+      var form = $(".submit-article-commet");
+      var hash = $('.main_session').val();
+      $(".submit-article-commet").ajaxForm({
+          url: '{{LINK aj/add-comment}}',
+          type:'POST',
+          data:{activity_id:'{{ID}}',hash:hash},
+          beforeSend: function() {
+            var query = form.find('textarea').val();
+
+            if (!query){
+               form.find('textarea').addClass('danger-field-border');
+               return false;
+            }
+
+            else if(query.length > 600){
+               form.find('textarea').addClass('danger-field-border');
+               return false;
+            }
+
+            else if (!$('#main-container').attr('data-logged') && $('#main-url').val()) {
+              window.location.href = PT_Ajax_Requests_File() + 'login?to=' + $('#main-url').val();
+              return false;
+            }
+          },
+          success: function(data) {
+            if (data.status == 200) {
+               if ($('.user-comments').find('.no-comments-found').length > 0) {
+                  $('.user-comments').html(data.comment);
+               }
+
+               else{
+                  $('.user-comments').prepend(data.comment);
+               }               
+               
+               form.find('textarea').val('');
+               form.find('textarea').removeClass('danger-field-border');
+            } 
+            else {
+               swal(
+                 'Error!',
+                 'Something went wrong.Please try again later!',
+                 'error'
+               );
+            }
+          }
+      });
+  });
+
+  function PT_DeleteComment(id) {
+      if (!$('#main-container').attr('data-logged') && $('#main-url').val()) {
+        window.location.href = PT_Ajax_Requests_File() + 'login?to=' + $('#main-url').val();
+        return false;
+      }
+
+      swal({
+        title: "{{LANG confirmation}}",
+        text: "{{LANG delete_confirmation}}",
+		showCancelButton: true,
+		focusConfirm: false,
+		confirmButtonText:"{{LANG delete}}",
+		buttonsStyling:false,
+		confirmButtonClass:'btn btn-main',
+		cancelButtonClass:"btn btn-link",
+		allowOutsideClick:true,
+      })
+      .then(function(willDelete){
+         if (willDelete) {
+            if (!id) { return false; }
+
+            $('#comment-' + id).slideUp('fast');
+            $.post('{{LINK aj/delete-comment}}', {id: id});
+         }
+         else {
+            swal.close();
+         }
+      },
+      function(){
+         //pass
+      });      
+  }
+
+  function PT_LikePost(self,type){
+    if (!self || (type != 'up' && type != 'down')){
+      return false;
+    }
+
+    else if (!$('#main-container').attr('data-logged') && $('#main-url').val()) {
+      window.location.href = PT_Ajax_Requests_File() + 'login?to=' + $('#main-url').val();
+      return false;
+    }
+
+    var self = $(self);
+    $.ajax({
+      url: '{{LINK aj/like-system/}}' + type,
+      type: 'POST',
+      dataType: 'json',
+      data: {activity_id: '{{ID}}'}
+    })
+    .done(function(data) {
+      if (data.status == 200 && type == 'up' && data.code == 1){
+        self.find('span').text((data.up));
+        $('[data-post-dislikes]').find('span').text((data.down));
+        self.find('.icon').addClass('active');
+        self.siblings().find('.icon').removeClass('active');
+        
+      }
+
+      else if (data.status == 200 && type == 'up' && data.code == 0){
+        self.find('span').text((data.up));
+        $('[data-post-dislikes]').find('span').text((data.down));
+        self.find('.icon').removeClass('active');
+        self.siblings().find('.icon').removeClass('active');
+      }
+
+      else if (data.status == 200 && type == 'down' && data.code == 1){
+        self.find('span').text((data.down));
+        self.find('.icon').addClass('active');
+        $('[data-post-likes]').find('span').text((data.up));
+        self.siblings().find('.icon').removeClass('active');
+      }
+
+      else if (data.status == 200 && type == 'down' && data.code == 0){
+        self.find('span').text((data.down));
+        self.find('.icon').removeClass('active');
+        $('[data-post-likes]').find('span').text((data.up));
+        self.siblings().find('.icon').removeClass('active');
+      }
+
+      else{
+        swal(
+           'Error!',
+           'Something went wrong.Please try again later!',
+           'error'
+         );
+      }
+    })
+    .fail(function() {
+      console.log("error");
+    })
+  }
+</script>

@@ -1,0 +1,173 @@
+<script src="{{CONFIG theme_url}}/js/highcharts/highcharts.js"></script>
+<script src="{{CONFIG theme_url}}/js/highcharts/exporting.js"></script>
+
+<div class="pt-4 pb-5 container">
+	<h2 class="mt-0 mb-3 display-4">{{LANG ads}}</h2>
+	<div class="mb-5 d-flex align-items-center justify-content-between tag_vid_page_nav">
+		<div class="d-flex align-items-center py-1 tag_vid_page_sub_nav">
+			<a href="{{LINK ads}}" data-load="?link1=ads" class="btn back px-0 d-none d-md-inline-flex">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.57 5.92993L3.5 11.9999L9.57 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path><path d="M20.5 12H3.67004" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path></svg> {{LANG go_back}}
+			</a>
+			<a href="{{LINK ads/create}}" data-load="?link1=create_ads" class="btn content">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 8V16M16 12L8 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z" stroke="currentColor" stroke-width="2"/></svg> {{LANG create_ad}}
+			</a>
+		</div>
+		
+		<div class="dropdown">
+			<a href="javascript:void(0);" role="button" data-toggle="dropdown" data-display="static" class="btn btn-main">
+				<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 11.5C2 7.02166 2 4.78249 3.39124 3.39124C4.78249 2 7.02166 2 11.5 2C15.9783 2 18.2175 2 19.6088 3.39124C21 4.78249 21 7.02166 21 11.5C21 15.9783 21 18.2175 19.6088 19.6088C18.2175 21 15.9783 21 11.5 21C7.02166 21 4.78249 21 3.39124 19.6088C2 18.2175 2 15.9783 2 11.5Z" stroke="currentColor" stroke-width="1.5"/><path d="M8.5 11.5L14.5001 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 15H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.5 8H15.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+			</a>
+			<div class="dropdown-menu dropdown-menu-right p-3" onclick="event.stopPropagation();">
+				<div class="form-group mb-0">
+					<select id="type" name="type" class="form-control">
+						<option value="today" <?php echo ($pt->cat_type == 'today') ? 'selected': '';?>>{{LANG today}}</option>
+						<option value="this_week" <?php echo ($pt->cat_type == 'this_week') ? 'selected': '';?>>{{LANG this_week}}</option>
+						<option value="this_month" <?php echo ($pt->cat_type == 'this_month') ? 'selected': '';?>>{{LANG this_month}}</option>
+						<option value="this_year" <?php echo ($pt->cat_type == 'this_year') ? 'selected': '';?>>{{LANG this_year}}</option>
+					</select>
+					<label>{{LANG view_report}}</label>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="row mb-4">
+		<div class="col-md-6">
+			<div class="mb-4 p-4 tag_affi_links pro">
+				<div class="mb-3 d-flex align-items-center">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.1709 6.63953C18.7409 4.46953 17.1309 3.51953 14.8909 3.51953H6.11094C3.47094 3.51953 1.71094 4.83953 1.71094 7.91953V13.0695C1.71094 15.2895 2.62094 16.5895 4.12094 17.1495C4.34094 17.2295 4.58094 17.2995 4.83094 17.3395C5.23094 17.4295 5.66094 17.4695 6.11094 17.4695H14.9009C17.5409 17.4695 19.3009 16.1495 19.3009 13.0695V7.91953C19.3009 7.44953 19.2609 7.02953 19.1709 6.63953ZM5.53094 11.9995C5.53094 12.4095 5.19094 12.7495 4.78094 12.7495C4.37094 12.7495 4.03094 12.4095 4.03094 11.9995V8.99953C4.03094 8.58953 4.37094 8.24953 4.78094 8.24953C5.19094 8.24953 5.53094 8.58953 5.53094 8.99953V11.9995ZM10.5009 13.1395C9.04094 13.1395 7.86094 11.9595 7.86094 10.4995C7.86094 9.03953 9.04094 7.85953 10.5009 7.85953C11.9609 7.85953 13.1409 9.03953 13.1409 10.4995C13.1409 11.9595 11.9609 13.1395 10.5009 13.1395ZM16.9609 11.9995C16.9609 12.4095 16.6209 12.7495 16.2109 12.7495C15.8009 12.7495 15.4609 12.4095 15.4609 11.9995V8.99953C15.4609 8.58953 15.8009 8.24953 16.2109 8.24953C16.6209 8.24953 16.9609 8.58953 16.9609 8.99953V11.9995Z" fill="#1bc3bb"/><path d="M22.3017 10.9183V16.0683C22.3017 19.1483 20.5417 20.4783 17.8917 20.4783H9.11172C8.36172 20.4783 7.69172 20.3683 7.11172 20.1483C6.64172 19.9783 6.23172 19.7283 5.90172 19.4083C5.72172 19.2383 5.86172 18.9683 6.11172 18.9683H14.8917C18.5917 18.9683 20.7917 16.7683 20.7917 13.0783V7.91832C20.7917 7.67832 21.0617 7.52832 21.2317 7.70832C21.9117 8.42832 22.3017 9.47832 22.3017 10.9183Z" fill="#1bc3bb"/></svg>&nbsp;&nbsp;&nbsp;&nbsp;
+					<p class="h6 mb-0">{{LANG spent}}</p>
+				</div>
+				<h1 class="d-block mb-0 display-4">{{CURRENCY}}{{TOTAL_SPENT}}</h1>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="mb-4 p-4 tag_affi_links user">
+				<div class="mb-3 d-flex align-items-center">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.9597 17.8385L19.3297 18.3885C18.8797 18.5385 18.5197 18.8885 18.3697 19.3485L17.8197 20.9785C17.3497 22.3885 15.3697 22.3585 14.9297 20.9485L13.0797 14.9985C12.7197 13.8185 13.8097 12.7185 14.9797 13.0885L20.9397 14.9385C22.3397 15.3785 22.3597 17.3685 20.9597 17.8385Z" fill="#3698fd"/><path d="M20.9994 11.4994C20.9994 11.9294 20.9694 12.3594 20.9194 12.7794C20.8794 13.0794 20.5694 13.2594 20.2794 13.1694L15.4294 11.6594C14.3494 11.3294 13.1994 11.6094 12.3994 12.3994C11.5994 13.1994 11.3094 14.3694 11.6494 15.4494L13.1494 20.2794C13.2394 20.5694 13.0494 20.8794 12.7494 20.9194C12.3294 20.9694 11.9194 20.9994 11.4994 20.9994C6.15942 20.9994 1.85942 16.6094 1.99942 11.2294C2.13942 6.26942 6.26942 2.13942 11.2294 1.99942C16.6094 1.85942 20.9994 6.15942 20.9994 11.4994Z" fill="#3698fd"/></svg>&nbsp;&nbsp;&nbsp;&nbsp;
+					<p class="h6 mb-0">{{TEXT_RESULT}}</p>
+				</div>
+				<h1 class="d-block mb-0 display-4">{{TOTAL_RESULT}}</h1>
+			</div>
+		</div>
+	</div>
+	   
+	<div id="chart-container"></div>
+</div>
+
+<script>
+    $("select#type").change(function(){
+        var type = $('#type').val();
+        window.location.href = site_url+"/ads/analytics/{{ID}}?type="+type;
+    });
+
+   $(function () {
+    Highcharts.setOptions({
+      colors: ['#6abd46', '#ce3d3d', '#f2b92b', '#6abd46']
+    });
+    $('#chart-container').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: '<?php echo($pt->chart_title); ?> (Based on UTC timezone)'
+        },
+        xAxis: {
+            <?php if ($pt->cat_type == 'today') { ?>
+                categories: [
+                    '00 AM',
+                    '1 AM',
+                    '2 AM',
+                    '3 AM',
+                    '4 AM',
+                    '5 AM',
+                    '6 AM',
+                    '7 AM',
+                    '8 AM',
+                    '9 AM',
+                    '10 AM',
+                    '11 AM',
+                    '12 PM',
+                    '1 PM',
+                    '2 PM',
+                    '3 PM',
+                    '4 PM',
+                    '5 PM',
+                    '6 PM',
+                    '7 PM',
+                    '8 PM',
+                    '9 PM',
+                    '10 PM',
+                    '11 PM'
+                ]
+            <?php }elseif ($pt->cat_type == 'this_week') { ?>
+                categories: [
+                    'Saturday',
+                    'Sunday',
+                    'Monday',
+                    'Tuesday',
+                    'Wednesday',
+                    'Thursday',
+                    'Friday'
+                ]
+            <?php }elseif ($pt->cat_type == 'this_month') { ?>
+                <?php if ($pt->month_days == 31) { ?>
+                    categories: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+                <?php }elseif ($pt->month_days == 30) { ?>
+                    categories: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+                <?php }elseif ($pt->month_days == 29) { ?>
+                    categories: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29]
+                <?php }elseif ($pt->month_days == 28) {  ?>
+                    categories: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28]
+                <?php } ?>
+            <?php }elseif ($pt->cat_type == 'this_year') { ?>
+                categories: [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+            <?php } ?>,
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: '<?php echo $pt->chart_text;?>'
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px;color:#fff;">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:#fff;padding:0">{series.name}: </td>' +
+                '<td style="padding:0;color:#fff;"><b>{point.y}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true,
+            backgroundColor: '#444'
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            name: '{{LANG spent}}',
+            data: [<?php echo $pt->array;?>]
+
+	        }, {
+            name: '{{TEXT_RESULT}}',
+            data: [<?php echo $pt->click_array;?>]
+
+	        }]
+    });
+});
+</script>

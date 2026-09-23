@@ -1,0 +1,79 @@
+body {text-align: right;}
+.main-content {margin-left: 0;margin-right: 100px;}
+.head_sidebar {left: auto;right: 0;}
+.head_sidebar_menu {left: auto;right: 0;}
+.head_sidebar_backsplash {transform: translateX(50%);background: linear-gradient(269deg,var(--body-bg) 20%,rgb(255 255 255 / 0%));right: 0;}
+.head_sidebar_menu a {padding: 16px 41.5px 16px 16.5px;}
+.head_sidebar_menu a span {transform: translateX(50px);left: auto;right: 95px;}
+.tag_mode_toggle.mini {left: auto;right: 0;}
+.dropdown-menu-right {left: 0;right: auto;}
+.tag_search_menu, .tag_noti_menu {transform: translateX(50%);box-shadow: -4px 0 24px rgb(0 0 0 / 14%);border-radius: 16px 0 0 16px;}
+.btn-close {right: auto;left: 0;}
+.tag_header_ddown {left: auto;right: 124px;}
+body.search_menu_open .head_sidebar, body.noti_menu_open .head_sidebar {border-right: 0;border-left: 1px solid #e7e7e7;}
+.tag_feat_video {margin: -70px 0 0 -1.5rem;}
+.tag_feat_video_img {margin-left: 0;margin-right: 350px;}
+.tag_feat_video_img:after {left: auto;right: -1px;transform: scaleX(-1);}
+.tag_feat_video_info {left: auto;right: 0;}
+.header_search .form-group input {padding: 0 60px 0 10px;}
+.tag_home_vid_list > .title a svg {transform: translateX(10px);transform: rotate(180deg);}
+.tag_home_vid_list:hover > .title a svg {transform: translateX(-5px) rotate(180deg);}
+.tag_video_grid_list .duration {right: auto;left: -10px;border-radius: 0 10px 0 10px;}
+.tag_video_grid_list:hover .duration {right: auto;left: 0;}
+.tag_video_grid_list .play_btn {background: linear-gradient(to top left,rgb(0 0 0 / 70%),rgb(0 0 0 / 10%),transparent 49%);}
+.tag_video_grid_list .play_btn svg {transform: rotate(180deg);}
+.tag_video_grid.top .tag_video_grid_list {padding-left: 0;padding-right: 60px;}
+.tag_video_grid.top .tag_video_grid_list:after {left: auto;right: 0;}
+.tag_header_ddown.tag_user_menu {left: 0;}
+.custom-control {padding-left: 0;padding-right: 1.5rem;}
+.custom-control-label::before {left: auto;right: -1.5rem;}
+.custom-control-label::after {left: auto;right: -1.5rem;}
+.tag_vid_page_sub_nav .btn.back svg {transform: rotate(180deg);}
+.promo_icon {left: auto;right: 0;}
+.promo_icon:before {transform: scaleX(-1);}
+.promo_icon svg {transform: scaleX(-1);}
+.form-group > label {left: auto;right: 0;}
+.form-group > .form-control:focus~label, .form-group > .form-control:not(:placeholder-shown)~label {transform: scale(.83) translateY(-.5rem) translateX(.5rem);}
+.form-group > select.form-control:not([multiple]), .form-group .bootstrap-select>.dropdown-toggle.btn {background-position: left .75rem center;}
+.bootstrap-select .dropdown-toggle .filter-option {text-align: right;}
+.tag_edit_thumb .position-absolute {right: auto;left: 0;}
+.tag_pro_plan > svg {right: auto;left: 0;transform: scaleX(1);}
+.tag_video_grid_list .thumb .shorts {right: auto;left: 0;}
+.tag_live {border-radius: 0 0.7rem 0 0;}
+.pt_live_controls {left: auto;right: 0;}
+.tag_live_comments {left: auto;right: 0;}
+.popular_channels_list .channels_list:nth-child(-n+3) .embed-responsive-item:before {-webkit-mask-image: linear-gradient(270deg, transparent, #000);right: auto;left: 0;}
+.popular_channels_list .channels_list:nth-child(-n+3) .embed-responsive-item:after {right: auto;left: -18px;}
+.tag_sett_sidebar a > svg {transform: rotate(180deg);}
+.shorts_events .icons {margin: 0 0 0 -80px;}
+.tag_short.swiper .swiper-button-prev, .tag_short.swiper .swiper-button-next {left: 16px;right: auto;}
+.tag_profile_cover {margin: -70px 0 0 -1.5rem;}
+.pt_upvid_three .cus_cont .custom-control-label::before, .pt_upvid_three .cus_cont .custom-control-label::after {left: auto;right: -0.6rem;}
+.tag_main_player, .tag_main_vid_details {padding-right: 0;padding-left: 30%;}
+.tag_watch_side {right: auto;left: 0;}
+body:not(.theater) .sticky-container_sticky .sticky-container__video {right: auto;left: 0;}
+.play-list-cont .side-barlist-wrapper:before {margin-right: 0;margin-left: -15px;}
+.vid-number-cont {left: 0;right: -25px;}
+.snackbar-container {left: auto;right: 50%;transform: translateX(50%);}
+.snackbar-container .action {margin: 0 auto 0 0;}
+.watermark {right: auto;left: 20px;}
+.custom-control-input {left: auto;right: 0;}
+
+
+
+
+
+@media (min-width: 992px) {
+.mr-lg-n4, .mx-lg-n4 {margin-right: 0 !important;margin-left: -1.5rem!important;}
+.liv_vid_cont {margin-left: 0;margin-right: 450px;}
+}
+
+@media (max-width: 767px) {
+.mobilerightpane, .mobileleftpane {
+    position: fixed;
+	padding: 0;
+}
+.pt_msg_header > h5 > svg.mobilemsgclose {
+	transform: scaleX(-1);
+}
+}

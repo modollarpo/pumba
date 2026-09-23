@@ -1,0 +1,28 @@
+<div class="pt-4 pb-5 container">
+	<h2 class="mt-0 mb-3 display-4">{{LANG about_us}}</h2>
+	
+	<div class="mb-5 d-flex align-items-center justify-content-between tag_vid_page_nav">
+		<div class="d-flex align-items-center py-1 tag_vid_page_sub_nav">
+			<a href="{{LINK }}" data-load="?link1=home" class="btn back px-0 d-none d-md-inline-flex">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.57 5.92993L3.5 11.9999L9.57 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path><path d="M20.5 12H3.67004" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path></svg> {{LANG home}}
+			</a>
+			<a href="{{LINK terms/faqs}}" data-load="?link1=terms&type=faqs" class="btn content">{{LANG faqs}}</a>
+			<?php if ($pt->refund_terms_page == 1) { ?>
+				<a href="{{LINK terms/refund-policy}}" data-load="?link1=terms&type=refund-policy" class="btn content">{{LANG refund_policy}}</a>
+			<?php } ?>
+			<?php if ($pt->terms_of_use_page == 1) { ?>
+				<a href="{{LINK terms/terms}}" data-load="?link1=terms&type=terms" class="btn content">{{LANG terms_of_use}}</a>
+			<?php } ?>
+			<?php if ($pt->privacy_policy_page == 1) { ?>
+				<a href="{{LINK terms/privacy-policy}}" data-load="?link1=terms&type=privacy-policy" class="btn content">{{LANG privacy_policy}}</a>
+			<?php } ?>
+			<?php if ($pt->about_page == 1) { ?>
+				<a href="{{LINK terms/about-us}}" data-load="?link1=terms&type=about-us" class="btn btn-main">{{LANG about_us}}</a>
+			<?php } ?>
+		</div>
+	</div>
+	
+	<div class="content p-4">
+		<?php echo htmlspecialchars_decode($pt->all_lang->about_page);?>
+	</div>
+</div>

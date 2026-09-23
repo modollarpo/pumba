@@ -1,0 +1,192 @@
+<?php if ($pt->config->user_mon_approve == 'on' && $pt->is_mon == 0 && $pt->settings->monetization == 0) { ?>
+    <form class="content p-4" id="monetization-request-form" method="POST">
+        <p class="lead mb-4">Enable monetization on your account and start selling videos, get paid from ads, and more.</p>
+
+        <div class="setting-delete-alert"></div>
+
+		<div class="monetization-request-alert"></div>
+		
+		<div class="form-group">
+			<input id="name" name="name" type="text" placeholder="{{LANG name}}" class="form-control">
+			<label for="username">{{LANG name}}</label>
+		</div>
+		
+		<div class="form-group">
+			<textarea name="message" rows="3" class="form-control" placeholder="{{LANG additional_details}}"></textarea>
+			<label for="username">{{LANG additional_details}}</label>
+		</div>
+		
+		<div type="button" class="d-flex align-items-center mb-4 tag_point_earn" onclick="$('#personal_photo').trigger('click');">
+			<div class="d-inline-flex align-items-center justify-content-center position-relative main icon">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z"></path></svg>
+			</div>
+			<div>
+				<div class="h6 mb-0">{{LANG personal_photo}}</div>
+				<div><small class="mt-1 form-text text-muted d-none text-truncate" id="per_photo"></small></div>
+			</div>
+		</div>
+		
+		<div type="button" class="d-flex align-items-center mb-4 tag_point_earn" onclick="$('#id_photo_input').trigger('click');">
+			<div class="d-inline-flex align-items-center justify-content-center position-relative main icon">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z"></path></svg>
+			</div>
+			<div>
+				<div class="h6 mb-0">{{LANG passport_id}}</div>
+				<div><small class="mt-1 form-text text-muted d-none text-truncate" id="pp_id"></small></div>
+			</div>
+		</div>
+		
+		<div class="pt-2">
+			<button id="btn_request" name="submit" class="btn btn-main btn-lg">{{LANG submit_request}}</button>
+		</div>
+		
+		<input type="hidden" name="hash_id" value="<?php echo PT_CreateSession()?>">
+		<input type="hidden" name="user_id" value="{{USER id}}">
+		<input type="file" name="personal_photo" id="personal_photo" class="d-none" accept="image/*">
+		<input type="file" name="id_photo" id="id_photo_input" class="d-none" accept="image/*">
+    </form>
+
+    <script type="text/javascript">
+        $(function () {
+			$("#personal_photo").change(function () {
+				var filename = $(this).val().replace(/C:\\fakepath\\/i, '');
+				$("#per_photo").text(filename).removeClass('d-none');
+			});
+			$("#id_photo_input").change(function () {
+				var filename = $(this).val().replace(/C:\\fakepath\\/i, '');
+				$("#pp_id").text(filename).removeClass('d-none');
+			});
+
+			$('#monetization-request-form').ajaxForm({
+                url: '{{LINK aj/main/monetization}}?hash=' + $('.main_session').val(),
+                dataType:'json',
+                beforeSend: function() {
+                    $('#monetization-request-form').find('#btn_request').text("{{LANG please_wait}}");
+                    $('#monetization-request-form').find('#btn_request').attr('disabled', 'true');
+                },
+                success: function(data) {   
+                    scrollToTop();  
+                    if (data.status == 200) {
+                        $('.monetization-request-alert').html('<div class="alert alert-success">'+data.message+'</div>');
+                        $('#monetization-request-form').resetForm();
+
+                        PT_Delay(function(){
+                            location.reload();
+                        },1500);
+                    }
+                    else{
+                       $('.monetization-request-alert').html('<div class="alert alert-danger">'+data.message+'</div>');  
+                    }
+                    $('#monetization-request-form').find('#btn_request').text("{{LANG submit_request}}");
+                    $('#monetization-request-form').find('#btn_request').removeAttr('disabled')
+                }
+			});
+		});
+    </script>
+<?php }elseif ($pt->config->user_mon_approve == 'on' && $pt->is_mon > 0 && $pt->settings->monetization == 0) { ?>
+    <div class="content p-4">
+		<div class="text-center empty_state">
+			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 13C3.24 13 1 15.23 1 18C1 20.77 3.24 23 6 23C8.76 23 11 20.76 11 18C11 15.24 8.77 13 6 13ZM3.95999 15.96H6C6.38 15.96 6.67999 16.27 6.67999 16.64C6.67999 17.01 6.37 17.32 6 17.32H3.95999C3.57999 17.32 3.28 17.01 3.28 16.64C3.28 16.27 3.57999 15.96 3.95999 15.96ZM8.04001 20.04H3.95001C3.57001 20.04 3.26999 19.73 3.26999 19.36C3.26999 18.99 3.58001 18.68 3.95001 18.68H8.04001C8.42001 18.68 8.72 18.99 8.72 19.36C8.72 19.73 8.42001 20.04 8.04001 20.04Z" fill="currentColor"/><path opacity="0.4" d="M17 3H7C4 3 2 4.5 2 8V11.14C2 11.87 2.75001 12.33 3.42001 12.04C4.52001 11.56 5.76999 11.38 7.07999 11.59C9.69999 12.02 11.84 14.09 12.37 16.69C12.52 17.45 12.54 18.19 12.44 18.9C12.36 19.49 12.84 20.01 13.43 20.01H17C20 20.01 22 18.51 22 15.01V8.00999C22 4.49999 20 3 17 3Z" fill="currentColor"/><path d="M11.9988 11.8719C11.1588 11.8719 10.3088 11.6119 9.6588 11.0819L6.5288 8.58192C6.2088 8.32192 6.14881 7.85192 6.4088 7.53192C6.6688 7.21192 7.13879 7.15193 7.45879 7.41193L10.5888 9.91193C11.3488 10.5219 12.6388 10.5219 13.3988 9.91193L16.5288 7.41193C16.8488 7.15193 17.3288 7.20192 17.5788 7.53192C17.8388 7.85192 17.7888 8.33192 17.4588 8.58192L14.3288 11.0819C13.6888 11.6119 12.8388 11.8719 11.9988 11.8719Z" fill="currentColor"/></svg> {{LANG verif_request_received}}
+		</div>
+    </div>
+<?php } else{ ?>
+	<form class="content p-4" id="general-settings" method="POST">
+		<div class="setting-general-alert"></div>
+	
+		<div class="position-relative tag_sett_monetize">
+			<div class="row align-items-center">
+				<div class="col-lg-7">
+					<h5 class="lead mb-4">{{LANG earn_mon}}</h5>
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input" id="toggle-video-monetization" <?php echo ($pt->settings->video_mon == '1') ? 'checked': '';?>>
+						<label class="custom-control-label" for="toggle-video-monetization">{{LANG monetization}}</label>
+					</div>
+				</div>
+				<div class="col-lg-1"></div>
+				<div class="col-lg-4 text-center d-none d-lg-block">
+					<img src="{{CONFIG theme_url}}/img/coins.svg">
+				</div>
+			</div>
+		</div>
+	
+        <?php if ($pt->config->payed_subscribers == 'on' && canUseFeature($pt->settings->id,'who_can_payed_subscribers')) { ?>
+			<hr class="my-4">
+			<div class="form-group">
+				<input id="subscriber_price" name="subscriber_price" type="text" placeholder=" " class="form-control" value="{{USER subscriber_price}}">
+				<label for="subscriber_price">{{LANG subscriber_price}}</label>
+			</div>
+        <?php } ?>
+		
+		<input type="hidden" name="hash_id" value="<?php echo PT_CreateSession()?>">
+		<input type="hidden" name="user_id" value="{{USER id}}">
+   
+		<?php if ($pt->config->payed_subscribers == 'on' && canUseFeature($pt->settings->id,'who_can_payed_subscribers')) { ?>
+			<div class="pt-2">
+				<button id="submit" name="submit" class="btn btn-main btn-lg">{{LANG save}}</button>
+			</div>
+		<?php } ?>
+	</form>
+
+	<script>
+		jQuery(document).ready(function($) {
+			$("#toggle-video-monetization").change(function(event) {
+				let hash_id = $('.main_session').val();
+				let url     = "{{LINK aj/user/video-monetization}}?hash=" + hash_id;
+				$.post(url,{user_id:'<?php echo($pt->settings->id);?>'}, function(data, textStatus, xhr) { /* pass */});
+			});
+
+			var form = $('form#monetization-settings');
+			form.ajaxForm({
+				url: '{{LINK aj/user/request-withdrawal}}?hash=' + $('.main_session').val(),
+				dataType:'json',
+				beforeSend: function() {
+					form.find('button').text("{{LANG please_wait}}");
+				},
+				success: function(data) {
+					scrollToTop();
+					if (data.status == 200) {
+						$('.monetization-settings-alert').html('<div class="alert alert-success bg-success">' + data.message + '</div>');
+						$('.alert-success').fadeIn('fast', function() {
+							$(this).delay(2500).slideUp(500, function() {
+								$(this).remove();
+							});
+						});
+					} 
+					else if (data.status == 400) {
+						$('.monetization-settings-alert').html('<div class="alert alert-danger bg-danger">' + data.message + '</div>');
+						$('.alert-danger').fadeIn(300);
+					}
+					form.find('button').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> {{LANG submit_withdrawal_request}}');
+				}
+			});
+			<?php if ($pt->config->payed_subscribers == 'on' && canUseFeature($pt->settings->id,'who_can_payed_subscribers')) { ?>
+			var form = $('form#general-settings');
+
+			form.ajaxForm({
+				url: '{{LINK aj/user/change_price}}?hash=' + $('.main_session').val(),
+				beforeSend: function() {
+					form.find('button').text("{{LANG please_wait}}");
+					// FL_progressIconLoader(form.find('button'));
+				},
+				success: function(data) {
+					scrollToTop();
+					if (data.status == 200) {
+						$('.setting-general-alert').html('<div class="alert alert-success">' + data.message + '</div>');
+						$('.alert-success').fadeIn('fast', function() {
+							$(this).delay(2500).slideUp(500, function() {
+								$(this).remove();
+							});
+						});
+					} else if (data.errors) {
+						var errors = data.errors.join("<br>");
+						$('.setting-general-alert').html('<div class="alert alert-danger">' + errors + '</div>');
+						$('.alert-danger').fadeIn(300);
+					}
+					form.find('button').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> {{LANG save}}');
+					// FL_progressIconLoader(form.find('button'));
+				}
+			});
+			<?php } ?>
+		});
+	</script>
+<?php } ?>

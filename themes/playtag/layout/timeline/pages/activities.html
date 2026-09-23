@@ -1,0 +1,82 @@
+<h3 class="title mb-3 d-none">{{LANG recent_activities}}</h3>
+
+<div class="videos-latest-list">
+	<div class="row">
+		<div class="col-lg-2 col-md-1"></div>
+		<div class="col-lg-8 col-md-10">
+			<div class="articles-container">
+				{{VIDEOS}}
+			</div>
+		</div>
+		<div class="col-lg-2 col-md-1"></div>
+	</div>
+
+	<?php if ($pt->posts_count > 20) { ?>
+		<div class="pt-2 text-center">
+			<div class="btn btn-main" data-type="activity" onclick="PT_LoadActivity(this);">{{LANG show_more}}</div>
+		</div>
+	<?php } ?>
+</div>
+
+<script type="text/javascript">
+	  function PT_LikePost(self,type){
+    if (!self || (type != 'up' && type != 'down')){
+      return false;
+    }
+
+    else if (!$('#main-container').attr('data-logged') && $('#main-url').val()) {
+      window.location.href = PT_Ajax_Requests_File() + 'login?to=' + $('#main-url').val();
+      return false;
+    }
+    id = $(self).attr('data-post-id');
+
+    var self = $(self);
+    $.ajax({
+      url: '{{LINK aj/like-system/}}' + type,
+      type: 'POST',
+      dataType: 'json',
+      data: {activity_id: id}
+    })
+    .done(function(data) {
+      if (data.status == 200 && type == 'up' && data.code == 1){
+        self.find('span').text((data.up));
+        $('[data-post-dislikes]').find('span').text((data.down));
+        self.find('.icon').addClass('active');
+        self.siblings().find('.icon').removeClass('active');
+        
+      }
+
+      else if (data.status == 200 && type == 'up' && data.code == 0){
+        self.find('span').text((data.up));
+        $('[data-post-dislikes]').find('span').text((data.down));
+        self.find('.icon').removeClass('active');
+        self.siblings().find('.icon').removeClass('active');
+      }
+
+      else if (data.status == 200 && type == 'down' && data.code == 1){
+        self.find('span').text((data.down));
+        self.find('.icon').addClass('active');
+        $('[data-post-likes]').find('span').text((data.up));
+        self.siblings().find('.icon').removeClass('active');
+      }
+
+      else if (data.status == 200 && type == 'down' && data.code == 0){
+        self.find('span').text((data.down));
+        self.find('.icon').removeClass('active');
+        $('[data-post-likes]').find('span').text((data.up));
+        self.siblings().find('.icon').removeClass('active');
+      }
+
+      else{
+        swal(
+           'Error!',
+           'Something went wrong.Please try again later!',
+           'error'
+         );
+      }
+    })
+    .fail(function() {
+      console.log("error");
+    })
+  }
+</script>

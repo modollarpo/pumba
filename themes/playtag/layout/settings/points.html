@@ -1,0 +1,82 @@
+<div class="py-4 container">
+	<h2 class="mt-0 mb-3 display-4">{{LANG points}}</h2>
+	
+	<div class="mb-5 d-flex align-items-center justify-content-between tag_vid_page_nav">
+		<div class="d-flex align-items-center py-1 tag_vid_page_sub_nav">
+			<a href="{{LINK }}" data-load="?link1=home" class="btn back px-0 d-none d-md-inline-flex">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.57 5.92993L3.5 11.9999L9.57 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5 12H3.67004" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG home}}
+			</a>
+			<a href="{{LINK wallet}}" data-load="?link1=wallet" class="btn content">{{LANG wallet}}</a>
+			<?php if (($pt->config->usr_v_mon == 'on' && $pt->config->sell_videos_system == 'on') || ($pt->config->usr_v_mon == 'off' && $pt->config->sell_videos_system == 'on') || ($pt->config->usr_v_mon == 'on' && $pt->config->sell_videos_system == 'off') ) { ?>
+				<a href="{{LINK settings/balance/<?php echo $pt->settings->username; ?>}}" data-load="?link1=settings&page=balance&user=<?php echo $pt->settings->username; ?>" class="btn content">{{LANG balance_}}</a>
+			<?php } ?>
+			<?php if ($pt->config->point_level_system == 1): ?>  
+				<a href="{{LINK settings/points/<?php echo $pt->settings->username; ?>}}" data-load="?link1=settings&page=points&user=<?php echo $pt->settings->username; ?>" class="btn content btn-main">{{LANG points}}</a>
+			<?php endif ?>
+			<?php if ($pt->config->usr_v_mon == 'on' || $pt->config->payed_subscribers == 'on'): ?>
+				<a href="{{LINK settings/monetization/<?php echo $pt->settings->username; ?>}}" data-load="?link1=settings&page=monetization&user=<?php echo $pt->settings->username; ?>" class="btn content">{{LANG monetization}}</a>
+			<?php endif; ?>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col-lg-3">
+			<div class="p-4 py-5 mb-4 position-relative overflow-hidden text-center tag_wallet_balance tag_point_balance">
+				<svg xmlns="http://www.w3.org/2000/svg" width="483" height="504" viewBox="0 0 483 504" fill="none" class="position-absolute circle" opacity="0.15"><circle cx="269" cy="235" r="209" stroke="#faa500" stroke-width="120"/></svg>
+				
+				<svg width="124" height="99" viewBox="0 0 124 99" fill="none" xmlns="http://www.w3.org/2000/svg" class="position-absolute m-4 dots" opacity="0.5"><circle opacity="0.2" cx="77" cy="12" r="12" fill="#faa500"/><circle opacity="0.4" cx="15" cy="84" r="15" fill="#faa500"/><circle opacity="0.5" cx="117" cy="91" r="7" fill="#faa500"/></svg>
+			
+				<div class="h6">{{LANG points}} {{LANG balance_}}</div>
+				<div class="h1 mb-2">{{ME points}}</div>
+				<div>{{LANG points}}</div>
+			</div>
+		</div>
+		<div class="col-lg-9">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="h5 mb-3">{{LANG can_use_point}}</div>
+				</div>
+				<div class="col-lg-6">
+					<div class="d-flex align-items-center tag_point_earn">
+						<div class="d-inline-flex align-items-center justify-content-center position-relative main icon">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 6H22M18 2L18 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.09881 19.5C4.7987 19.3721 3.82475 18.9816 3.17157 18.3284C2 17.1569 2 15.2712 2 11.5V11C2 7.22876 2 5.34315 3.17157 4.17157C4.34315 3 6.22876 3 10 3H11.5M6.5 18C6.29454 19.0019 5.37769 21.1665 6.31569 21.8651C6.806 22.2218 7.58729 21.8408 9.14987 21.0789C10.2465 20.5441 11.3562 19.9309 12.5546 19.655C12.9931 19.5551 13.4395 19.5125 14 19.5C17.7712 19.5 19.6569 19.5 20.8284 18.3284C21.947 17.2098 21.9976 15.4403 21.9999 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 14H14M8 9H11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+						</div>
+						<div class="h6 m-0"><?php echo str_replace('{point}', $pt->config->comments_point, $lang_array['comment_video']); ?></div>
+					</div>
+				</div>
+				<div class="col-lg-6">
+					<div class="d-flex align-items-center tag_point_earn">
+						<div class="d-inline-flex align-items-center justify-content-center position-relative main icon">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 12C2 10.8954 2.89543 10 4 10C5.65685 10 7 11.3431 7 13V17C7 18.6569 5.65685 20 4 20C2.89543 20 2 19.1046 2 18V12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.4787 7.30626L15.2124 8.16634C14.9942 8.87111 14.8851 9.22349 14.969 9.5018C15.0369 9.72695 15.1859 9.92102 15.389 10.0487C15.64 10.2065 16.0197 10.2065 16.7791 10.2065H17.1831C19.7532 10.2065 21.0382 10.2065 21.6452 10.9673C21.7145 11.0542 21.7762 11.1467 21.8296 11.2437C22.2965 12.0921 21.7657 13.2351 20.704 15.5211C19.7297 17.6189 19.2425 18.6678 18.338 19.2852C18.2505 19.3449 18.1605 19.4013 18.0683 19.4541C17.116 20 15.9362 20 13.5764 20H13.0646C10.2057 20 8.77628 20 7.88814 19.1395C7 18.2789 7 16.8939 7 14.1239V13.1503C7 11.6946 7 10.9668 7.25834 10.3006C7.51668 9.63441 8.01135 9.08664 9.00069 7.99112L13.0921 3.46056C13.1947 3.34694 13.246 3.29012 13.2913 3.25075C13.7135 2.88328 14.3652 2.92464 14.7344 3.34235C14.774 3.3871 14.8172 3.44991 14.9036 3.57554C15.0388 3.77205 15.1064 3.87031 15.1654 3.96765C15.6928 4.83913 15.8524 5.87436 15.6108 6.85715C15.5838 6.96692 15.5488 7.0801 15.4787 7.30626Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+						</div>
+						<div class="h6 m-0"><?php echo str_replace('{point}', $pt->config->likes_point, $lang_array['like_video_point']); ?></div>
+					</div>
+				</div>
+				<div class="col-lg-6">
+					<div class="d-flex align-items-center tag_point_earn">
+						<div class="d-inline-flex align-items-center justify-content-center position-relative main icon">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 11C2 12.1046 2.89543 13 4 13C5.65685 13 7 11.6569 7 10V6C7 4.34315 5.65685 3 4 3C2.89543 3 2 3.89543 2 5V11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.4787 15.6937L15.2124 14.8337C14.9942 14.1289 14.8851 13.7765 14.969 13.4982C15.0369 13.2731 15.1859 13.079 15.389 12.9513C15.64 12.7935 16.0197 12.7935 16.7791 12.7935H17.1831C19.7532 12.7935 21.0382 12.7935 21.6452 12.0327C21.7145 11.9458 21.7762 11.8533 21.8296 11.7563C22.2965 10.9079 21.7657 9.76487 20.704 7.4789C19.7297 5.38111 19.2425 4.33222 18.338 3.71485C18.2505 3.65508 18.1605 3.5987 18.0683 3.54586C17.116 3 15.9362 3 13.5764 3H13.0646C10.2057 3 8.77628 3 7.88814 3.86053C7 4.72106 7 6.10607 7 8.87607V9.84966C7 11.3054 7 12.0332 7.25834 12.6994C7.51668 13.3656 8.01135 13.9134 9.00069 15.0089L13.0921 19.5394C13.1947 19.6531 13.246 19.7099 13.2913 19.7493C13.7135 20.1167 14.3652 20.0754 14.7344 19.6577C14.774 19.6129 14.8172 19.5501 14.9036 19.4245C15.0388 19.228 15.1064 19.1297 15.1654 19.0323C15.6928 18.1609 15.8524 17.1256 15.6108 16.1429C15.5838 16.0331 15.5488 15.9199 15.4787 15.6937Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+						</div>
+						<div class="h6 m-0"><?php echo str_replace('{point}', $pt->config->dislikes_point, $lang_array['dislike_video_point']); ?></div>
+					</div>
+				</div>
+				<div class="col-lg-6">
+					<div class="d-flex align-items-center tag_point_earn">
+						<div class="d-inline-flex align-items-center justify-content-center position-relative main icon">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9 9.51001L12 6.51001L15 9.51001" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 6.51001V14.51" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6 16.51C9.89 17.81 14.11 17.81 18 16.51" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+						</div>
+						<div class="h6 m-0"><?php echo str_replace('{point}', $pt->config->upload_point, $lang_array['upload_video_point']); ?></div>
+					</div>
+				</div>
+				<div class="col-lg-6">
+					<div class="d-flex align-items-center tag_point_earn">
+						<div class="d-inline-flex align-items-center justify-content-center position-relative main icon">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.53 20.4201H6.21C3.05 20.4201 2 18.3201 2 16.2101V7.79008C2 4.63008 3.05 3.58008 6.21 3.58008H12.53C15.69 3.58008 16.74 4.63008 16.74 7.79008V16.2101C16.74 19.3701 15.68 20.4201 12.53 20.4201Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19.52 17.0999L16.74 15.1499V8.83989L19.52 6.88989C20.88 5.93989 22 6.51989 22 8.18989V15.8099C22 17.4799 20.88 18.0599 19.52 17.0999Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M11.5 11C12.3284 11 13 10.3284 13 9.5C13 8.67157 12.3284 8 11.5 8C10.6716 8 10 8.67157 10 9.5C10 10.3284 10.6716 11 11.5 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+						</div>
+						<div class="h6 m-0"><?php echo str_replace('{point}', $pt->config->watching_point, $lang_array['watch_video_point']); ?></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

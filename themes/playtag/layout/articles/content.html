@@ -1,0 +1,81 @@
+<div class="pt-4 pb-5 container">
+	<h2 class="mt-0 mb-3 display-4">{{LANG articles}}</h2>
+	<div class="mb-5 d-flex align-items-center justify-content-between tag_vid_page_nav">
+		<?php if ($pt->config->all_create_articles == 'on') { ?>
+			<div class="d-flex align-items-center py-1 tag_vid_page_sub_nav">
+				<a href="{{LINK create_article}}" data-load="?link1=create_article" class="btn btn-main">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 8V16M16 12L8 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z" stroke="currentColor" stroke-width="2"/></svg> {{LANG create_article}}
+				</a>
+			</div>
+		<?php } ?>
+		
+		<div class="dropdown">
+			<?php if ($pt->config->all_create_articles == 'on') { ?>
+				<a href="javascript:void(0);" role="button" data-toggle="dropdown" data-display="static" class="btn btn-main">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.5 17.5L22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 11C20 6.02944 15.9706 2 11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C15.9706 20 20 15.9706 20 11Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+				</a>
+			<?php } else { ?>
+				<a href="javascript:void(0);" role="button" data-toggle="dropdown" data-display="static" class="btn btn-main full">
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.5 17.5L22 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 11C20 6.02944 15.9706 2 11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C15.9706 20 20 15.9706 20 11Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg> {{LANG search}}
+				</a>
+			<?php } ?>
+			<div class="dropdown-menu <?php if ($pt->config->all_create_articles == 'on') { ?>dropdown-menu-right<?php } ?> p-3" onclick="event.stopPropagation();">
+				<form class="search-articles-form" method="post" action="">
+					<div class="form-group">
+						<input type="text" class="form-control" placeholder="{{LANG search_articles}}" name="q" required>
+						<label>{{LANG search_articles}}</label>
+					</div>
+					<button class="btn btn-main btn-block" type="submit">{{LANG search}}</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col-xl-9">
+			<div class="row articles-container">
+				<div class="ads-placment col-xl-4 col-lg-6 col-md-6 mb-4 pb-2">{{WATCH_SIDEBAR_AD}}</div>
+				{{POSTS}}
+			</div>
+
+			<?php if ($pt->posts_count > 0) { ?>
+				<div class="text-center pt-4 pb-5"><div class="btn btn-main" data-type="articles" onclick="PT_LoadPost('{{CATEGORY}}',this);">{{LANG show_more}}</div></div>
+			<?php } ?>
+		</div>
+		
+		<div class="col-xl-3">
+			<h4 class="title mb-3">{{LANG categories}}</h4>
+			<div class="d-flex align-items-center flex-wrap tag_home_cat_list less mb-5">
+				<a class="position-relative main bold small" href="{{LINK articles}}" data-load="?link1=articles">{{LANG all}}</a>
+				<?php foreach ($pt->categories as $cat_id => $category): ?>
+					<?php if ($pt->category == $cat_id): ?>
+						<a class="position-relative main active bold small" href="<?php echo PT_Link("articles/category/$cat_id") ?>"  data-load="?link1=articles&category_id=<?php echo($cat_id) ?>"><?php echo $category; ?></a>
+					<?php else: ?>
+						<a class="position-relative main bold small" href="<?php echo PT_Link("articles/category/$cat_id") ?>" data-load="?link1=articles&category_id=<?php echo($cat_id) ?>"><?php echo $category; ?></a>
+					<?php endif; ?>
+				<?php endforeach; ?>
+			</div>
+			
+			<h4 class="title mb-3">{{LANG most_popular}}</h4>
+			<div class="row mx-n2">
+				{{POPULAR_POSTS}}
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+   jQuery(document).ready(function($) {
+      $('.search-articles-form').submit(function(event) {
+         var query = $(this).find('input').val();
+         if (!query){
+            $(this).find('input').addClass('danger-field-border');
+            return false;
+         }
+         else if(query.length > 50){
+            $(this).find('input').addClass('danger-field-border');
+            return false;
+         }
+      });
+   });
+</script>

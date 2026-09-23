@@ -1,0 +1,32 @@
+<div class="py-4 container">
+	<h2 class="mt-0 mb-3 display-4">{{TITLE}}</h2>
+	<div class="mb-5 d-flex align-items-center justify-content-between tag_vid_page_nav">
+		<div class="d-flex align-items-center py-1 tag_vid_page_sub_nav">
+			<a href="{{LINK }}" data-load="?link1=home" class="btn back px-0 d-none d-md-inline-flex">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.57 5.92993L3.5 11.9999L9.57 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5 12H3.67004" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG home}}
+			</a>
+			<a href="{{LINK videos/latest}}" data-load="?link1=videos&page=latest" class="btn content">{{LANG latest_videos}}</a>
+			<a href="{{LINK videos/trending}}" data-load="?link1=videos&page=trending" class="btn content">{{LANG trending}}</a>
+			<a href="{{LINK videos/top}}" data-load="?link1=videos&page=top" class="btn content">{{LANG top_videos}}</a>
+			<?php if ( $pt->config->stock_videos == 'on') { ?>
+				<a href="{{LINK videos/stock}}" data-load="?link1=videos&page=stock" class="btn content">{{LANG stock_videos}}</a>
+			<?php } ?>
+		</div>
+	</div>
+	
+	<?php if (!empty($data['VIDEOS'])) { ?>
+		{{VIDEOS}}
+	<?php } ?>
+	
+	<div class="clear"></div>
+
+	<?php if (!empty($data['SHORTS'])) { ?>
+		{{SHORTS}}
+	<?php } ?>
+
+	<?php if (empty($data['SHORTS']) && empty($data['VIDEOS'])) { ?>
+		<div class="text-center empty_state">
+			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="d-block" xmlns="http://www.w3.org/2000/svg"><path opacity="0.32" d="M9 4.25C6.43531 4.25 5.15297 4.25 4.1567 4.70928C3.07554 5.20771 2.20771 6.07554 1.70928 7.1567C1.25 8.15297 1.25 9.43531 1.25 12V12C1.25 14.5647 1.25 15.847 1.70928 16.8433C2.20771 17.9245 3.07554 18.7923 4.1567 19.2907C5.15297 19.75 6.43531 19.75 9 19.75H15C17.5647 19.75 18.847 19.75 19.8433 19.2907C20.9245 18.7923 21.7923 17.9245 22.2907 16.8433C22.75 15.847 22.75 14.5647 22.75 12V12C22.75 9.43531 22.75 8.15297 22.2907 7.1567C21.7923 6.07554 20.9245 5.20771 19.8433 4.70928C18.847 4.25 17.5647 4.25 15 4.25H9Z" fill="currentColor"></path><path d="M4.5 4.57268V4.57268C4.5 2.87569 5.87569 1.5 7.57268 1.5H16.4273C18.1243 1.5 19.5 2.87569 19.5 4.57268V4.57268C18.5469 4.24986 17.2803 4.24986 15 4.24986H9C6.71968 4.24986 5.4531 4.24986 4.5 4.57268Z" fill="currentColor"></path><path d="M4.5 19.427V19.427C4.5 21.1242 5.87581 22.5 7.57297 22.5H16.427C18.1242 22.5 19.5 21.1242 19.5 19.427V19.427C18.5469 19.7499 17.2803 19.7499 15 19.7499H9C6.71968 19.7499 5.4531 19.7499 4.5 19.427Z" fill="currentColor"></path><path d="M12.4875 14.3417C11.6795 14.8804 11.2754 15.1497 10.9404 15.1297C10.6485 15.1123 10.3789 14.968 10.2025 14.7348C10 14.4671 10 13.9815 10 13.0104V10.9896C10 10.0185 10 9.53288 10.2025 9.26521C10.3789 9.03202 10.6485 8.88772 10.9404 8.87029C11.2754 8.85029 11.6795 9.11964 12.4875 9.65835L14.0031 10.6687C14.6708 11.1138 15.0046 11.3364 15.1209 11.6169C15.2227 11.8622 15.2227 12.1378 15.1209 12.3831C15.0046 12.6636 14.6708 12.8862 14.0031 13.3313L12.4875 14.3417Z" fill="currentColor"></path></svg> {{LANG no_videos_found_for_now}}
+		</div>
+	<?php } ?>
+</div>

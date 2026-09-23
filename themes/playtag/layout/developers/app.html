@@ -1,0 +1,152 @@
+<div class="pt-4 pb-5 container">
+	<h2 class="mt-0 mb-3 display-4">{{LANG edit_app}}</h2>
+	
+	<div class="mb-5 d-flex align-items-center justify-content-between tag_vid_page_nav">
+		<div class="d-flex align-items-center py-1 tag_vid_page_sub_nav">
+			<a href="{{LINK my_apps}}" data-load="?link1=my_apps" class="btn back px-0">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.57 5.92993L3.5 11.9999L9.57 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5 12H3.67004" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG go_back}}
+			</a>
+		</div>
+	</div>
+	
+	<div class="content p-4">
+		<form action="" class="user-app-form" method="POST">
+			<div class="user-app-alert"></div>
+			
+			<h5 class="mb-3">{{LANG app}}</h5>
+			<div class="row">
+				<div class="col-lg-6">
+					<div class="form-group">
+						<input id="app_id" class="form-control" type="text" value="{{app_id}}" placeholder=" " readonly>
+						<label for="app_id">{{LANG app_id}}</label>
+					</div>
+				</div>
+				<div class="col-lg-6">
+					<div class="form-group">
+						<input id="app_secret" class="form-control" type="text" value="{{app_secret}}" placeholder=" " readonly>
+						<label for="app_secret">{{LANG app_secret}}</label>
+					</div>
+				</div>
+			</div>
+			
+			<hr class="mt-3 mb-4">
+			
+			<div class="row pt-3">
+				<div class="col-lg-6">
+					<div class="form-group">
+						<input id="app_name" class="form-control" name="app_name" type="text" value="{{app_name}}" placeholder=" ">
+						<label for="app_name">{{LANG name}}</label>
+					</div>
+				</div>
+				<div class="col-lg-6">
+					<div class="form-group">
+						<input id="app_website_url" class="form-control" name="app_website_url" type="text" value="{{app_website_url}}" placeholder=" ">
+						<label for="app_website_url">{{LANG domain}}</label>
+					</div>
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<input id="app_callback_url" class="form-control" name="app_callback_url" type="text" value="{{app_callback_url}}" placeholder=" ">
+				<label for="app_callback_url">{{LANG redirect_uri}}</label>
+			</div>
+			
+			<div class="form-group">
+				<textarea name="app_description" class="form-control" id="app_description" rows="5" placeholder=" ">{{app_description}}</textarea>
+				<label for="app_description">{{LANG descritpion}}</label>
+			</div>
+			
+			<div type="button" class="d-flex align-items-center mb-4 tag_point_earn" onclick="$('#app-media').trigger('click');">
+				<div class="d-inline-flex align-items-center justify-content-center position-relative main icon">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z"></path></svg>
+				</div>
+				<div>
+					<div class="h6 mb-0">{{LANG thumbnail}}</div>
+					<div><small class="mt-1 form-text text-muted d-none text-truncate" id="app_photo"></small></div>
+				</div>
+			</div>
+			
+			<div class="progress mb-4 d-none">
+				<div class="progress-bar bg-success" role="progressbar"></div> 
+			</div>
+			
+			<input id="app-media" name="app_avatar" type="file" class="d-none" accept="image/*">
+			<input type="hidden" name="id" value="{{id}}">
+			
+			<div class="pt-2">
+				<button type="submit" id="submit-btn" class="btn btn-main btn-lg">{{LANG edit}}</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script>
+$("#app-media").change(function () {
+	var filename = $(this).val().replace(/C:\\fakepath\\/i, '');
+	$("#app_photo").text(filename).removeClass('d-none');
+});
+
+    var _Delay = (function(){
+        var timer = 0;
+        return function(callback, ms){
+            clearTimeout (timer);
+            timer = setTimeout(callback, ms);
+        };
+    })();
+
+    function scrollToTop() {
+        verticalOffset = typeof (verticalOffset) != 'undefined' ? verticalOffset : 0;
+        element = $('html');
+        offset = element.offset();
+        offsetTop = offset.top;
+        $('html, body').animate({
+            scrollTop: offsetTop
+        }, 300, 'linear');
+    }
+
+  var bar         = $('.progress-bar');
+
+	jQuery(document).ready(function($) {
+
+    $('.user-app-form').ajaxForm({
+      url: '{{LINK aj/developers/edit}}?hash=' + $('.main_session').val(),
+      dataType:"json",
+      beforeSend: function() {
+        if ($("#app-media").val()) {
+          $(".user-app-alert").html($('.progress').clone(true).addClass('progress-clone').removeClass('d-none'));
+          bar     = $('.progress-clone').find('.progress-bar');
+        }
+
+        $('#submit-btn').attr('disabled', true).text("{{LANG please_wait}}");
+        
+      },
+      uploadProgress: function(event, position, total, percentComplete) {
+          var percentVal = percentComplete + '%';
+          bar.width(percentVal);
+
+          if (percentComplete == 100) {
+            $(".user-app-alert").empty();
+          }
+      },
+      success: function(data) {
+        scrollToTop();
+        $('#submit-btn').removeAttr('disabled').text('{{LANG edit}}');
+        if (data.status == 200){
+          $(".user-app-alert").html('<div class="alert alert-success">'+
+            data.message
+            +'</div>');
+            _Delay(function(){
+            window.location.href = data.url;
+          },2000);
+          
+        }
+        else {
+          $('#submit-btn').removeAttr('disabled').text('{{LANG edit}}');
+          $(".user-app-alert").html('<div class="alert alert-danger">'+
+            data.message
+            +'</div>');
+        }
+      }
+    });
+	});
+</script>

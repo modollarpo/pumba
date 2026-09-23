@@ -1,0 +1,62 @@
+<div class="content h-100 d-flex flex-column messages-sidebar">
+    <div class="d-flex align-items-center gap-15 p-4 flex-0">
+		<div class="flex-1">
+			<input type="text" name="search" placeholder="{{LANG search}}" id="search-list" class="w-100 px-3 tag_live_title tag_msg_search">
+		</div>
+		<button type="button" class="btn btn-light p-2 rounded-circle flex-0" onclick="MarkAllAsRead(this);">
+			<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path fill="currentColor" d="M160-640q-17 0-28.5-11.5T120-680q0-17 11.5-28.5T160-720h400q17 0 28.5 11.5T600-680q0 17-11.5 28.5T560-640H160Zm0 160q-17 0-28.5-11.5T120-520q0-17 11.5-28.5T160-560h400q17 0 28.5 11.5T600-520q0 17-11.5 28.5T560-480H160Zm0 160q-17 0-28.5-11.5T120-360q0-17 11.5-28.5T160-400h240q17 0 28.5 11.5T440-360q0 17-11.5 28.5T400-320H160Zm466 92-86-86q-11-11-11-28t11-28q11-11 27.5-11t28.5 11l58 56 142-142q11-11 27.5-11t28.5 12q12 12 11.5 29T851-397L682-228q-11 11-28 11t-28-11Z"/></svg>
+		</button>
+    </div>
+	
+	<div class="overflow-hidden user_scroll">
+		<div class="list-group" onscroll="LoadMoreUserChat()">
+			{{USERS}}
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+    function MarkAllAsRead(self) {
+        $(self).html('<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="0" y="0" width="24" height="24" fill="none"></rect><circle cx="50" cy="50" r="40" stroke="currentColor" fill="none" stroke-width="10" stroke-linecap="round"><animate attributeName="stroke-dashoffset" dur="1.5s" repeatCount="indefinite" from="0" to="502"></animate><animate attributeName="stroke-dasharray" dur="1.5s" repeatCount="indefinite" values="150.6 100.4;1 250;150.6 100.4"></animate></circle></svg>');
+        $.post('{{LINK aj/messages/mark_read}}', function (data, textStatus, xhr) {
+            if (data.status == 200) {
+                setTimeout(function () {
+                    $('.user-list').find('.countunseen').html('');
+                    $("#new-messages").html("");
+                    $(self).html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path><path d="M9 12l2 2l4 -4"></path></svg>');
+                    setTimeout(function () {
+                        $(self).html('<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path fill="currentColor" d="M160-640q-17 0-28.5-11.5T120-680q0-17 11.5-28.5T160-720h400q17 0 28.5 11.5T600-680q0 17-11.5 28.5T560-640H160Zm0 160q-17 0-28.5-11.5T120-520q0-17 11.5-28.5T160-560h400q17 0 28.5 11.5T600-520q0 17-11.5 28.5T560-480H160Zm0 160q-17 0-28.5-11.5T120-360q0-17 11.5-28.5T160-400h240q17 0 28.5 11.5T440-360q0 17-11.5 28.5T400-320H160Zm466 92-86-86q-11-11-11-28t11-28q11-11 27.5-11t28.5 11l58 56 142-142q11-11 27.5-11t28.5 12q12 12 11.5 29T851-397L682-228q-11 11-28 11t-28-11Z"/></svg>');
+                    },1000);
+                },1000);
+            }
+        });
+    }
+	var sent = 0;
+    function LoadMoreUserChat() {
+        if (sent === 0) {
+            clearTimeout(window.UpdateChatU);
+            sent = 1;
+            let time = $('.user-list').last().attr('data-time');
+            $.post('{{LINK aj/messages/load_user_chat}}', {
+                time: time
+            }, function (data, textStatus, xhr) {
+                if (data.status == 200) {
+                    $('.list-group').append(data.html);
+                    setTimeout(function () {
+                        sent = 0;
+                        window.UpdateChatU = setTimeout(function () {
+                            if (sent === 0) {
+                                fetchMessages();
+                            }
+                        },5000);
+                    },500);
+                }
+                else{
+                    window.UpdateChatU = setTimeout(function () {
+                        fetchMessages();
+                    },5000);
+                }
+            });
+        }
+    }
+</script>

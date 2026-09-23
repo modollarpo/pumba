@@ -1,0 +1,48 @@
+<div class="container">
+	<div class="d-flex align-items-center justify-content-center empty_state_center">
+		<div class="content flex-1 my-5 w-100 position-relative tag_auth">
+			<div class="content shadow-none bg-transparent overflow-hidden w-100 position-relative">
+				<div class="d-md-flex">
+					<div class="p-5 flex-1 w-100 tag_auth_main">
+						<div class="app_permission_alert"></div>
+						<div class="mb-4">
+							<img src="{{app_avatar}}" alt="Picture" class="rounded-lg" width="70" height="70"/>
+						</div>
+						
+						<h3>{{app_name}}</h3>
+						
+						<p class="mb-4">{{app_description}}</p>
+						
+						<div>{{app_name}} {{LANG receive_the_following_info}}:</div>
+						<div class="bold mb-2">{{LANG user_data}}</div>
+						
+						<div class="d-flex align-items-center justify-content-end gap-10 pt-4">
+							<a href="{{app_website_url}}" class="btn btn-link main">{{LANG back}}</a>
+							<button type="button" class="btn btn-main" onclick="acceptPermission()">{{LANG accept}}</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	function acceptPermission() {
+		$.post('{{LINK aj/developers/accept}}?hash=' + $('.main_session').val(), {id: "{{app_id}}"},(data) => {
+			if (data.status == 200) {
+				$(".app_permission_alert").html('<div class="alert alert-success">'+
+	            data.message
+	            +'</div>');
+	            PT_Delay(function(){
+	            window.location.href = data.url;
+	          },2000);
+			}
+			else{
+				$(".app_permission_alert").html('<div class="alert alert-danger">'+
+	            data.message
+	            +'</div>');
+			}
+		});
+	}
+</script>

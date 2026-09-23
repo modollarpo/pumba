@@ -1,0 +1,18 @@
+<div class="user-list" data-id="{{ID}}" data-time="{{TTIME}}">
+    <a href="<?php echo ($pt->config->server == 'ajax') ? "{{LINK messages/{{USERNAME}}}}" : "{{LINK @{{USERNAME}}}}"?>" <?php if ($pt->config->server == 'ajax') { ?>  data-load="?link1=messages&id={{USERNAME}}"<?php } ?> data-id="{{ID}}" class="d-flex align-items-center gap-15 px-4 py-3 black black-hover">
+        <div class="user-avatar flex-0">
+            <img src="{{AVATAR}}" alt="user avatar" width="60" height="60" class="rounded-circle">
+        </div>
+		<div class="flex-1 d-inline-flex align-items-center justify-content-between gap-10 mw-0">
+			<div class="flex-1 mw-0">
+				<small><div class="time text-muted small text-truncate">{{TIME}}</div></small>
+				<div class="user-name bold text-truncate">
+					{{NAME}}
+					<span class="username text-muted small d-none">@{{USERNAME}}</span>
+				</div>
+				<div class="user-last-message text-muted text-truncate">{{LAST_MESSAGE}}</div>
+			</div>
+			<div class="countunseen badge btn-main flex-0">{{COUNT}}</div>
+		</div>
+    </a>
+</div>

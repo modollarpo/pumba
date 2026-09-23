@@ -1,0 +1,189 @@
+<div class="py-4 container">
+	<h2 class="mt-0 mb-3 display-4">{{LANG balance_}}</h2>
+	
+	<div class="mb-5 d-flex align-items-center justify-content-between tag_vid_page_nav">
+		<div class="d-flex align-items-center py-1 tag_vid_page_sub_nav">
+			<a href="{{LINK }}" data-load="?link1=home" class="btn back px-0 d-none d-md-inline-flex">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.57 5.92993L3.5 11.9999L9.57 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5 12H3.67004" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG home}}
+			</a>
+			<a href="{{LINK wallet}}" data-load="?link1=wallet" class="btn content">{{LANG wallet}}</a>
+			<?php if (($pt->config->usr_v_mon == 'on' && $pt->config->sell_videos_system == 'on') || ($pt->config->usr_v_mon == 'off' && $pt->config->sell_videos_system == 'on') || ($pt->config->usr_v_mon == 'on' && $pt->config->sell_videos_system == 'off') ) { ?>
+				<a href="{{LINK settings/balance/<?php echo $pt->settings->username; ?>}}" data-load="?link1=settings&page=balance&user=<?php echo $pt->settings->username; ?>" class="btn content btn-main">{{LANG balance_}}</a>
+			<?php } ?>
+			<?php if ($pt->config->point_level_system == 1): ?>  
+				<a href="{{LINK settings/points/<?php echo $pt->settings->username; ?>}}" data-load="?link1=settings&page=points&user=<?php echo $pt->settings->username; ?>" class="btn content">{{LANG points}}</a>
+			<?php endif ?>
+			<?php if ($pt->config->usr_v_mon == 'on' || $pt->config->payed_subscribers == 'on'): ?>
+				<a href="{{LINK settings/monetization/<?php echo $pt->settings->username; ?>}}" data-load="?link1=settings&page=monetization&user=<?php echo $pt->settings->username; ?>" class="btn content">{{LANG monetization}}</a>
+			<?php endif; ?>
+		</div>
+	</div>
+
+	<form id="monetization-settings" method="POST">
+		<div class="row">
+			<div class="col-lg-5">
+				<div class="p-4 py-5 mb-4 position-relative overflow-hidden text-center tag_wallet_balance tag_balance">
+					<svg width="1440" height="668" viewBox="0 0 1440 668" fill="none" xmlns="http://www.w3.org/2000/svg" class="fixed-top w-100 h-100 text-success position-absolute"><path opacity="0.4" fill-rule="evenodd" clip-rule="evenodd" d="M184.388 -30.5993C183.77 1.18216 183.225 39.4183 188.256 85.7053C193.302 132.127 217.49 165.939 254.186 189.545C290.864 213.139 340.033 226.539 395.083 232.199C505.185 243.519 638.985 223.898 743.936 192.714C848.72 161.58 931.547 174.471 1004.84 209.612C1073.72 242.637 1134.19 295.314 1196.57 349.656C1200.6 353.164 1204.63 356.68 1208.68 360.197C1262.22 406.745 1331.53 406.654 1396.31 387.717C1461.09 368.779 1521.44 330.966 1557.23 301.888L1556.6 301.112C1520.88 330.13 1460.65 367.865 1396.03 386.757C1331.4 405.649 1262.51 405.669 1209.34 359.442C1205.34 355.969 1201.36 352.498 1197.38 349.032L1197.34 349.002L1197.23 348.901L1197.2 348.876C1134.85 294.559 1074.28 241.796 1005.27 208.71C931.765 173.466 848.683 160.548 743.651 191.756C638.786 222.914 505.121 242.507 395.185 231.204C340.216 225.552 291.221 212.18 254.727 188.704C218.252 165.24 194.26 131.682 189.25 85.5973C184.226 39.3776 184.77 1.19513 185.388 -30.5799C185.411 -31.7424 185.434 -32.8964 185.456 -34.0421C186.049 -64.1864 186.528 -88.5071 181.951 -108.357C177.187 -129.012 166.948 -144.841 145.74 -157.42C124.571 -169.977 92.4832 -179.289 44.0387 -187L43.8815 -186.012C92.301 -178.306 124.231 -169.016 145.23 -156.56C166.191 -144.128 176.271 -128.535 180.976 -108.132C185.525 -88.4076 185.049 -64.2026 184.455 -33.9806V-33.9797V-33.9788V-33.9756L184.388 -30.5993ZM144.168 36.4344C143.55 68.2159 143.005 106.452 148.036 152.739C153.082 199.161 177.27 232.972 213.966 256.579C250.644 280.173 299.812 293.572 354.862 299.232C464.965 310.553 598.765 290.932 703.716 259.748C808.5 228.614 891.327 241.504 964.622 276.646C1033.5 309.671 1093.97 362.347 1156.35 416.69C1160.38 420.198 1164.41 423.714 1168.46 427.231C1222 473.779 1291.31 473.687 1356.09 454.75C1420.87 435.812 1481.22 398 1517.01 368.922L1516.38 368.146C1480.66 397.164 1420.43 434.899 1355.81 453.791C1291.18 472.683 1222.29 472.703 1169.12 426.476C1165.06 422.951 1161.02 419.427 1156.98 415.91C1094.63 361.592 1034.06 308.83 965.054 275.744C891.545 240.5 808.463 227.582 703.431 258.79C598.566 289.948 464.901 309.541 354.965 298.238C299.995 292.586 251.001 279.214 214.507 255.738C178.032 232.273 154.039 198.716 149.03 152.631C144.006 106.411 144.55 68.2288 145.168 36.4538C145.191 35.2913 145.213 34.1373 145.236 32.9916C145.829 2.84729 146.308 -21.4734 141.73 -41.3228C136.967 -61.9781 126.728 -77.8074 105.52 -90.3867C84.3502 -102.943 52.2628 -112.255 3.81836 -119.966L3.66113 -118.979C52.0807 -111.272 84.0106 -101.982 105.01 -89.5266C125.97 -77.0939 136.051 -61.5011 140.756 -41.0981C145.305 -21.3735 144.829 2.83203 144.234 33.0549V33.0582L144.168 36.4344ZM107.816 219.773C102.784 173.486 103.33 135.25 103.948 103.468L104.014 100.092V100.089V100.088V100.087C104.608 69.8651 105.084 45.6601 100.536 25.9359C95.8303 5.53293 85.7499 -10.0599 64.7893 -22.4926C43.7903 -34.9481 11.8604 -44.2378 -36.5592 -51.9447L-36.402 -52.9323C12.0425 -45.2214 44.1299 -35.9093 65.2994 -23.3527C86.5072 -10.7734 96.7466 5.05588 101.51 25.7112C106.087 45.5606 105.609 69.8813 105.016 100.026C104.993 101.171 104.97 102.325 104.948 103.488C104.33 135.263 103.786 173.445 108.81 219.665C113.819 265.75 137.811 299.307 174.287 322.772C210.781 346.248 259.775 359.62 314.744 365.272C424.681 376.575 558.345 356.982 663.211 325.824C768.243 294.616 851.325 307.534 924.834 342.778C993.842 375.864 1054.41 428.626 1116.76 482.944C1120.8 486.461 1124.84 489.985 1128.9 493.51C1182.07 539.737 1250.96 539.717 1315.59 520.824C1380.21 501.933 1440.44 464.198 1476.16 435.18L1476.79 435.956C1441 465.034 1380.65 502.846 1315.87 521.784C1251.09 540.721 1181.78 540.813 1128.24 494.265C1124.19 490.747 1120.16 487.232 1116.13 483.724L1116.13 483.723C1053.75 429.381 993.282 376.705 924.401 343.68C851.106 308.538 768.28 295.648 663.495 326.782C558.545 357.966 424.744 377.587 314.642 366.266C259.592 360.606 210.424 347.207 173.746 323.613C137.05 300.006 112.861 266.195 107.816 219.773ZM63.7274 170.502C63.1094 202.284 62.564 240.52 67.5952 286.807C72.6411 333.229 96.8292 367.04 133.525 390.646C170.203 414.241 219.372 427.64 274.422 433.3C384.524 444.621 518.324 424.999 623.275 393.816C728.059 362.682 810.886 375.572 884.181 410.714C953.062 443.739 1013.53 496.415 1075.91 550.758C1079.94 554.266 1083.97 557.781 1088.02 561.299C1141.56 607.847 1210.87 607.755 1275.65 588.818C1340.43 569.88 1400.78 532.068 1436.57 502.99L1435.94 502.214C1400.22 531.232 1339.99 568.967 1275.37 587.858C1210.74 606.751 1141.85 606.771 1088.68 560.544C1084.62 557.019 1080.58 553.495 1076.54 549.978C1014.19 495.66 953.622 442.898 884.613 409.812C811.104 374.568 728.022 361.65 622.99 392.857C518.125 424.015 384.46 443.609 274.524 432.305C219.555 426.654 170.56 413.281 134.066 389.805C97.5911 366.341 73.5985 332.784 68.5894 286.699C63.5654 240.479 64.1094 202.297 64.7273 170.522C64.7499 169.359 64.7726 168.205 64.7952 167.059C65.3884 136.915 65.8671 112.594 61.2896 92.745C56.5262 72.0897 46.2869 56.2604 25.0791 43.6811C3.90955 31.1246 -28.1779 21.8124 -76.6223 14.1015L-76.7795 15.0891C-28.36 22.796 3.56995 32.0858 24.569 44.5412C45.5295 56.9739 55.61 72.5668 60.3152 92.9697C64.864 112.694 64.3879 136.9 63.7936 167.123V167.126L63.7274 170.502ZM27.3749 353.841C22.3436 307.554 22.889 269.318 23.5071 237.536L23.5732 234.16V234.157C24.1676 203.934 24.6437 179.728 20.0948 160.004C15.3896 139.601 5.3092 124.008 -15.6514 111.575C-36.6504 99.1196 -68.5803 89.8299 -117 82.123L-116.843 81.1354C-68.3982 88.8463 -36.3108 98.1584 -15.1412 110.715C6.06653 123.294 16.3059 139.124 21.0692 159.779C25.6467 179.628 25.1681 203.949 24.5748 234.093C24.5522 235.239 24.5295 236.393 24.507 237.556C23.889 269.331 23.3451 307.513 28.369 353.733C33.3782 399.817 57.3707 433.375 93.8461 456.839C130.34 480.315 179.334 493.688 234.304 499.339C344.24 510.643 477.905 491.049 582.77 459.891C687.802 428.684 770.884 441.602 844.393 476.846C913.401 509.932 973.966 562.693 1036.32 617.011L1036.32 617.012C1040.36 620.529 1044.4 624.053 1048.46 627.578C1101.63 673.805 1170.52 673.785 1235.15 654.892C1299.76 636.001 1360 598.266 1395.72 569.248L1396.35 570.024C1360.56 599.102 1300.21 636.914 1235.43 655.852C1170.65 674.789 1101.34 674.881 1047.8 628.333C1043.75 624.815 1039.72 621.3 1035.69 617.792L1035.69 617.791C973.31 563.449 912.841 510.772 843.961 477.747C770.666 442.606 687.839 429.716 583.055 460.85C478.104 492.033 344.304 511.655 234.201 500.334C179.151 494.674 129.983 481.275 93.3051 457.68C56.6089 434.074 32.4208 400.263 27.3749 353.841Z" fill="currentColor"/></svg>
+					
+					<div class="h6">{{LANG balance}}</div>
+					<div class="h1 mb-4"><sup>{{CONFIG payment_currency}}</sup>{{ME balance}}</div>
+					<div>
+						<a href="{{LINK settings/withdrawals/{{ME username}}}}" class="btn btn-success">{{LANG withdrawals}}</a>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-lg-7">
+				<div class="content p-4">
+					<div class="monetization-settings-alert"></div>
+	
+					<div class="form-group">
+						<input id="total_ads" name="total_ads" type="text" placeholder=" " class="form-control" value="{{USER total_ads}}" onkeyup="SaveAds(this)">
+						<label for="total_ads">{{LANG total_ads_limit}}</label>
+						<small class="form-text text-muted">{{LANG your_ads_will_stop}}</small>
+					</div>
+
+					<hr class="my-4">
+
+					<div class="form-group">
+						<select id="withdraw_method" name="withdraw_method" class="form-control" onchange="ShowWithdrawMethod(this)">
+							<?php 
+							$first = 0;
+							foreach ($pt->config->withdrawal_payment_method as $key => $value) { 
+								if ($value == 1) {
+									if ($first == 0) {
+										$first = $key;
+									}
+									if ($key != 'custom') { ?>
+										<option value="<?php echo $key; ?>"><?php echo $lang_array[$key]; ?></option>
+							<?php } elseif(!empty($pt->config->custom_name)){ ?>
+								<option value="<?php echo $key; ?>"><?php echo $pt->config->custom_name; ?></option>
+							<?php }}} ?>
+						</select>
+						<label>{{LANG withdraw_method}}</label>
+					</div>
+
+					<div class="form-group">
+						<input type="number" class="form-control" placeholder="0.00" name="amount">
+						<label>{{LANG amount}} ({{LANG min}} {{CONFIG m_withdrawal}}: {{CONFIG payment_currency}})</label>
+					</div>
+
+					<div class="paypal_withdrawal" <?php echo($first == 'paypal' ? '' : 'style="display: none;"'); ?>>
+                        <div class="form-group">
+							<input type="email" class="form-control" placeholder=" " value="{{ME email}}" name="paypal_email">
+							<label>{{LANG paypal_email}}</label>
+                        </div>
+					</div>
+					
+					<div class="transfer_to_withdrawal" <?php echo(($first == 'skrill' || $first == 'custom') ? '' : 'style="display: none;"'); ?>>
+                        <div class="form-group">
+							<input type="text" class="form-control" placeholder=" " name="transfer_to">
+							<label>{{LANG transfer_to}}</label>
+                        </div>
+					</div>
+					
+					<div class="bank_withdrawal" <?php echo($first == 'bank' ? '' : 'style="display: none;"'); ?>>
+                        <div class="form-group">
+							<input type="text" class="form-control" placeholder=" " name="iban">
+							<label>{{LANG iban}}</label>
+                        </div>
+
+                        <div class="form-group">
+							<input type="text" class="form-control" placeholder=" " name="country">
+							<label>{{LANG country}}</label>
+                        </div>
+
+                        <div class="form-group">
+							<input type="text" class="form-control" placeholder=" " name="full_name">
+							<label>{{LANG full_name}}</label>
+                        </div>
+
+                        <div class="form-group">
+							<input type="text" class="form-control" placeholder=" " name="swift_code">
+							<label>{{LANG swift_code}}</label>
+                        </div>
+						
+                        <div class="form-group">
+							<textarea name="address" type="text" placeholder=" " rows="3" class="form-control"></textarea>
+							<label>{{LANG address}}</label>
+                        </div>
+					</div>
+
+					<input type="hidden" name="hash_id" value="<?php echo PT_CreateSession()?>">
+					<input type="hidden" name="user_id" value="{{USER id}}">
+					
+					<div class="pt-2">
+						<button id="submit" class="btn btn-main" type="submit">{{LANG submit}}</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+<script>
+	function ShowWithdrawMethod(self) {
+		if ($(self).val() == 'bank') {
+			$('.paypal_withdrawal').slideUp();
+			$('.transfer_to_withdrawal').slideUp();
+			$('.bank_withdrawal').slideDown();
+		}
+		else if($(self).val() == 'paypal'){
+			$('.bank_withdrawal').slideUp();
+			$('.transfer_to_withdrawal').slideUp();
+			$('.paypal_withdrawal').slideDown();
+		}
+		else{
+			$('.bank_withdrawal').slideUp();
+			$('.transfer_to_withdrawal').slideDown();
+			$('.paypal_withdrawal').slideUp();
+		}
+	}
+	
+    function SaveAds(self) {
+        $.post('{{LINK aj/user/save_ads}}?hash=' + $('.main_session').val(), {total_ads: $(self).val(),user_id:{{USER id}}}, function(data, textStatus, xhr) {
+            scrollToTop();
+            if (data.status == 200) {
+                $('.monetization-settings-alert').html('<div class="alert alert-success">' + data.message + '</div>');
+                $('.alert-success').fadeIn('fast', function() {
+                    $(this).delay(2500).slideUp(500, function() {
+                        $(this).remove();
+                    });
+                });
+            } 
+            else {
+                var errors = data.errors.join("<br>");
+                $('.monetization-settings-alert').html('<div class="alert alert-danger">' + errors + '</div>');
+                $('.alert-danger').fadeIn(300);
+            }
+        });
+    }
+	
+    jQuery(document).ready(function($) {
+        
+        var form = $('form#monetization-settings');
+        form.ajaxForm({
+            url: '{{LINK aj/user/request-withdrawal}}?hash=' + $('.main_session').val(),
+            dataType:'json',
+            beforeSend: function() {
+                form.find('button').text("{{LANG please_wait}}");
+            },
+            success: function(data) {
+                scrollToTop();
+                if (data.status == 200) {
+                    $('.monetization-settings-alert').html('<div class="alert alert-success">' + data.message + '</div>');
+                    $('.alert-success').fadeIn('fast', function() {
+                        $(this).delay(2500).slideUp(500, function() {
+                            $(this).remove();
+                        });
+                    });
+                } 
+                else if (data.status == 400) {
+                    $('.monetization-settings-alert').html('<div class="alert alert-danger">' + data.message + '</div>');
+                    $('.alert-danger').fadeIn(300);
+                }
+                form.find('button').html('{{LANG submit_withdrawal_request}}');
+            }
+        });
+    });
+</script>

@@ -1,0 +1,47 @@
+<div class="d-flex align-items-center justify-content-between flex-wrap ">
+	<p class="mb-0">{{LANG copyright}}</p>
+	<a href="javascript:void(0);" onclick="$('#select-language').modal('show')" class="black">
+		<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.06 18.6699L16.92 14.3999L14.78 18.6699" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.1699 17.9099H18.6899" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.9201 22.0001C14.1201 22.0001 11.8401 19.73 11.8401 16.92C11.8401 14.12 14.1101 11.8401 16.9201 11.8401C19.7201 11.8401 22.0001 14.11 22.0001 16.92C22.0001 19.73 19.7301 22.0001 16.9201 22.0001Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.02 2H8.94C11.01 2 12.01 3.00002 11.96 5.02002V8.94C12.01 11.01 11.01 12.01 8.94 11.96H5.02C3 12 2 11 2 8.92999V5.01001C2 3.00001 3 2 5.02 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.00995 5.84985H4.94995" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.96997 5.16992V5.84991" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.98994 5.83984C7.98994 7.58984 6.61994 9.00983 4.93994 9.00983" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.0099 9.01001C8.2799 9.01001 7.61991 8.62 7.15991 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 15C2 18.87 5.13 22 9 22L7.95 20.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 9C22 5.13 18.87 2 15 2L16.05 3.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG language}}
+	</a>
+</div>
+<div class="mt-3 mt-md-1 footer-links">
+	<a href="{{LINK terms/faqs}}" data-load="?link1=terms&type=faqs" class="black">{{LANG faqs}}</a>
+
+	<?php if ($pt->refund_terms_page == 1) { ?>
+		<span class="mx-1">•</span><a href="{{LINK terms/refund-policy}}" data-load="?link1=terms&type=refund-policy" class="black">{{LANG refund_policy}}</a>
+	<?php } ?>
+
+	<?php if ($pt->terms_of_use_page == 1) { ?>
+		<span class="mx-1">•</span><a href="{{LINK terms/terms}}" data-load="?link1=terms&type=terms" class="black">{{LANG terms_of_use}}</a>
+	<?php } ?>
+
+	<?php if ($pt->privacy_policy_page == 1) { ?>
+		<span class="mx-1">•</span><a href="{{LINK terms/privacy-policy}}" data-load="?link1=terms&type=privacy-policy" class="black">{{LANG privacy_policy}}</a>
+	<?php } ?>
+
+	<?php if ($pt->about_page == 1) { ?>
+		<span class="mx-1">•</span><a href="{{LINK terms/about-us}}" data-load="?link1=terms&type=about-us" class="black">{{LANG about_us}}</a>
+	<?php } ?>
+
+	<span class="mx-1">•</span><a href="{{LINK contact-us}}" data-load="?link1=contact" class="black">{{LANG contact_us}}</a>
+	
+	<?php if ($pt->config->developers_page == 'on') { ?>
+		<span class="mx-1">•</span><a href="{{LINK developers}}" data-load="?link1=developers" class="black">{{LANG developers}}</a>
+	<?php } ?>
+	
+	<?php if ($pt->config->affiliate_system == 1) { ?>
+		<span class="mx-1">•</span><a href="{{LINK affiliates}}" data-load="?link1=affiliates" class="black">{{LANG affiliates}}</a>
+	<?php } ?>
+
+	<?php if ($pt->exp_feed === true):
+		$page = (!empty($_GET['page'])) ? $_GET['page'] : '';
+		$category_id = (!empty($_GET['id']) && $page == 'category') ? $_GET['id'] . '/': '';
+	?>
+		<span class="mx-1">•</span><a href="<?php echo PT_Link("videos/$page/" . $category_id . "rss"); ?>" target="_blank" class="black">RSS</a>
+	<?php endif ?>
+
+	<?php if (!empty($pt->custom_pages)) {
+		foreach ($pt->custom_pages as $key => $value) { ?>
+			<span class="mx-1">•</span><a href="<?php echo PT_Link("site-pages/" . $value->page_name); ?>" target="_blank" class="black"><?php echo $value->page_title;?></a>
+	<?php } } ?>
+</div>

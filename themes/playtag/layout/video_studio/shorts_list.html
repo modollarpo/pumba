@@ -1,0 +1,36 @@
+<div class="col-xl-3 col-lg-4 col-md-6 video-wrapper" data-id="{{ID}}" id="video-{{ID}}">
+	<div class="content p-3 position-relative video-list tag_video_grid_list mb-4">
+		<a href="{{URL}}" data-load="?link1=shorts&id={{VIDEO_ID_}}" class="position-relative d-block thumb">
+			<img src="{{THUMBNAIL}}" alt="{{TITLE}}" class="h-100 position-absolute short">
+			
+			<div class="position-absolute d-inline-flex align-items-center text-white shorts">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22H15C20 22 22 20 22 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.52002 7.11011H21.48" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8.52002 2.11011V6.97011" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15.48 2.11011V6.52011" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.75 14.4501V13.2501C9.75 11.7101 10.84 11.0801 12.17 11.8501L13.21 12.4501L14.25 13.0501C15.58 13.8201 15.58 15.0801 14.25 15.8501L13.21 16.4501L12.17 17.0501C10.84 17.8201 9.75 17.1901 9.75 15.6501V14.4501V14.4501Z" stroke="currentColor" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path><path d="M14.7295 2H9.26953V6.36H14.7295V2Z" fill="currentColor" class="hover_path"></path><path d="M16.2305 2V6.36H21.8705C21.3605 3.61 19.3305 2.01 16.2305 2Z" fill="currentColor" class="hover_path"></path><path d="M2 7.85938V16.1894C2 19.8294 4.17 21.9994 7.81 21.9994H16.19C19.83 21.9994 22 19.8294 22 16.1894V7.85938H2ZM14.44 16.1794L12.36 17.3794C11.92 17.6294 11.49 17.7594 11.09 17.7594C10.79 17.7594 10.52 17.6894 10.27 17.5494C9.69 17.2194 9.37 16.5394 9.37 15.6594V13.2594C9.37 12.3794 9.69 11.6994 10.27 11.3694C10.85 11.0294 11.59 11.0894 12.36 11.5394L14.44 12.7394C15.21 13.1794 15.63 13.7994 15.63 14.4694C15.63 15.1394 15.2 15.7294 14.44 16.1794Z" fill="currentColor" class="hover_path"></path><path d="M7.76891 2C4.66891 2.01 2.63891 3.61 2.12891 6.36H7.76891V2Z" fill="currentColor" class="hover_path"></path></svg> {{LANG shorts}}
+			</div>
+			
+			<div class="position-absolute text-white play_btn">
+				<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.1186 2.63788C8.5271 1.66527 7.73133 1.17897 7.07571 1.23632C6.50412 1.28632 5.98153 1.57941 5.64081 2.04106C5.25 2.57059 5.25 3.50319 5.25 5.36838V18.6314C5.25 20.4966 5.25 21.4292 5.64081 21.9587C5.98153 22.4204 6.50412 22.7135 7.07571 22.7635C7.73133 22.8208 8.5271 22.3345 10.1186 21.3619L20.9702 14.7304C22.4475 13.8276 23.1861 13.3762 23.438 12.7951C23.6578 12.2877 23.6578 11.712 23.438 11.2047C23.1861 10.6236 22.4475 10.1722 20.9702 9.26939L10.1186 2.63788Z" fill="currentColor"/></svg>
+			</div>
+		</a>
+
+		<div class="info">
+			<h4 title="{{TITLE}}" class="d-block text-truncate"><a href="{{URL}}" data-load="?link1=shorts&id={{VIDEO_ID_}}" class="black black-hover">{{TITLE}}</a></h4>
+
+			<div class="d-flex align-items-center text-muted small foot">{{VIEWS}} {{LANG views}}<span class="mx-2">•</span>{{TIME}}</div>
+			<div class="d-flex align-items-center text-muted small foot">{{LIKES}} {{LANG likes}}<span class="mx-2">•</span>{{DISLIKES}} {{LANG dislikes}}<span class="mx-2">•</span>{{COMMENTS}} {{LANG comments}}</div>
+		</div>
+		
+		<hr class="my-3">
+		
+		<div class="d-flex align-items-center gap-10 flex-wrap">
+			<a class="btn btn-main flex-1" href="{{LINK edit-video/{{ID}}}}" data-load="?link1=edit-video&id=category&id={{ID}}">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.9459 3.17305C17.5332 2.58578 17.8268 2.29215 18.1521 2.15173C18.6208 1.94942 19.1521 1.94942 19.6208 2.15173C19.946 2.29215 20.2397 2.58578 20.8269 3.17305C21.4142 3.76032 21.7079 4.05395 21.8483 4.37925C22.0506 4.8479 22.0506 5.37924 21.8483 5.84789C21.7079 6.17319 21.4142 6.46682 20.8269 7.05409L15.8054 12.0757C14.5682 13.3129 13.9496 13.9315 13.1748 14.298C12.4 14.6645 11.5294 14.7504 9.78823 14.9222L9 15L9.07778 14.2118C9.24958 12.4706 9.33549 11.6 9.70201 10.8252C10.0685 10.0504 10.6871 9.43183 11.9243 8.19464L16.9459 3.17305Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path><path d="M6 15H3.75C2.7835 15 2 15.7835 2 16.75C2 17.7165 2.7835 18.5 3.75 18.5H13.25C14.2165 18.5 15 19.2835 15 20.25C15 21.2165 14.2165 22 13.25 22H11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg> {{LANG edit}}
+			</a>
+			<a class="btn btn-light flex-1 shadow-none" href="{{LINK view_analytics/{{V_ID}}}}&type=today" data-load="?link1=view_analytics&id={{V_ID}}&type=today" title="{{LANG view_analytics}}">
+				{{LANG analytics}}
+			</a>
+			<a type="button" class="btn btn-light flex-0 border-0 p-2" onclick="PT_DeleteVideo({{ID}}, 'manage-page')" title="{{LANG delete_videos}}">
+				<svg class="m-1" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.5 5.5L18.8803 15.5251C18.7219 18.0864 18.6428 19.3671 18.0008 20.2879C17.6833 20.7431 17.2747 21.1273 16.8007 21.416C15.8421 22 14.559 22 11.9927 22C9.42312 22 8.1383 22 7.17905 21.4149C6.7048 21.1257 6.296 20.7408 5.97868 20.2848C5.33688 19.3626 5.25945 18.0801 5.10461 15.5152L4.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M21 5.5H3" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M9 11.7349H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M16.0575 5.5L15.3748 4.09173C14.9213 3.15626 14.6946 2.68852 14.3035 2.39681C14.2167 2.3321 14.1249 2.27454 14.0288 2.2247C13.5957 2 13.0759 2 12.0363 2C10.9706 2 10.4377 2 9.99745 2.23412C9.89986 2.28601 9.80675 2.3459 9.71906 2.41317C9.3234 2.7167 9.10239 3.20155 8.66037 4.17126L8.05469 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M10.5 15.6543H13.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>
+			</a>
+		</div>
+	</div>
+</div>

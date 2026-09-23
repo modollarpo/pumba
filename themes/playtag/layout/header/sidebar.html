@@ -1,0 +1,284 @@
+<div class="position-fixed d-flex h-100 head_sidebar">
+	<div class="d-flex align-items-center position-absolute h-100 head_sidebar_menu">
+		<nav class="d-flex flex-md-column py-md-4">
+			<div id="home_menu_">
+				<a href="{{LINK }}" data-load="?link1=home" class="position-relative d-inline-flex d-md-flex align-items-center <?php echo ($pt->page == 'home') ? 'active': '';?>">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.02 2.84004L3.63 7.04004C2.73 7.74004 2 9.23004 2 10.36V17.77C2 20.09 3.89 21.99 6.21 21.99H17.79C20.11 21.99 22 20.09 22 17.78V10.5C22 9.29004 21.19 7.74004 20.2 7.05004L14.02 2.72004C12.62 1.74004 10.37 1.79004 9.02 2.84004Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 17.99V14.99" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.0402 6.82165L14.2802 2.79165C12.7102 1.69165 10.3002 1.75165 8.79023 2.92165L3.78023 6.83165C2.78023 7.61165 1.99023 9.21165 1.99023 10.4716V17.3716C1.99023 19.9216 4.06023 22.0016 6.61023 22.0016H17.3902C19.9402 22.0016 22.0102 19.9316 22.0102 17.3816V10.6016C22.0102 9.25165 21.1402 7.59165 20.0402 6.82165ZM12.7502 18.0016C12.7502 18.4116 12.4102 18.7516 12.0002 18.7516C11.5902 18.7516 11.2502 18.4116 11.2502 18.0016V15.0016C11.2502 14.5916 11.5902 14.2516 12.0002 14.2516C12.4102 14.2516 12.7502 14.5916 12.7502 15.0016V18.0016Z" fill="currentColor" class="hover_path"/></svg><span class="position-absolute d-none d-lg-block">{{LANG home}}</span>
+				</a>
+			</div>
+			
+			<div id="search_menu_">
+				<a href="javascript:void(0);" role="button" data-toggle="dropdown" data-display="static" onclick="$('body').toggleClass('search_menu_open');$('body').removeClass('noti_menu_open');$('body').removeClass('user_menu_open');$('.tag_user_menu').addClass('d-none');" class="position-relative d-inline-flex d-md-flex align-items-center <?php echo ($pt->page == 'search') ? 'active': '';?>">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 22L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z" fill="currentColor" class="hover_path"/><path d="M21.3005 21.9986C21.1205 21.9986 20.9405 21.9286 20.8105 21.7986L18.9505 19.9386C18.6805 19.6686 18.6805 19.2286 18.9505 18.9486C19.2205 18.6786 19.6605 18.6786 19.9405 18.9486L21.8005 20.8086C22.0705 21.0786 22.0705 21.5186 21.8005 21.7986C21.6605 21.9286 21.4805 21.9986 21.3005 21.9986Z" fill="currentColor" class="hover_path"/></svg><span class="position-absolute d-none d-lg-block">{{LANG search}}</span>
+				</a>
+				<div class="dropdown-menu d-none"></div>
+			</div>
+			
+			<?php if ( $pt->config->shorts_system == 'on') { ?>
+				<div id="shorts_menu_">
+					<a href="{{LINK shorts}}" data-load="?link1=shorts&id=" class="position-relative d-inline-flex d-md-flex align-items-center <?php echo ($pt->page == 'shorts') ? 'active': '';?>">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22H15C20 22 22 20 22 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.52002 7.11011H21.48" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.52002 2.11011V6.97011" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.48 2.11011V6.52011" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.75 14.4501V13.2501C9.75 11.7101 10.84 11.0801 12.17 11.8501L13.21 12.4501L14.25 13.0501C15.58 13.8201 15.58 15.0801 14.25 15.8501L13.21 16.4501L12.17 17.0501C10.84 17.8201 9.75 17.1901 9.75 15.6501V14.4501V14.4501Z" stroke="currentColor" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.7295 2H9.26953V6.36H14.7295V2Z" fill="currentColor" class="hover_path"/><path d="M16.2305 2V6.36H21.8705C21.3605 3.61 19.3305 2.01 16.2305 2Z" fill="currentColor" class="hover_path"/><path d="M2 7.85938V16.1894C2 19.8294 4.17 21.9994 7.81 21.9994H16.19C19.83 21.9994 22 19.8294 22 16.1894V7.85938H2ZM14.44 16.1794L12.36 17.3794C11.92 17.6294 11.49 17.7594 11.09 17.7594C10.79 17.7594 10.52 17.6894 10.27 17.5494C9.69 17.2194 9.37 16.5394 9.37 15.6594V13.2594C9.37 12.3794 9.69 11.6994 10.27 11.3694C10.85 11.0294 11.59 11.0894 12.36 11.5394L14.44 12.7394C15.21 13.1794 15.63 13.7994 15.63 14.4694C15.63 15.1394 15.2 15.7294 14.44 16.1794Z" fill="currentColor" class="hover_path"/><path d="M7.76891 2C4.66891 2.01 2.63891 3.61 2.12891 6.36H7.76891V2Z" fill="currentColor" class="hover_path"/></svg><span class="position-absolute d-none d-lg-block">{{LANG shorts}}</span>
+					</a>
+				</div>
+			<?php } ?>
+			
+			<?php if (IS_LOGGED): ?>
+				<div class="position-relative" id="messages_menu_">
+					<span class="position-absolute d-flex align-items-center justify-content-center new_updates" id="new-messages"></span>
+					<a href="{{LINK messages}}" data-load="?link1=messages" class="position-relative d-inline-flex d-md-flex align-items-center <?php echo ($pt->page == 'messages') ? 'active': '';?>">
+				   		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.47 16.83L18.86 19.99C18.96 20.82 18.07 21.4 17.36 20.97L13.17 18.48C12.71 18.48 12.26 18.45 11.82 18.39C12.56 17.52 13 16.42 13 15.23C13 12.39 10.54 10.09 7.49997 10.09C6.33997 10.09 5.26997 10.42 4.37997 11C4.34997 10.75 4.33997 10.5 4.33997 10.24C4.33997 5.68999 8.28997 2 13.17 2C18.05 2 22 5.68999 22 10.24C22 12.94 20.61 15.33 18.47 16.83Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 15.23C13 16.42 12.56 17.5201 11.82 18.3901C10.83 19.5901 9.26 20.36 7.5 20.36L4.89 21.91C4.45 22.18 3.89 21.81 3.95 21.3L4.2 19.3301C2.86 18.4001 2 16.91 2 15.23C2 13.47 2.94 11.9201 4.38 11.0001C5.27 10.4201 6.34 10.0901 7.5 10.0901C10.54 10.0901 13 12.39 13 15.23Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.4704 16.83L18.8604 19.99C18.9604 20.82 18.0704 21.4 17.3604 20.97L13.9004 18.91C13.6604 18.77 13.6004 18.47 13.7304 18.23C14.2304 17.31 14.5004 16.27 14.5004 15.23C14.5004 11.57 11.3604 8.59 7.50038 8.59C6.71038 8.59 5.94038 8.71 5.22038 8.95C4.85038 9.07 4.49038 8.73 4.58038 8.35C5.49038 4.71 8.99038 2 13.1704 2C18.0504 2 22.0004 5.69 22.0004 10.24C22.0004 12.94 20.6104 15.33 18.4704 16.83Z" fill="currentColor" class="hover_path"/><path d="M13 15.2298C13 16.4198 12.56 17.5198 11.82 18.3898C10.83 19.5898 9.26 20.3598 7.5 20.3598L4.89 21.9098C4.45 22.1798 3.89 21.8098 3.95 21.2998L4.2 19.3298C2.86 18.3998 2 16.9098 2 15.2298C2 13.4698 2.94 11.9198 4.38 10.9998C5.27 10.4198 6.34 10.0898 7.5 10.0898C10.54 10.0898 13 12.3898 13 15.2298Z" fill="currentColor" class="hover_path"/></svg><span class="position-absolute d-none d-lg-block">{{LANG messages}}</span>
+				    </a>
+				</div>
+				<div class="dropdown">
+					<span class="position-absolute d-flex align-items-center justify-content-center new_updates" id="new-notifications"></span>
+				    <a href="javascript:void(0);" id="get-notifications" role="button" data-toggle="dropdown" data-display="static" onclick="$('body').toggleClass('noti_menu_open');$('body').removeClass('search_menu_open');$('body').removeClass('user_menu_open');$('.tag_user_menu').addClass('d-none');" class="position-relative d-inline-flex d-md-flex align-items-center">
+				   		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.3399 14.49L18.3399 12.83C18.1299 12.46 17.9399 11.76 17.9399 11.35V8.82C17.9399 6.47 16.5599 4.44 14.5699 3.49C14.0499 2.57 13.0899 2 11.9899 2C10.8999 2 9.91994 2.59 9.39994 3.52C7.44994 4.49 6.09994 6.5 6.09994 8.82V11.35C6.09994 11.76 5.90994 12.46 5.69994 12.82L4.68994 14.49C4.28994 15.16 4.19994 15.9 4.44994 16.58C4.68994 17.25 5.25994 17.77 5.99994 18.02C7.93994 18.68 9.97994 19 12.0199 19C14.0599 19 16.0999 18.68 18.0399 18.03C18.7399 17.8 19.2799 17.27 19.5399 16.58C19.7999 15.89 19.7299 15.13 19.3399 14.49Z" fill="currentColor" class="hover_path"/><path d="M14.8297 20.01C14.4097 21.17 13.2997 22 11.9997 22C11.2097 22 10.4297 21.68 9.87969 21.11C9.55969 20.81 9.31969 20.41 9.17969 20C9.30969 20.02 9.43969 20.03 9.57969 20.05C9.80969 20.08 10.0497 20.11 10.2897 20.13C10.8597 20.18 11.4397 20.21 12.0197 20.21C12.5897 20.21 13.1597 20.18 13.7197 20.13C13.9297 20.11 14.1397 20.1 14.3397 20.07C14.4997 20.05 14.6597 20.03 14.8297 20.01Z" fill="currentColor" class="hover_path"/></svg><span class="position-absolute d-none d-lg-block">{{LANG notifications}}</span>
+				    </a>
+					<div class="dropdown-menu d-none"></div>
+				</div>
+			<?php endif; ?>
+			
+			<?php if (IS_LOGGED) { ?>
+				<div>
+					<a href="javascript:void(0);" data-toggle="dropdown" data-display="static" onclick="$('.tag_user_menu').toggleClass('d-none');$('body').toggleClass('user_menu_open');$('body').removeClass('search_menu_open');$('body').removeClass('noti_menu_open');" class="position-relative d-inline-flex d-md-flex align-items-center">
+						<img class="rounded-circle" src="{{ME avatar}}" alt="{{ME name}}" /><span class="position-absolute d-none d-lg-block">{{ME name}}</span>
+					</a>
+					<div class="dropdown-menu d-none"></div>
+				</div>
+			<?php } else { ?>
+				<div>
+					<a href="javascript:void(0);" data-toggle="dropdown" data-display="static" onclick="$('.tag_user_menu').toggleClass('d-none');$('body').toggleClass('user_menu_open');$('body').removeClass('search_menu_open');" class="position-relative d-inline-flex d-md-flex align-items-center">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 10H19C21 10 22 9 22 7V5C22 3 21 2 19 2H17C15 2 14 3 14 5V7C14 9 15 10 17 10Z" stroke="currentColor" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 22H7C9 22 10 21 10 19V17C10 15 9 14 7 14H5C3 14 2 15 2 17V19C2 21 3 22 5 22Z" stroke="currentColor" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10C8.20914 10 10 8.20914 10 6C10 3.79086 8.20914 2 6 2C3.79086 2 2 3.79086 2 6C2 8.20914 3.79086 10 6 10Z" stroke="currentColor" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 22C20.2091 22 22 20.2091 22 18C22 15.7909 20.2091 14 18 14C15.7909 14 14 15.7909 14 18C14 20.2091 15.7909 22 18 22Z" stroke="currentColor" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.6695 2H16.7695C14.5895 2 13.4395 3.15 13.4395 5.33V7.23C13.4395 9.41 14.5895 10.56 16.7695 10.56H18.6695C20.8495 10.56 21.9995 9.41 21.9995 7.23V5.33C21.9995 3.15 20.8495 2 18.6695 2Z" fill="currentColor" class="hover_path"/><path d="M7.24 13.4297H5.34C3.15 13.4297 2 14.5797 2 16.7597V18.6597C2 20.8497 3.15 21.9997 5.33 21.9997H7.23C9.41 21.9997 10.56 20.8497 10.56 18.6697V16.7697C10.57 14.5797 9.42 13.4297 7.24 13.4297Z" fill="currentColor" class="hover_path"/><path d="M6.29 10.58C8.6593 10.58 10.58 8.6593 10.58 6.29C10.58 3.9207 8.6593 2 6.29 2C3.9207 2 2 3.9207 2 6.29C2 8.6593 3.9207 10.58 6.29 10.58Z" fill="currentColor" class="hover_path"/><path d="M17.7099 22.0019C20.0792 22.0019 21.9999 20.0812 21.9999 17.7119C21.9999 15.3426 20.0792 13.4219 17.7099 13.4219C15.3406 13.4219 13.4199 15.3426 13.4199 17.7119C13.4199 20.0812 15.3406 22.0019 17.7099 22.0019Z" fill="currentColor" class="hover_path"/></svg><span class="position-absolute d-none d-lg-block">{{LANG explore_more}}</span>
+					</a>
+					<div class="dropdown-menu d-none"></div>
+				</div>
+			<?php } ?>
+		</nav>
+	</div>
+	<div class="position-absolute h-100 d-none d-lg-block head_sidebar_backsplash"></div>
+	
+	<?php if ($pt->config->night_mode == 'both' || $pt->config->night_mode == 'night_default'): ?>
+		<label class="position-fixed text-center tag_mode_toggle overflow-hidden d-none d-md-block mini">
+			<input type="checkbox" {{MODE}} class="d-none toggle-mode">
+			<div role="button" class="d-inline-flex justify-content-center align-items-center rounded-circle shadow-none content" title="{{LANG mode}}" data-toggle="tooltip" data-placement="right">
+				<div class="position-absolute d-flex align-items-center justify-content-center flex-column two_icons">
+					<svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="moon"><path d="M2.03009 12.42C2.39009 17.57 6.76009 21.76 11.9901 21.99C15.6801 22.15 18.9801 20.43 20.9601 17.72C21.7801 16.61 21.3401 15.87 19.9701 16.12C19.3001 16.24 18.6101 16.29 17.8901 16.26C13.0001 16.06 9.00009 11.97 8.98009 7.13996C8.97009 5.83996 9.24009 4.60996 9.73009 3.48996C10.2701 2.24996 9.62009 1.65996 8.37009 2.18996C4.41009 3.85996 1.70009 7.84996 2.03009 12.42Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					<svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="sun"><path d="M12 18.5C15.5899 18.5 18.5 15.5899 18.5 12C18.5 8.41015 15.5899 5.5 12 5.5C8.41015 5.5 5.5 8.41015 5.5 12C5.5 15.5899 8.41015 18.5 12 18.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.14 19.14L19.01 19.01M19.01 4.99L19.14 4.86L19.01 4.99ZM4.86 19.14L4.99 19.01L4.86 19.14ZM12 2.08V2V2.08ZM12 22V21.92V22ZM2.08 12H2H2.08ZM22 12H21.92H22ZM4.99 4.99L4.86 4.86L4.99 4.99Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+				</div>
+			</div>
+		</label>
+	<?php endif; ?>
+</div>
+
+<!--Search Menu-->
+<div class="dropdown-menu border-0 p-0 pt-md-5 m-0 position-fixed tag_header_ddown tag_search_menu">
+	<button type="button" onclick="$('body').removeClass('search_menu_open');" class="position-absolute rounded-circle btn btn-close">
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 18L18 6M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+	</button>
+	
+	<div class="w-100 p-4">
+		<h3 class="mb-4">{{LANG search}}</h3>
+	
+		<form class="header_search pb-4" role="search" action="{{LINK search}}" method="GET">
+			<div class="position-relative form-group">
+				<svg width="21" height="21" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="position-absolute"><path d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M22 22L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+				<input type="text" class="border-0 w-100 content" id="search-bar" name="keyword" placeholder="{{LANG search_keyword}}" autocomplete="off"> 
+				<?php if (!empty($_GET['is_channel'])) { ?>
+				<input type="hidden" name="is_channel" value="true">
+				<?php } ?>
+			</div>
+			<div class="content shadow-none overflow-hidden search-dropdown d-none"></div>
+		</form>
+	</div>
+</div>
+<!--End Search Menu-->
+
+<!--Notification Menu-->
+<div class="dropdown-menu border-0 p-0 pt-md-5 m-0 position-fixed notfi-dropdown tag_header_ddown tag_noti_menu" id="notifications">
+	<button type="button" onclick="$('body').removeClass('noti_menu_open');" class="position-absolute rounded-circle btn btn-close">
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 18L18 6M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+	</button>
+	
+	<div class="w-100 p-4">
+		<h3 class="mb-4">{{LANG notifications}}</h3>
+
+		<ul class="list-unstyled m-0 p-0 pb-3" id="notifications-list">
+			<div class="d-flex align-items-center skel_noti">
+				<div class="skel rounded-circle skel_avatar"></div>
+				<div>
+					<div class="skel skel_2 skel_noti_name"></div>
+					<div class="skel skel_2 skel_noti_time"></div>
+				</div>
+			</div>
+			<div class="d-flex align-items-center skel_noti">
+				<div class="skel rounded-circle skel_avatar"></div>
+				<div>
+					<div class="skel skel_2 skel_noti_name"></div>
+					<div class="skel skel_2 skel_noti_time"></div>
+				</div>
+			</div>
+			<div class="d-flex align-items-center skel_noti">
+				<div class="skel rounded-circle skel_avatar"></div>
+				<div>
+					<div class="skel skel_2 skel_noti_name"></div>
+					<div class="skel skel_2 skel_noti_time"></div>
+				</div>
+			</div>
+			<div class="d-flex align-items-center skel_noti">
+				<div class="skel rounded-circle skel_avatar"></div>
+				<div>
+					<div class="skel skel_2 skel_noti_name"></div>
+					<div class="skel skel_2 skel_noti_time"></div>
+				</div>
+			</div>
+			<div class="d-flex align-items-center skel_noti">
+				<div class="skel rounded-circle skel_avatar"></div>
+				<div>
+					<div class="skel skel_2 skel_noti_name"></div>
+					<div class="skel skel_2 skel_noti_time"></div>
+				</div>
+			</div>
+		</ul>
+	</div>
+</div>
+<!--End Notification Menu-->
+
+<script>
+<?php if (IS_LOGGED): ?>
+	jQuery(document).ready(function($) {
+		pt_get_notifications({type:'new'});
+		UpdateInfo();
+		
+		$("#get-notifications").click(function(event) {
+			//if ($('#notifications').css('display') == 'none') {
+				var notfi_cont = $(".notfi-dropdown");
+				
+				if ($("span#new-notifications").html() != '') {
+					$(this).find('span#new-notifications').empty();
+				}
+
+				pt_get_notifications({sa:1});
+			//}
+		});
+
+		setInterval(function(){
+			pt_get_notifications({type:'new'});
+		}, 6000);
+	});
+	function UpdateInfo() {
+		$.post('{{LINK aj/user/update_info}}?hash=' + $('.main_session').val(), function(data, textStatus, xhr) {});
+	}
+
+	function pt_get_notifications(args){
+		if (!args) {
+			args = {};
+		}
+		var notfi_cont = $(".notfi-dropdown");
+		var notfi_set  = $("#notifications");
+		
+		defparams = {
+			type: false,
+			sa:false
+		}
+
+		options = Object.assign(defparams,args);
+		data    = {'hash':$('.main_session').val()};
+
+		if (options['type']) {
+			data['t'] = options['type'];
+		}
+
+		if (options['sa']) {
+			data['sa'] = options['sa'];
+			//notfi_set.find('i.spin').removeClass('d-none');
+		}
+
+		$.ajax({
+			url: '{{LINK aj/get_notifications}}',
+			type: 'GET',
+			dataType: 'json',
+			data:data
+		})
+		.done(function(data) {
+			if (data.status == 200) {
+				if (data.new) {
+					$("span#new-notifications").html($('<b>',{
+						text:data.new
+					}));
+				}
+				else{
+					//notfi_set.find('b').text(data.len);
+					notfi_set.find('ul').html(data.html);
+					$('span#new-notifications').empty();
+				}			
+			}
+			else if(data.status == 304 && options['sa']){
+				notfi_set.find('ul').html('<div class="text-center w-100 empty_state"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="d-block"><path d="M19 8C20.6569 8 22 6.65685 22 5C22 3.34315 20.6569 2 19 2C17.3431 2 16 3.34315 16 5C16 6.65685 17.3431 8 19 8Z" fill="currentColor"/><path d="M19.8 9.42C19.78 9.42 19.76 9.43 19.74 9.43C19.64 9.45 19.54 9.46 19.43 9.48C19.01 9.52 18.56 9.5 18.1 9.41C17.98 9.38 17.88 9.36 17.77 9.32C17.44 9.24 17.13 9.11 16.84 8.94C16.72 8.88 16.6 8.8 16.49 8.73C16.01 8.4 15.6 7.99 15.27 7.51C15.2 7.4 15.12 7.28 15.06 7.16C14.89 6.87 14.76 6.56 14.68 6.23C14.64 6.12 14.62 6.02 14.59 5.9C14.5 5.44 14.48 4.99 14.52 4.57C14.54 4.46 14.55 4.36 14.57 4.26C14.57 4.24 14.58 4.22 14.58 4.2C14.7 3.58 14.24 3 13.6 3H7.52C7.38 3 7.24 3.01 7.11 3.02C6.99 3.03 6.88 3.04 6.76 3.06C6.64 3.07 6.52 3.09 6.41 3.11C4 3.46 2.46 4.99 2.11 7.41C2.09 7.52 2.07 7.64 2.06 7.76C2.04 7.88 2.03 7.99 2.02 8.11C2.01 8.24 2 8.38 2 8.52V16.48C2 16.62 2.01 16.76 2.02 16.89C2.03 17.01 2.04 17.12 2.06 17.24C2.07 17.36 2.09 17.48 2.11 17.59C2.46 20.01 4 21.54 6.41 21.89C6.52 21.91 6.64 21.93 6.76 21.94C6.88 21.96 6.99 21.97 7.11 21.98C7.24 21.99 7.38 22 7.52 22H15.48C15.62 22 15.76 21.99 15.89 21.98C16.01 21.97 16.12 21.96 16.24 21.94C16.36 21.93 16.48 21.91 16.59 21.89C19 21.54 20.54 20.01 20.89 17.59C20.91 17.48 20.93 17.36 20.94 17.24C20.96 17.12 20.97 17.01 20.98 16.89C20.99 16.76 21 16.62 21 16.48V10.4C21 9.76 20.42 9.3 19.8 9.42ZM6.75 12.5H11.75C12.16 12.5 12.5 12.84 12.5 13.25C12.5 13.66 12.16 14 11.75 14H6.75C6.34 14 6 13.66 6 13.25C6 12.84 6.34 12.5 6.75 12.5ZM15.75 18H6.75C6.34 18 6 17.66 6 17.25C6 16.84 6.34 16.5 6.75 16.5H15.75C16.16 16.5 16.5 16.84 16.5 17.25C16.5 17.66 16.16 18 15.75 18Z" fill="currentColor"/></svg><p class="m-0">{{LANG no_notifications}}</p></div>');
+			}
+
+			if (data.count_messages > 0) {
+				$('#new-messages').html('<b>' + data.count_messages + '</b>');
+			} else {
+				$('#new-messages').html('');
+			}
+
+			if (options['sa']) {
+				//notfi_set.find('i.spin').addClass('d-none');
+			}
+			
+		})
+		.fail(function() {
+			console.log("error");
+		});
+	}
+<?php endif ?>
+
+$('#search-bar').keyup(function(event) {
+	var search_value = $(this).val();
+	var search_dropdown = $('.search-dropdown');
+	if (search_value == '') {
+		search_dropdown.addClass('d-none');
+		search_dropdown.empty();
+		return false;
+	} else {
+		search_dropdown.removeClass('d-none');
+	}
+    $.post('{{LINK aj/search}}', {search_value: search_value}, function(data, textStatus, xhr) {
+    	if (data.status == 200) {
+    		search_dropdown.html(data.html);
+    	} else {
+	       search_dropdown.addClass('d-none');
+		   search_dropdown.empty();
+		   return false;
+    	}
+    });
+});
+
+jQuery(document).click(function(event){
+    if (!(jQuery(event.target).closest(".tag_user_menu").length)) {
+        jQuery('.tag_user_menu').addClass('d-none');
+		jQuery('body').removeClass('user_menu_open');
+    }
+});
+jQuery(document).click(function(event){
+    if (!(jQuery(event.target).closest(".tag_search_menu").length)) {
+		jQuery('body').removeClass('search_menu_open');
+    }
+});
+jQuery(document).click(function(event){
+    if (!(jQuery(event.target).closest(".tag_noti_menu").length)) {
+		jQuery('body').removeClass('noti_menu_open');
+    }
+});
+
+$(".tag_user_menu a").click(function(event) {
+	$(".tag_user_menu").addClass('d-none');
+	$('body').removeClass('user_menu_open');
+});
+$(".tag_search_menu a").click(function(event) {
+	$('body').removeClass('search_menu_open');
+});
+$(".tag_noti_menu a").click(function(event) {
+	$('body').removeClass('noti_menu_open');
+});
+</script>

@@ -1,0 +1,30 @@
+<div class="col-md-3">
+	<div class="position-relative video-list tag_video_grid_list mb-4" data-id="{{ID}}" data-views="{{VIEWS}}">
+		<a href="{{URL}}" data-load="{{ajax_url}}" class="position-relative d-block thumb">
+			<img src="{{THUMBNAIL}}" alt="{{TITLE}}" class="w-100 h-100 position-absolute">
+			
+			<?php if (!empty($pt->video) && $pt->video->live_time >= (time() - 10)) { ?>
+				<div class="position-absolute d-inline-flex align-items-center text-white live"><svg xmlns="http://www.w3.org/2000/svg" height="8" viewBox="0 96 960 960" width="8"><path fill="currentColor" d="M480.276 1006q-88.916 0-167.743-33.104-78.828-33.103-137.577-91.852-58.749-58.749-91.852-137.535Q50 664.723 50 575.542q0-89.438 33.162-167.491 33.163-78.053 92.175-136.942 59.011-58.889 137.533-91.999Q391.393 146 480.458 146q89.428 0 167.518 33.093T784.94 271.06q58.874 58.874 91.967 137.215Q910 486.615 910 575.808q0 89.192-33.11 167.518-33.11 78.326-91.999 137.337-58.889 59.012-137.167 92.174Q569.447 1006 480.276 1006Z"/></svg> {{LANG live}}</div>
+			<?php } ?>
+			
+			<?php if (!empty($pt->video) && $pt->video->is_stock == 1 && $pt->video->sell_video > 0) { ?>
+				<div class="position-absolute d-inline-flex align-items-center text-white live">
+					{{CURRENCY}}{{PRICE}}
+				</div>
+			<?php } ?>
+			
+			<div class="position-absolute text-white play_btn" onmouseenter="show_gif(this,'{{GIF}}')" onmouseleave="hide_gif(this)">
+				<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.1186 2.63788C8.5271 1.66527 7.73133 1.17897 7.07571 1.23632C6.50412 1.28632 5.98153 1.57941 5.64081 2.04106C5.25 2.57059 5.25 3.50319 5.25 5.36838V18.6314C5.25 20.4966 5.25 21.4292 5.64081 21.9587C5.98153 22.4204 6.50412 22.7135 7.07571 22.7635C7.73133 22.8208 8.5271 22.3345 10.1186 21.3619L20.9702 14.7304C22.4475 13.8276 23.1861 13.3762 23.438 12.7951C23.6578 12.2877 23.6578 11.712 23.438 11.2047C23.1861 10.6236 22.4475 10.1722 20.9702 9.26939L10.1186 2.63788Z" fill="currentColor"/></svg>
+			</div>
+			
+			<div class="position-absolute text-white duration">{{DURATION}}</div>
+		</a>
+
+		<div class="info">
+			<h4 title="{{TITLE}}"><a href="{{URL}}" data-load="{{ajax_url}}" class="black black-hover">{{TITLE}}</a></h4>
+
+			<p class="mb-0 small text-truncate"><a href="{{USER url}}" data-load="?link1=timeline&id={{USER username}}" class="text-muted black-hover">{{USER name_v}}</a></p>
+			<div class="d-flex align-items-center text-muted small foot">{{VIEWS_NUM}} {{LANG views}}<span class="mx-2">•</span>{{TIME}}</div>
+		</div>
+	</div>
+</div>

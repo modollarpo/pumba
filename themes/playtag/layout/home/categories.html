@@ -1,0 +1,28 @@
+<div class="mb-5">
+	<div class="tag_home_vid_list pb-2">
+		<h4 class="title"><a href="<?php echo (!empty($pt->subscriptions)) ? "{{LINK subscriptions}}" : "{{LINK videos/category/{{CATEGORY_ONE_ID}}}}" ?>" data-load="<?php echo (!empty($pt->subscriptions)) ? '?link1=subscriptions' : '?link1=videos&page=category&id={{CATEGORY_ONE_ID}}' ?>" class="black black-hover d-inline-flex align-items-center">{{CATEGORY_ONE_NAME}} <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.4301 5.92993L20.5001 11.9999L14.4301 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 12H20.33" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h4>
+		
+		<div class="row tag_video_grid scroll">
+			<?php 
+				foreach ($pt->cat_videos as $key => $video) {
+					$video = PT_GetVideoByID($video, 0, 0, 0);
+					echo PT_LoadPage('home/list', array(
+						'ID' => $video->id,
+						'TITLE' => $video->title,
+						'VIEWS' => number_format($video->views),
+						'VIEWS_NUM' => number_format($video->views),
+						'USER_DATA' => $video->owner,
+						'THUMBNAIL' => $video->thumbnail,
+						'URL' => $video->url,
+						'ajax_url' => $video->ajax_url,
+						'TIME' => $video->time_ago,
+						'DURATION' => $video->duration,
+						'VIDEO_ID' => $video->video_id_,
+						'VIDEO_ID_' => PT_Slug($video->title, $video->video_id),
+						'GIF' => $video->gif
+					));
+				}
+			?>
+		</div>
+	</div>
+</div>

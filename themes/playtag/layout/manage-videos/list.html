@@ -1,0 +1,21 @@
+<div class="mb-4 video-wrapper" data-id="{{ID}}" id="video-{{ID}}">
+	<div class="content">
+		<div class="p-4 d-flex align-items-center gap-15">
+			<div class="flex-0 dash_comms dash_video large">
+				<a href="{{URL}}" data-load="?link1=watch&id={{VIDEO_ID_}}" class="embed-responsive embed-responsive-16by9">
+					<img src="{{THUMBNAIL}}" alt="{{TITLE}}" class="embed-responsive-item">
+				</a>
+			</div>
+			
+			<div>
+				<p class="mb-1 h5"><a href="{{URL}}" data-load="?link1=watch&id={{VIDEO_ID_}}" class="black">{{TITLE}}</a></p>
+				<p class="mb-0 small text-muted">{{VIEWS}} {{LANG views}}<span class="mx-2">•</span>{{TIME}}</p>
+
+				<div class="mt-4">
+					<a href="{{LINK edit-video/{{ID}}}}" data-load="?link1=edit-video&id=category&id={{ID}}" class="btn btn-main">{{LANG edit_video}}</a> 
+					<a type="button" onclick="PT_DeleteVideo({{ID}}, 'manage-page')" class="btn btn-link text-danger">{{LANG delete_videos}}</a> 
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

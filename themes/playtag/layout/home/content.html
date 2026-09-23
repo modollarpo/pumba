@@ -1,0 +1,181 @@
+<div class="position-relative tag_feat_video">
+	<div class="swiper swiper_feat_vid">
+		<div class="swiper-wrapper">
+			<?php if (!empty($pt->videos_array)) {
+				foreach ($pt->videos_array as $key => $video_slide) {
+			?>
+				<div class="swiper-slide">
+					<div class="position-relative tag_feat_video_img">
+						<a href="<?php echo($video_slide->url) ?>" data-load="?link1=watch&id=<?php echo(PT_Slug($video_slide->title, $video_slide->video_id)) ?>">
+							<img class="w-100 h-100" src="<?php echo $video_slide->thumbnail; ?>" />
+						</a>
+					</div>
+					<div class="position-absolute d-flex align-items-end pt-5 tag_feat_video_info">
+						<div class="py-5 mb-5 position-relative">
+							<h6 class="d-inline-flex align-items-center">
+								<svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.3895 5.21125L16.7995 8.03125C16.9895 8.42125 17.4995 8.79125 17.9295 8.87125L20.4795 9.29125C22.1095 9.56125 22.4895 10.7413 21.3195 11.9213L19.3295 13.9113C18.9995 14.2413 18.8095 14.8913 18.9195 15.3613L19.4895 17.8213C19.9395 19.7613 18.8995 20.5213 17.1895 19.5013L14.7995 18.0813C14.3695 17.8213 13.6495 17.8213 13.2195 18.0813L10.8295 19.5013C9.11945 20.5113 8.07945 19.7613 8.52945 17.8213L9.09945 15.3613C9.18945 14.8813 8.99945 14.2313 8.66945 13.9013L6.67945 11.9113C5.50945 10.7413 5.88945 9.56125 7.51945 9.28125L10.0695 8.86125C10.4995 8.79125 11.0095 8.41125 11.1995 8.02125L12.6095 5.20125C13.3795 3.68125 14.6195 3.68125 15.3895 5.21125Z" fill="currentColor"/><path d="M8 5.75H2C1.59 5.75 1.25 5.41 1.25 5C1.25 4.59 1.59 4.25 2 4.25H8C8.41 4.25 8.75 4.59 8.75 5C8.75 5.41 8.41 5.75 8 5.75Z" fill="currentColor"/><path d="M5 19.75H2C1.59 19.75 1.25 19.41 1.25 19C1.25 18.59 1.59 18.25 2 18.25H5C5.41 18.25 5.75 18.59 5.75 19C5.75 19.41 5.41 19.75 5 19.75Z" fill="currentColor"/><path d="M3 12.75H2C1.59 12.75 1.25 12.41 1.25 12C1.25 11.59 1.59 11.25 2 11.25H3C3.41 11.25 3.75 11.59 3.75 12C3.75 12.41 3.41 12.75 3 12.75Z" fill="currentColor"/></svg> {{LANG featured_video}}
+							</h6>
+							<h1 class="mb-3">
+								<a href="<?php echo($video_slide->url) ?>" data-load="?link1=watch&id=<?php echo(PT_Slug($video_slide->title, $video_slide->video_id)) ?>" class="black black-hover"><?php echo $video_slide->title; ?></a>
+							</h1>
+							<p class="d-flex">{{TIME}}<span class="mx-2">•</span>{{CATEGORY}}<span class="mx-2">•</span><?php echo $video_slide->views; ?> {{LANG views}}</p>
+							<div class="mt-5">
+								<a href="<?php echo($video_slide->url) ?>" data-load="?link1=watch&id=<?php echo(PT_Slug($video_slide->title, $video_slide->video_id)) ?>" class="btn btn-main"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.8906 12.846C18.5371 14.189 16.8667 15.138 13.5257 17.0361C10.296 18.8709 8.6812 19.7884 7.37983 19.4196C6.8418 19.2671 6.35159 18.9776 5.95624 18.5787C5 17.6139 5 15.7426 5 12C5 8.2574 5 6.3861 5.95624 5.42132C6.35159 5.02245 6.8418 4.73288 7.37983 4.58042C8.6812 4.21165 10.296 5.12907 13.5257 6.96393C16.8667 8.86197 18.5371 9.811 18.8906 11.154C19.0365 11.7084 19.0365 12.2916 18.8906 12.846Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg> {{LANG vid_play}}</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			<?php }} ?>
+		</div>
+	</div>
+	<div class="position-absolute tag_feat_video_thumbs d-none">
+		<div thumbsSlider="" class="swiper swiper_feat_vid_thumb">
+			<div class="swiper-wrapper">
+				<?php if (!empty($pt->videos_array)) {
+					foreach ($pt->videos_array as $key => $video_slide) {
+				?>
+					<div class="swiper-slide">
+						<img src="<?php echo $video_slide->thumbnail; ?>" />
+					</div>
+				<?php }} ?>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Announcement -->
+<div class="home_announce">{{ANNOUNCEMENT}}</div>
+<!-- End Announcement -->
+
+<div class="pb-4 container">
+	<?php if ($pt->config->shorts_system == 'on') { ?>
+        <div class="mb-5">
+			<div class="tag_home_vid_list pb-2">
+				<h4 class="title mb-3"><a href="{{LINK shorts}}" data-load="?link1=shorts&id=" class="black black-hover d-inline-flex align-items-center">{{LANG shorts}} <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.4301 5.92993L20.5001 11.9999L14.4301 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 12H20.33" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h4>
+
+				<div class="d-flex align-items-center tag_short_home scroll">
+					<?php if (IS_LOGGED) { ?>
+						<?php if ( $pt->config->shorts_system == 'on' && !$pt->user->suspend_upload) { ?> 
+							<div class="tag_short_home_list d-none d-md-block">
+								<a href="{{LINK upload-video}}?type=shorts" data-load="?link1=upload-video&type=shorts" class="d-flex align-items-center justify-content-center flex-column position-relative black black-hover">
+									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-3"><path d="M2.5 7.5H21.5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M17 2.5L14 7.5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 2.5L7 7.5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z" stroke="currentColor" stroke-width="2"/><path d="M14.9531 14.8948C14.8016 15.5215 14.0857 15.9644 12.6539 16.8502C11.2697 17.7064 10.5777 18.1346 10.0199 17.9625C9.78934 17.8913 9.57925 17.7562 9.40982 17.57C9 17.1198 9 16.2465 9 14.5C9 12.7535 9 11.8802 9.40982 11.4299C9.57925 11.2438 9.78934 11.1087 10.0199 11.0375C10.5777 10.8654 11.2697 11.2936 12.6539 12.1498C14.0857 13.0356 14.8016 13.4785 14.9531 14.1052C15.0156 14.3639 15.0156 14.6361 14.9531 14.8948Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg> {{LANG create}} {{LANG shorts}}
+								</a>
+							</div>
+						<?php } ?>
+					<?php } ?>
+					{{SHORTS_HTML}}
+				</div>
+			</div>
+        </div>
+	<?php } ?>
+	
+	<div class="mb-5">
+		<div class="tag_home_vid_list pb-2">
+			<h4 class="title mb-3"><a href="{{LINK videos/trending}}" data-load="?link1=videos&page=trending" class="black black-hover d-inline-flex align-items-center">{{LANG trending}} <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.4301 5.92993L20.5001 11.9999L14.4301 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 12H20.33" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h4>
+			
+			<div class="row pt_no_vid_found_trend tag_video_grid scroll">
+				{{TRENDING_LIST}}
+			</div>
+		</div>
+	</div>
+
+	<div class="mb-5">
+		<div class="pb-2">
+			<h4 class="title mb-3">{{LANG categories}}</h4>
+
+			<div class="d-flex align-items-center flex-wrap tag_home_cat_list scroll">
+				<a class="position-relative main bold" href="{{LINK }}" data-load="?link1=home">{{LANG all}}</a>
+				<?php foreach($pt->categories as $key => $category) {
+						if (1) { ?>
+					<a class="position-relative main bold" href="{{LINK videos/category/<?php echo $key?>}}" data-load="?link1=videos&page=category&id=<?php echo $key?>"><?php echo $category?></a>
+				<?php } }?>
+			</div>
+		</div>
+	</div>
+		
+	<div class="mb-5">
+		<div class="tag_home_vid_list pb-2">
+			<h4 class="title mb-3"><a href="{{LINK videos/top}}" data-load="?link1=videos&page=top" class="black black-hover d-inline-flex align-items-center">{{LANG top_videos}} <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.4301 5.92993L20.5001 11.9999L14.4301 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 12H20.33" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h4>
+			
+			<div class="row pt_no_vid_found_top tag_video_grid top scroll">
+				{{TOP_LIST}}
+			</div>
+		</div>
+	</div>
+	
+	<?php if ($pt->config->live_video == 1 && $pt->have_live) { ?>
+        <div class="mb-5">
+			<div class="tag_home_vid_list pb-2">
+				<h4 class="title mb-3"><a href="{{LINK videos/live}}" data-load="?link1=videos&page=live" class="black black-hover d-inline-flex align-items-center">{{LANG live_videos}} <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.4301 5.92993L20.5001 11.9999L14.4301 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 12H20.33" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h4>
+				
+				<div class="row tag_video_grid scroll">
+					{{LIVE_LIST}}
+				</div>
+			</div>
+        </div>
+	<?php } ?>
+	
+	<?php if ($pt->config->show_articles == 'on') { ?>
+		<div class="mb-3">
+			<div class="tag_home_vid_list pb-2">
+				<h4 class="title mb-3"><a href="{{LINK articles}}" data-load="?link1=articles" class="black black-hover d-inline-flex align-items-center">{{LANG articles}} <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.4301 5.92993L20.5001 11.9999L14.4301 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 12H20.33" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h4>
+
+				<div class="row pt_no_arti_found">
+					{{HTML_POSTS}}
+				</div>
+			</div>
+		</div>
+	<?php } ?>
+ 
+	{{SUBSC_HTML}}
+
+	<div class="mb-5">
+		<div class="tag_home_vid_list pb-2">
+			<h4 class="title mb-3"><a href="{{LINK videos/latest}}" data-load="?link1=videos&page=latest" class="black black-hover d-inline-flex align-items-center">{{LANG latest_videos}} <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.4301 5.92993L20.5001 11.9999L14.4301 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 12H20.33" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h4>
+			
+			<div class="row tag_video_grid scroll">
+				{{LATEST_LIST}}
+			</div>
+		</div>
+	</div>
+		
+	{{HOME_PAGE_VIDEOS}}
+
+</div>
+
+<script>
+var swiper = new Swiper(".swiper_feat_vid_thumb", {
+	spaceBetween: 10,
+	slidesPerView: 4,
+	freeMode: true,
+	watchSlidesProgress: true,
+});
+var swiper2 = new Swiper(".swiper_feat_vid", {
+	spaceBetween: 10,
+	effect: 'fade',
+	thumbs: {
+		swiper: swiper,
+	},
+	autoplay: {
+		delay: 3000,
+	},
+});
+
+$(document).ready(function() {
+if( !$.trim( $('.pt_no_vid_found_trend').html() ).length ) {
+	$('.pt_no_vid_found_trend').html('<div class="col"><div class="text-center empty_state"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="d-block" xmlns="http://www.w3.org/2000/svg"><path opacity="0.32" d="M9 4.25C6.43531 4.25 5.15297 4.25 4.1567 4.70928C3.07554 5.20771 2.20771 6.07554 1.70928 7.1567C1.25 8.15297 1.25 9.43531 1.25 12V12C1.25 14.5647 1.25 15.847 1.70928 16.8433C2.20771 17.9245 3.07554 18.7923 4.1567 19.2907C5.15297 19.75 6.43531 19.75 9 19.75H15C17.5647 19.75 18.847 19.75 19.8433 19.2907C20.9245 18.7923 21.7923 17.9245 22.2907 16.8433C22.75 15.847 22.75 14.5647 22.75 12V12C22.75 9.43531 22.75 8.15297 22.2907 7.1567C21.7923 6.07554 20.9245 5.20771 19.8433 4.70928C18.847 4.25 17.5647 4.25 15 4.25H9Z" fill="currentColor"/><path d="M4.5 4.57268V4.57268C4.5 2.87569 5.87569 1.5 7.57268 1.5H16.4273C18.1243 1.5 19.5 2.87569 19.5 4.57268V4.57268C18.5469 4.24986 17.2803 4.24986 15 4.24986H9C6.71968 4.24986 5.4531 4.24986 4.5 4.57268Z" fill="currentColor"/><path d="M4.5 19.427V19.427C4.5 21.1242 5.87581 22.5 7.57297 22.5H16.427C18.1242 22.5 19.5 21.1242 19.5 19.427V19.427C18.5469 19.7499 17.2803 19.7499 15 19.7499H9C6.71968 19.7499 5.4531 19.7499 4.5 19.427Z" fill="currentColor"/><path d="M12.4875 14.3417C11.6795 14.8804 11.2754 15.1497 10.9404 15.1297C10.6485 15.1123 10.3789 14.968 10.2025 14.7348C10 14.4671 10 13.9815 10 13.0104V10.9896C10 10.0185 10 9.53288 10.2025 9.26521C10.3789 9.03202 10.6485 8.88772 10.9404 8.87029C11.2754 8.85029 11.6795 9.11964 12.4875 9.65835L14.0031 10.6687C14.6708 11.1138 15.0046 11.3364 15.1209 11.6169C15.2227 11.8622 15.2227 12.1378 15.1209 12.3831C15.0046 12.6636 14.6708 12.8862 14.0031 13.3313L12.4875 14.3417Z" fill="currentColor"/></svg> {{LANG no_videos_found_for_now}}</div></div>');
+};
+});
+
+$(document).ready(function() {
+if( !$.trim( $('.pt_no_vid_found_top').html() ).length ) {
+	$('.pt_no_vid_found_top').html('<div class="col"><div class="text-center empty_state"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="d-block" xmlns="http://www.w3.org/2000/svg"><path opacity="0.32" d="M9 4.25C6.43531 4.25 5.15297 4.25 4.1567 4.70928C3.07554 5.20771 2.20771 6.07554 1.70928 7.1567C1.25 8.15297 1.25 9.43531 1.25 12V12C1.25 14.5647 1.25 15.847 1.70928 16.8433C2.20771 17.9245 3.07554 18.7923 4.1567 19.2907C5.15297 19.75 6.43531 19.75 9 19.75H15C17.5647 19.75 18.847 19.75 19.8433 19.2907C20.9245 18.7923 21.7923 17.9245 22.2907 16.8433C22.75 15.847 22.75 14.5647 22.75 12V12C22.75 9.43531 22.75 8.15297 22.2907 7.1567C21.7923 6.07554 20.9245 5.20771 19.8433 4.70928C18.847 4.25 17.5647 4.25 15 4.25H9Z" fill="currentColor"/><path d="M4.5 4.57268V4.57268C4.5 2.87569 5.87569 1.5 7.57268 1.5H16.4273C18.1243 1.5 19.5 2.87569 19.5 4.57268V4.57268C18.5469 4.24986 17.2803 4.24986 15 4.24986H9C6.71968 4.24986 5.4531 4.24986 4.5 4.57268Z" fill="currentColor"/><path d="M4.5 19.427V19.427C4.5 21.1242 5.87581 22.5 7.57297 22.5H16.427C18.1242 22.5 19.5 21.1242 19.5 19.427V19.427C18.5469 19.7499 17.2803 19.7499 15 19.7499H9C6.71968 19.7499 5.4531 19.7499 4.5 19.427Z" fill="currentColor"/><path d="M12.4875 14.3417C11.6795 14.8804 11.2754 15.1497 10.9404 15.1297C10.6485 15.1123 10.3789 14.968 10.2025 14.7348C10 14.4671 10 13.9815 10 13.0104V10.9896C10 10.0185 10 9.53288 10.2025 9.26521C10.3789 9.03202 10.6485 8.88772 10.9404 8.87029C11.2754 8.85029 11.6795 9.11964 12.4875 9.65835L14.0031 10.6687C14.6708 11.1138 15.0046 11.3364 15.1209 11.6169C15.2227 11.8622 15.2227 12.1378 15.1209 12.3831C15.0046 12.6636 14.6708 12.8862 14.0031 13.3313L12.4875 14.3417Z" fill="currentColor"/></svg> {{LANG no_videos_found_for_now}}</div></div>');
+};
+});
+
+$(document).ready(function() {
+if( !$.trim( $('.pt_no_arti_found').html() ).length ) {
+	$('.pt_no_arti_found').html('<div class="col"><div class="text-center empty_state"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="d-block"><path opacity="0.32" d="M11.45 1.25C8.92976 1.25 7.66965 1.25 6.70704 1.74047C5.86031 2.1719 5.1719 2.86031 4.74047 3.70704C4.25 4.66965 4.25 5.92976 4.25 8.45V15.55C4.25 18.0702 4.25 19.3304 4.74047 20.293C5.1719 21.1397 5.86031 21.8281 6.70704 22.2595C7.66965 22.75 8.92976 22.75 11.45 22.75H12.55C15.0702 22.75 16.3304 22.75 17.293 22.2595C18.1397 21.8281 18.8281 21.1397 19.2595 20.293C19.75 19.3304 19.75 18.0702 19.75 15.55V8.45C19.75 5.92976 19.75 4.66965 19.2595 3.70704C18.8281 2.86031 18.1397 2.1719 17.293 1.74047C16.3304 1.25 15.0702 1.25 12.55 1.25H11.45Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1 9.25V14.75C1 16.5449 2.45507 18 4.25 18V6C2.45507 6 1 7.45507 1 9.25ZM23 9.25V14.75C23 16.5449 21.5449 18 19.75 18V6C21.5449 6 23 7.45507 23 9.25ZM9 6.25C8.58579 6.25 8.25 6.58579 8.25 7C8.25 7.41421 8.58579 7.75 9 7.75H15C15.4142 7.75 15.75 7.41421 15.75 7C15.75 6.58579 15.4142 6.25 15 6.25H9ZM9 10.25C8.58579 10.25 8.25 10.5858 8.25 11C8.25 11.4142 8.58579 11.75 9 11.75H15C15.4142 11.75 15.75 11.4142 15.75 11C15.75 10.5858 15.4142 10.25 15 10.25H9ZM9 14.25C8.58579 14.25 8.25 14.5858 8.25 15C8.25 15.4142 8.58579 15.75 9 15.75H11C11.4142 15.75 11.75 15.4142 11.75 15C11.75 14.5858 11.4142 14.25 11 14.25H9Z" fill="currentColor"/></svg> {{LANG no_more_articles}}</div></div>');
+};
+});
+</script>

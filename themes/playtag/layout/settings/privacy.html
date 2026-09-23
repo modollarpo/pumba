@@ -1,0 +1,65 @@
+<form class="content p-4" id="privacy-settings" method="POST">
+    <div class="setting-privacy-alert"></div>
+
+    <div class="form-group">
+		<select id="show_subscriptions_count" name="show_subscriptions_count" class="form-control">
+			<option value="yes" <?php echo ($pt->settings->privacy->show_subscriptions_count == 'yes') ? 'selected': '';?>>{{LANG yes}}</option>
+			<option value="no" <?php echo ($pt->settings->privacy->show_subscriptions_count == 'no') ? 'selected': '';?>>{{LANG no}}</option>
+		</select>
+		<label for="show_subscriptions_count">{{LANG show_subscriptions_count}}</label>
+    </div>
+	
+    <div class="form-group">
+		<select id="who_can_message_me" name="who_can_message_me" class="form-control">
+			<option value="all" <?php echo ($pt->settings->privacy->who_can_message_me == 'all') ? 'selected': '';?>>{{LANG all}}</option>
+			<option value="subscribers" <?php echo ($pt->settings->privacy->who_can_message_me == 'subscribers') ? 'selected': '';?>>{{LANG subscribers}}</option>
+			<option value="no_one" <?php echo ($pt->settings->privacy->who_can_message_me == 'no_one') ? 'selected': '';?>>{{LANG no_one}}</option>
+		</select>
+		<label for="who_can_message_me">{{LANG who_can_message_me}}</label>
+    </div>
+	
+    <div class="form-group">
+		<select id="who_can_watch_my_videos" name="who_can_watch_my_videos" class="form-control">
+			<option value="all" <?php echo ($pt->settings->privacy->who_can_watch_my_videos == 'all') ? 'selected': '';?>>{{LANG all}}</option>
+			<option value="subscribers" <?php echo ($pt->settings->privacy->who_can_watch_my_videos == 'subscribers') ? 'selected': '';?>>{{LANG subscribers}}</option>
+			<option value="only_me" <?php echo ($pt->settings->privacy->who_can_watch_my_videos == 'only_me') ? 'selected': '';?>>{{LANG only_me}}</option>
+		</select>
+		<label for="who_can_watch_my_videos">{{LANG who_can_watch_my_videos}}</label>
+		<small class="form-text text-muted">Please note changing the privacy of this option will reset all your videos privacy to the option you choose.</small>
+    </div>
+	
+	<input type="hidden" name="hash_id" value="<?php echo PT_CreateSession()?>">
+	<input type="hidden" name="user_id" value="{{USER id}}">
+
+	<div class="pt-2">
+		<button id="submit" name="submit" class="btn btn-main btn-lg">{{LANG save}}</button>
+	</div>
+</form>
+
+<script>
+    $(function() {
+        var form = $('form#privacy-settings');
+        form.ajaxForm({
+            url: '{{LINK aj/user/privacy}}?hash=' + $('.main_session').val(),
+            beforeSend: function() {
+                form.find('button').text("{{LANG please_wait}}");
+            },
+            success: function(data) {
+                scrollToTop();
+                if (data.status == 200) {
+                    $('.setting-privacy-alert').html('<div class="alert alert-success">' + data.message + '</div>');
+                    $('.alert-success').fadeIn('fast', function() {
+                        $(this).delay(2500).slideUp(500, function() {
+                            $(this).remove();
+                        });
+                    });
+                } else if (data.errors) {
+                    var errors = data.errors.join("<br>");
+                    $('.setting-privacy-alert').html('<div class="alert alert-danger">' + errors + '</div>');
+                    $('.alert-danger').fadeIn(300);
+                }
+                form.find('button').html('{{LANG save}}');
+            }
+        });
+    });
+</script>

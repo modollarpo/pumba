@@ -1,0 +1,63 @@
+<nav class="position-fixed w-100 d-flex align-items-center tag_header <?php echo ($pt->page == 'home') ? 'hide_splash': '';?>">
+	<div class="navbar w-100 p-0">
+		<div class="navbar-header">
+			<a class="navbar-brand m-0 p-0" href="{{LINK }}" itemprop="url">
+				<img itemprop="logo" src="{{CONFIG theme_url}}/img/<?php echo ($pt->mode != 'night') ? 'logo' : 'logo-light';?>.png?cache=<?php echo($pt->config->logo_cache) ?>" alt="{{CONFIG title}}">
+			</a>
+		</div>
+		
+		<div class="dropdown nav">
+			<?php if (IS_LOGGED) { ?>
+				<a href="javascript:void(0);" role="button" data-toggle="dropdown" data-display="static" class="btn btn-main-outline">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 4H8.4C6.15979 4 5.03968 4 4.18404 4.43597C3.43139 4.81947 2.81947 5.43139 2.43597 6.18404C2 7.03968 2 8.15979 2 10.4V15.6C2 17.8402 2 18.9603 2.43597 19.816C2.81947 20.5686 3.43139 21.1805 4.18404 21.564C5.03968 22 6.15979 22 8.4 22H13.6C15.8402 22 16.9603 22 17.816 21.564C18.5686 21.1805 19.1805 20.5686 19.564 19.816C20 18.9603 20 17.8402 20 15.6V10.5M20 1V4M20 4V7M20 4H17M20 4H23M13.0031 14.3313L11.4875 15.3417C10.6795 15.8804 10.2754 16.1497 9.9404 16.1297C9.64852 16.1123 9.37889 15.968 9.20249 15.7348C9 15.4671 9 14.9815 9 14.0104V11.9896C9 11.0185 9 10.5329 9.20249 10.2652C9.37889 10.032 9.64852 9.88772 9.9404 9.87029C10.2754 9.85029 10.6795 10.1196 11.4875 10.6583L13.0031 11.6687C13.6708 12.1138 14.0046 12.3364 14.1209 12.6169C14.2227 12.8622 14.2227 13.1378 14.1209 13.3831C14.0046 13.6636 13.6708 13.8862 13.0031 14.3313Z" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG create}}
+				</a>
+				<div class="dropdown-menu dropdown-menu-right">
+					<?php if (($pt->config->who_upload == 'admin' && PT_IsAdmin()) || $pt->config->who_upload == 'all') { ?>
+					<?php if ($pt->config->upload_system == 'on' && !$pt->user->suspend_upload) { ?> 
+						<div class="dropdown-item">
+							<a href="{{LINK upload-video}}" data-load="?link1=upload-video">
+								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 9.51001L12 6.51001L15 9.51001" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6.51001V14.51" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 16.51C9.89 17.81 14.11 17.81 18 16.51" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG upload}}
+							</a>
+						</div>
+					<?php } ?>
+					<?php } ?>
+					<?php if ($pt->config->import_system == 'on' && !$pt->user->suspend_import) { ?> 
+						<div class="dropdown-item">
+							<a href="{{LINK import-video}}" data-load="?link1=import-video">
+								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 11.51L12 14.51L15 11.51" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 14.51V6.51001" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 16.51C9.89 17.81 14.11 17.81 18 16.51" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG import}}
+							</a>
+						</div>
+					<?php } ?>
+					<?php if ($pt->config->live_video == 1 && ($pt->config->who_use_live == 'all' || ($pt->config->who_use_live == 'admin' && PT_IsAdmin()) || ($pt->config->who_use_live == 'pro' && $pt->user->is_pro > 0))) { ?>
+						<div class="dropdown-divider"></div>
+						<div class="dropdown-item">
+							<a href="{{LINK live}}" data-load="?link1=live">
+								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 18C21.26 16.33 22 14.25 22 12C22 9.75 21.26 7.67 20 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 6C2.74 7.67 2 9.75 2 12C2 14.25 2.74 16.33 4 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.8 15.6C17.55 14.6 18.0001 13.35 18.0001 12C18.0001 10.65 17.55 9.40002 16.8 8.40002" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.20001 8.40002C6.45001 9.40002 6 10.65 6 12C6 13.35 6.45001 14.6 7.20001 15.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG live}}
+							</a>
+						</div>
+					<?php } ?>
+					<?php if ( $pt->config->shorts_system == 'on' && !$pt->user->suspend_upload) { ?> 
+						<div class="dropdown-item">
+							<a href="{{LINK upload-video}}?type=shorts" data-load="?link1=upload-video&type=shorts">
+								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5H21.5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M17 2.5L14 7.5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 2.5L7 7.5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z" stroke="currentColor" stroke-width="2"/><path d="M14.9531 14.8948C14.8016 15.5215 14.0857 15.9644 12.6539 16.8502C11.2697 17.7064 10.5777 18.1346 10.0199 17.9625C9.78934 17.8913 9.57925 17.7562 9.40982 17.57C9 17.1198 9 16.2465 9 14.5C9 12.7535 9 11.8802 9.40982 11.4299C9.57925 11.2438 9.78934 11.1087 10.0199 11.0375C10.5777 10.8654 11.2697 11.2936 12.6539 12.1498C14.0857 13.0356 14.8016 13.4785 14.9531 14.1052C15.0156 14.3639 15.0156 14.6361 14.9531 14.8948Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg> {{LANG shorts}}
+							</a>
+						</div>
+					<?php } ?>
+					<?php if ($pt->config->post_system == 'on') { ?>
+						<div class="dropdown-item">
+							<a href="{{LINK create_post}}" data-load="?link1=create_post">
+								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.9459 3.17305C17.5332 2.58578 17.8268 2.29215 18.1521 2.15173C18.6208 1.94942 19.1521 1.94942 19.6208 2.15173C19.946 2.29215 20.2397 2.58578 20.8269 3.17305C21.4142 3.76032 21.7079 4.05395 21.8483 4.37925C22.0506 4.8479 22.0506 5.37924 21.8483 5.84789C21.7079 6.17319 21.4142 6.46682 20.8269 7.05409L15.8054 12.0757C14.5682 13.3129 13.9496 13.9315 13.1748 14.298C12.4 14.6645 11.5294 14.7504 9.78823 14.9222L9 15L9.07778 14.2118C9.24958 12.4706 9.33549 11.6 9.70201 10.8252C10.0685 10.0504 10.6871 9.43183 11.9243 8.19464L16.9459 3.17305Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path><path d="M6 15H3.75C2.7835 15 2 15.7835 2 16.75C2 17.7165 2.7835 18.5 3.75 18.5H13.25C14.2165 18.5 15 19.2835 15 20.25C15 21.2165 14.2165 22 13.25 22H11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg> {{LANG create_post}}
+							</a>
+						</div>
+					<?php } ?>
+				</div>
+			<?php } else { ?>
+				<a href="{{LINK login}}" role="button" class="btn btn-main-outline">
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.12 12.78C12.05 12.77 11.96 12.77 11.88 12.78C10.12 12.72 8.71997 11.28 8.71997 9.50998C8.71997 7.69998 10.18 6.22998 12 6.22998C13.81 6.22998 15.28 7.69998 15.28 9.50998C15.27 11.28 13.88 12.72 12.12 12.78Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18.74 19.3801C16.96 21.0101 14.6 22.0001 12 22.0001C9.40001 22.0001 7.04001 21.0101 5.26001 19.3801C5.36001 18.4401 5.96001 17.5201 7.03001 16.8001C9.77001 14.9801 14.25 14.9801 16.97 16.8001C18.04 17.5201 18.64 18.4401 18.74 19.3801Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg> {{LANG login}}
+				</a>
+			<?php } ?>
+		</div>
+	</div>
+</nav>
+
+{{SIDE_HEADER}}

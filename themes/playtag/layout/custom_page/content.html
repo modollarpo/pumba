@@ -1,0 +1,14 @@
+<?php if ($pt->page_data->page_type == 0) { ?>
+	<div class="pt-4 pb-5 container">
+		<div class="content p-4">
+			<?php echo htmlspecialchars_decode($pt->page_data->page_content);?>
+		</div>
+	</div>
+<?php } else { ?>
+	<div class="pt-4 pb-5 container">
+		<h2 class="mt-0 mb-3 display-4"><?php echo $pt->page_data->page_title?></h2>
+		<div class="content p-4">
+			<?php echo htmlspecialchars_decode($pt->page_data->page_content);?>
+		</div>
+	</div>
+<?php } ?>
