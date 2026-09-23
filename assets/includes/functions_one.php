@@ -348,6 +348,12 @@ function PT_GetVideoByID($video_id = '', $add_views = 0, $likes_dislikes = 0, $r
 
         }
         $get_video->type         = 'video';
+        if (!empty($get_video->youtube) && $get_video->converted == 1) {
+            $get_video->youtube        = '';
+            $get_video->video_type     = 'video/mp4';
+            $get_video->source         = 'Uploaded';
+            $get_video->video_location = PT_GetMedia($get_video->video_location);
+        }
         if (!empty($get_video->youtube) && $get_video->is_short == 0 && $get_video->converted != 1) {
             $get_video->video_type     = 'video/youtube';
             $get_video->video_location = 'https://www.youtube.com/watch?v=' . $get_video->youtube;
