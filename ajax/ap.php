@@ -687,99 +687,19 @@ if ($first == 'import-youtube-videos') {
 
 
     if (!empty($_POST['videos'])) {
-        $ids = array();
         $category_id = 0;
         if (!empty($_POST['category_id'])) {
             if (in_array($_POST['category_id'], array_keys(ToArray($pt->categories)))) {
                 $category_id = $_POST['category_id'];
             }
         }
-        foreach ($_POST['videos'] as $key => $data_fro_ajax) {
-            $video_id  = PT_GenerateKey(15, 15);
-            $video_id_ = $data_fro_ajax['video_id'];
-            $title = $data_fro_ajax['title'];
-            $description = $data_fro_ajax['description'];
-            $duration = $data_fro_ajax['duration'];
-            $thumb = $data_fro_ajax['thumb'];
-            $tags = $data_fro_ajax['tags'];
-            $insert = false;
-            if (strpos($thumb, 'upload/photos/thumbnail')) {
-                $thumb = 'upload/photos/thumbnail.jpg';
-            }
-            $check_for_video = $db->where('video_id', $video_id)->getValue(T_VIDEOS, 'count(*)');
-            if ($check_for_video > 0) {
-                $video_id = PT_GenerateKey(15, 15);
-            }
-            $link_regex = '/(http\:\/\/|https\:\/\/|www\.)([^\ ]+)/i';
-            $i          = 0;
-            preg_match_all($link_regex, PT_Secure($description), $matches);
-            foreach ($matches[0] as $match) {
-                $match_url           = strip_tags($match);
-                $syntax              = '[a]' . urlencode($match_url) . '[/a]';
-                $description = str_replace($match, $syntax, $description);
-            }
-            $user_id = $user->id;
-            if (!empty($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0) {
-                $user_id = PT_Secure($_POST['user_id']);
-            }
-            $data_insert = array(
-                'video_id' => $video_id,
-                'user_id' => $user_id,
-                'title' => PT_Secure($title),
-                'description' => PT_Secure($description),
-                'tags' => PT_Secure($tags),
-                'duration' => $duration,
-                'category_id' => $category_id,
-                'youtube' => $video_id_,
-                'thumbnail' => $thumb,
-                'time' => time(),
-                'registered' => date('Y') . '/' . intval(date('m'))
-            );
-            if (!empty($_POST['sub_category_id'])) {
-                $is_found = $db->where('type',PT_Secure($_POST['category_id']))->where('lang_key',PT_Secure($_POST['sub_category_id']))->getValue(T_LANGS,'COUNT(*)');
-                if ($is_found > 0) {
-                    $data_insert['sub_category'] = PT_Secure($_POST['sub_category_id']);
-                }
-            }
-            $insert      = $db->insert(T_VIDEOS, $data_insert);
-            if ($insert) {
-                if (empty($_SESSION['imported-videos'])) {
-                    $_SESSION['imported-videos'] = 1;
-                } else {
-                    $_SESSION['imported-videos']++;
-                }
-
-                $YP_url = '';
-                try {
-                    $YP_url = getYotubeRapidAPIData("https://www.youtube.com/watch?v=" . $data_fro_ajax['video_id']);
-                } catch (Exception $e) {
-                    $YP_url = '';
-                }
-                if (!empty($YP_url)) {
-                    $videoContent = downloadYPVideo($YP_url);
-                    if (!empty($videoContent) && $videoContent['status'] == 200) {
-                        $update = array();
-                        $video_url = 'upload/videos/' . date('Y') . '/' . date('m').'/' .PT_GenerateKey() . ".mp4";
-                        file_put_contents($video_url, $videoContent['data']);
-                        PT_UploadToS3($video_url);
-                        $update['video_location'] = $video_url;
-                        $update['converted'] = 1;
-                        $update['is_short'] = (!empty($data_fro_ajax['main_duration']) && checkIfVideoSort($data_fro_ajax['main_duration'])) ? 1 : 0;
-
-                        $newThumbnail = 'upload/photos/' . date('Y') . '/' . date('m').'/' .PT_GenerateKey() . ".jpg";
-                        if (filter_var($thumb, FILTER_VALIDATE_URL) !== FALSE && @file_put_contents($newThumbnail, file_get_contents($thumb))) {
-                            PT_UploadToS3($newThumbnail);
-                            $update['thumbnail'] = $newThumbnail;
-                        }
-
-                        $db->where('id',$insert)->update(T_VIDEOS,$update);
-                    }
-                }
-            }
+        $sub_category_id = (!empty($_POST['sub_category_id'])) ? $_POST['sub_category_id'] : 0;
+        $user_id = $user->id;
+        if (!empty($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0) {
+            $user_id = PT_Secure($_POST['user_id']);
         }
-        if ($insert) {
-            $data = array('status' => 200);
-        }
+        $result = PT_EnqueueImportJobs('youtube', $_POST['videos'], $category_id, $sub_category_id, $user_id);
+        $data = array('status' => 200, 'queued' => $result['queued'], 'skipped' => $result['skipped']);
     }
 }
 
@@ -791,85 +711,26 @@ if ($first == 'import-tiktok-videos') {
                 $category_id = $_POST['category_id'];
             }
         }
-        foreach ($_POST['videos'] as $key => $data_fro_ajax) {
-            $video_id   = PT_GenerateKey(15, 15);
-            $video_id_  = $data_fro_ajax['video_id'];
-            $title      = $data_fro_ajax['title'];
-            $description = $data_fro_ajax['description'];
-            $duration   = $data_fro_ajax['duration'];
-            $thumb      = $data_fro_ajax['thumb'];
-            $tags       = $data_fro_ajax['tags'];
-            $author     = (!empty($data_fro_ajax['author'])) ? $data_fro_ajax['author'] : '';
-            $insert     = false;
-            if (strpos($thumb, 'upload/photos/thumbnail')) {
-                $thumb = 'upload/photos/thumbnail.jpg';
-            }
-            $check_for_video = $db->where('video_id', $video_id)->getValue(T_VIDEOS, 'count(*)');
-            if ($check_for_video > 0) {
-                $video_id = PT_GenerateKey(15, 15);
-            }
-            $link_regex = '/(http\:\/\/|https\:\/\/|www\.)([^\ ]+)/i';
-            $i          = 0;
-            preg_match_all($link_regex, PT_Secure($description), $matches);
-            foreach ($matches[0] as $match) {
-                $match_url           = strip_tags($match);
-                $syntax              = '[a]' . urlencode($match_url) . '[/a]';
-                $description = str_replace($match, $syntax, $description);
-            }
-            $user_id = $user->id;
-            if (!empty($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0) {
-                $user_id = PT_Secure($_POST['user_id']);
-            }
-            $video_url = '';
-            if (!empty($author) && !empty($video_id_)) {
-                $links = GetTiktokVideoDownloadLink('https://www.tiktok.com/@'.$author.'/video/'.$video_id_);
-                if (!empty($links) && !empty($links['status']) && $links['status'] == 200) {
-                    $video_url = SaveTiktokVideo($links['video_url']);
-                }
-            }
-            if (!empty($video_url)) {
-                $new_thumbnail = 'upload/photos/' . date('Y') . '/' . date('m').'/' .PT_GenerateKey() . ".jpg";
-                if (!empty($thumb) && filter_var($thumb, FILTER_VALIDATE_URL) !== FALSE && @file_put_contents($new_thumbnail, file_get_contents($thumb))) {
-                    PT_UploadToS3($new_thumbnail);
-                    $thumb = $new_thumbnail;
-                }
-                $data_insert = array(
-                    'video_id' => $video_id,
-                    'user_id' => $user_id,
-                    'title' => PT_Secure($title),
-                    'description' => PT_Secure($description),
-                    'tags' => PT_Secure($tags),
-                    'duration' => $duration,
-                    'category_id' => $category_id,
-                    'video_location' => $video_url,
-                    'converted' => 1,
-                    'is_short' => 1,
-                    'thumbnail' => $thumb,
-                    'time' => time(),
-                    'registered' => date('Y') . '/' . intval(date('m'))
-                );
-                if (!empty($_POST['sub_category_id'])) {
-                    $is_found = $db->where('type',PT_Secure($_POST['category_id']))->where('lang_key',PT_Secure($_POST['sub_category_id']))->getValue(T_LANGS,'COUNT(*)');
-                    if ($is_found > 0) {
-                        $data_insert['sub_category'] = PT_Secure($_POST['sub_category_id']);
-                    }
-                }
-                $insert = $db->insert(T_VIDEOS, $data_insert);
-            }
-            if ($insert) {
-                if (empty($_SESSION['imported-videos'])) {
-                    $_SESSION['imported-videos'] = 1;
-                } else {
-                    $_SESSION['imported-videos']++;
-                }
-            }
+        $sub_category_id = (!empty($_POST['sub_category_id'])) ? $_POST['sub_category_id'] : 0;
+        $user_id = $user->id;
+        if (!empty($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0) {
+            $user_id = PT_Secure($_POST['user_id']);
         }
-        if ($insert) {
-            $data = array('status' => 200);
-        } else {
-            $data = array('status' => 400, 'message' => 'Could not import the videos.');
-        }
+        $result = PT_EnqueueImportJobs('tiktok', $_POST['videos'], $category_id, $sub_category_id, $user_id);
+        $data = array('status' => 200, 'queued' => $result['queued'], 'skipped' => $result['skipped']);
     }
+}
+
+if ($first == 'import-queue-status') {
+    $stats = PT_ImportQueueStats();
+    $data = array('status' => 200) + $stats;
+}
+
+if ($first == 'import-run-queue') {
+    $run_limit = (!empty($_POST['limit']) && is_numeric($_POST['limit'])) ? (int) $_POST['limit'] : 5;
+    $run   = PT_ProcessImportQueue($run_limit);
+    $stats = PT_ImportQueueStats();
+    $data  = array('status' => 200) + $stats;
 }
 
 if ($first == 'create-ads') {

@@ -43,6 +43,7 @@ define('T_CHATS', 'conversations');
 define('T_VIDEOS_TRSNS', 'videos_transactions');
 define('T_VIEWS', 'views');
 define('T_QUEUE', 'queue');
+define('T_IMPORT_QUEUE', 'import_queue');
 define('T_ADS_TRANS', 'ads_transactions');
 define('T_MOVIES', 'movies');
 define('T_BLOCK', 'block');

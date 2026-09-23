@@ -4583,6 +4583,416 @@ function downloadYPVideo($url='')
     ];
 }
 
+function PT_EnsureImportQueueTable()
+{
+    global $sqlConnect;
+
+    $sql = "CREATE TABLE IF NOT EXISTS `" . T_IMPORT_QUEUE . "` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `video_id` int(11) NOT NULL DEFAULT '0',
+        `source` varchar(20) NOT NULL DEFAULT '',
+        `payload` text,
+        `status` int(11) NOT NULL DEFAULT '0',
+        `attempts` int(11) NOT NULL DEFAULT '0',
+        `error` varchar(500) NOT NULL DEFAULT '',
+        `time` int(11) NOT NULL DEFAULT '0',
+        PRIMARY KEY (`id`),
+        KEY `video_id` (`video_id`),
+        KEY `status` (`status`),
+        KEY `source` (`source`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+    @mysqli_query($sqlConnect, $sql);
+}
+
+function PT_EnqueueImportJobs($source = 'youtube', $videos = array(), $category_id = 0, $sub_category_id = 0, $user_id = 0)
+{
+    global $pt, $db;
+
+    PT_EnsureImportQueueTable();
+
+    $queued   = 0;
+    $skipped  = 0;
+
+    if (empty($videos) || !is_array($videos)) {
+        return array('queued' => 0, 'skipped' => 0);
+    }
+
+    foreach ($videos as $key => $data_fro_ajax) {
+        if (empty($data_fro_ajax['video_id'])) {
+            continue;
+        }
+        $video_id_  = $data_fro_ajax['video_id'];
+        $exists     = false;
+        if ($source == 'youtube') {
+            $check_for_video = $db->where('youtube', PT_Secure($video_id_))->getOne(T_VIDEOS, array('id', 'video_location'));
+            if (!empty($check_for_video) && !empty($check_for_video->id)) {
+                // Only skip when a full copy already exists; embed-only rows are
+                // re-queued so the worker can download and attach the local copy.
+                if (!empty($check_for_video->video_location)) {
+                    $exists = true;
+                }
+            }
+        }
+        if ($exists) {
+            $skipped++;
+            continue;
+        }
+        $payload = array(
+            'video_id'          => $video_id_,
+            'title'             => (!empty($data_fro_ajax['title'])) ? $data_fro_ajax['title'] : '',
+            'description'       => (!empty($data_fro_ajax['description'])) ? $data_fro_ajax['description'] : '',
+            'duration'          => (!empty($data_fro_ajax['duration'])) ? $data_fro_ajax['duration'] : '',
+            'main_duration'     => (!empty($data_fro_ajax['main_duration'])) ? $data_fro_ajax['main_duration'] : '',
+            'thumb'             => (!empty($data_fro_ajax['thumb'])) ? $data_fro_ajax['thumb'] : '',
+            'tags'              => (!empty($data_fro_ajax['tags'])) ? $data_fro_ajax['tags'] : '',
+            'user_id'           => $user_id,
+            'category_id'       => $category_id,
+            'sub_category_id'   => $sub_category_id,
+        );
+        if ($source == 'tiktok') {
+            $payload['author']    = (!empty($data_fro_ajax['author'])) ? $data_fro_ajax['author'] : '';
+            $payload['video_url'] = (!empty($data_fro_ajax['video_url'])) ? $data_fro_ajax['video_url'] : '';
+        }
+        $db->insert(T_IMPORT_QUEUE, array(
+            'video_id'  => 0,
+            'source'    => $source,
+            'payload'   => json_encode($payload),
+            'status'    => 0,
+            'attempts'  => 0,
+            'error'     => '',
+            'time'      => time()
+        ));
+        $queued++;
+    }
+
+    return array('queued' => $queued, 'skipped' => $skipped);
+}
+
+function PT_ProcessImportYouTubeJob($payload = array())
+{
+    global $pt, $db;
+
+    $video_id_      = (!empty($payload['video_id'])) ? $payload['video_id'] : '';
+    $title          = (!empty($payload['title'])) ? $payload['title'] : '';
+    $description    = (!empty($payload['description'])) ? $payload['description'] : '';
+    $duration       = (!empty($payload['duration'])) ? $payload['duration'] : '';
+    $main_duration  = (!empty($payload['main_duration'])) ? $payload['main_duration'] : '';
+    $thumb          = (!empty($payload['thumb'])) ? $payload['thumb'] : '';
+    $tags           = (!empty($payload['tags'])) ? $payload['tags'] : '';
+    $user_id        = (!empty($payload['user_id'])) ? (int) $payload['user_id'] : 0;
+    $category_id    = (!empty($payload['category_id'])) ? $payload['category_id'] : 0;
+    $sub_category   = (!empty($payload['sub_category_id'])) ? $payload['sub_category_id'] : '';
+
+    if (empty($video_id_)) {
+        return array('status' => 400, 'message' => 'Missing video id');
+    }
+    if (empty($user_id)) {
+        $user_id = (!empty($pt->user->id)) ? $pt->user->id : 0;
+    }
+
+    $check_for_video = $db->where('youtube', PT_Secure($video_id_))->getOne(T_VIDEOS, array('id', 'video_location'));
+    if (!empty($check_for_video) && !empty($check_for_video->id)) {
+        // The video already exists. If it's only an embed (no local copy yet),
+        // try to download and attach the local copy to the existing row.
+        if (empty($check_for_video->video_location)) {
+            $existing_video_id = (int) $check_for_video->id;
+        } else {
+            return array('status' => 200, 'message' => 'Skipped, already exists.');
+        }
+    }
+
+    $video_id = PT_GenerateKey(15, 15);
+    if (strpos($thumb, 'upload/photos/thumbnail') !== false) {
+        $thumb = 'upload/photos/thumbnail.jpg';
+    }
+    $check_for_video = $db->where('video_id', $video_id)->getValue(T_VIDEOS, 'count(*)');
+    if ($check_for_video > 0) {
+        $video_id = PT_GenerateKey(15, 15);
+    }
+    $link_regex = '/(http\:\/\/|https\:\/\/|www\.)([^\ ]+)/i';
+    $i          = 0;
+    preg_match_all($link_regex, PT_Secure($description), $matches);
+    foreach ($matches[0] as $match) {
+        $match_url           = strip_tags($match);
+        $syntax              = '[a]' . urlencode($match_url) . '[/a]';
+        $description = str_replace($match, $syntax, $description);
+    }
+
+    $data_insert = array(
+        'video_id' => $video_id,
+        'user_id' => $user_id,
+        'title' => PT_Secure($title),
+        'description' => PT_Secure($description),
+        'tags' => PT_Secure($tags),
+        'duration' => $duration,
+        'category_id' => $category_id,
+        'youtube' => $video_id_,
+        'thumbnail' => $thumb,
+        'time' => time(),
+        'registered' => date('Y') . '/' . intval(date('m'))
+    );
+    if (!empty($sub_category) && !empty($category_id)) {
+        $is_found = $db->where('type', PT_Secure($category_id))->where('lang_key', PT_Secure($sub_category))->getValue(T_LANGS,'COUNT(*)');
+        if ($is_found > 0) {
+            $data_insert['sub_category'] = PT_Secure($sub_category);
+        }
+    }
+    $update_existing = (!empty($existing_video_id)) ? true : false;
+    if ($update_existing) {
+        $insert = $existing_video_id;
+    } else {
+        $insert = $db->insert(T_VIDEOS, $data_insert);
+        if (!$insert) {
+            return array('status' => 400, 'message' => 'Could not import the video, database error.');
+        }
+    }
+
+    $YP_url = '';
+    try {
+        $YP_url = getYotubeRapidAPIData("https://www.youtube.com/watch?v=" . $video_id_);
+    } catch (Exception $e) {
+        $YP_url = '';
+    }
+    if (!empty($YP_url)) {
+        $videoContent = downloadYPVideo($YP_url);
+        if (!empty($videoContent) && $videoContent['status'] == 200) {
+            $update = array();
+            $video_url = 'upload/videos/' . date('Y') . '/' . date('m').'/' . PT_GenerateKey() . "_video.mp4";
+            @file_put_contents($video_url, $videoContent['data']);
+            PT_UploadToS3($video_url);
+            $update['video_location'] = $video_url;
+            $update['converted'] = 1;
+            $update['is_short'] = (!empty($main_duration) && checkIfVideoSort($main_duration)) ? 1 : 0;
+
+            $newThumbnail = 'upload/photos/' . date('Y') . '/' . date('m').'/' . PT_GenerateKey() . ".jpg";
+            if (filter_var($thumb, FILTER_VALIDATE_URL) !== FALSE && @file_put_contents($newThumbnail, file_get_contents($thumb))) {
+                PT_UploadToS3($newThumbnail);
+                $update['thumbnail'] = $newThumbnail;
+            }
+            $db->where('id', $insert)->update(T_VIDEOS, $update);
+
+            if (!empty($update['video_location']) && $update['is_short'] != 1 && $pt->config->ffmpeg_system == 'on' && !empty($pt->config->ffmpeg_binary_file) && file_exists($pt->config->ffmpeg_binary_file)) {
+                $video_res = 0;
+                try {
+                    $getID3   = new getID3;
+                    $file     = $getID3->analyze($update['video_location']);
+                    if (!empty($file['video']['resolution_x'])) {
+                        $video_res = (int) $file['video']['resolution_x'];
+                    }
+                } catch (Exception $e) {
+                    $video_res = 0;
+                }
+                $check_in_queue = $db->where('video_id', $insert)->getValue(T_QUEUE, 'count(*)');
+                if ($check_in_queue == 0) {
+                    $db->insert(T_QUEUE, array(
+                        'video_id' => $insert,
+                        'video_res' => $video_res,
+                        'processing' => 0
+                    ));
+                }
+            }
+        }
+    }
+
+    return array('status' => 200, 'message' => 'Imported.', 'id' => $insert);
+}
+
+function PT_ProcessImportTikTokJob($payload = array())
+{
+    global $pt, $db;
+
+    $video_id_      = (!empty($payload['video_id'])) ? $payload['video_id'] : '';
+    $title          = (!empty($payload['title'])) ? $payload['title'] : '';
+    $description    = (!empty($payload['description'])) ? $payload['description'] : '';
+    $duration       = (!empty($payload['duration'])) ? $payload['duration'] : '';
+    $thumb          = (!empty($payload['thumb'])) ? $payload['thumb'] : '';
+    $tags           = (!empty($payload['tags'])) ? $payload['tags'] : '';
+    $author         = (!empty($payload['author'])) ? $payload['author'] : '';
+    $user_id        = (!empty($payload['user_id'])) ? (int) $payload['user_id'] : 0;
+    $category_id    = (!empty($payload['category_id'])) ? $payload['category_id'] : 0;
+    $sub_category   = (!empty($payload['sub_category_id'])) ? $payload['sub_category_id'] : '';
+
+    if (empty($video_id_) || empty($author)) {
+        return array('status' => 400, 'message' => 'Missing video id or author.');
+    }
+    if (empty($user_id)) {
+        $user_id = (!empty($pt->user->id)) ? $pt->user->id : 0;
+    }
+
+    $video_id = PT_GenerateKey(15, 15);
+    if (strpos($thumb, 'upload/photos/thumbnail') !== false) {
+        $thumb = 'upload/photos/thumbnail.jpg';
+    }
+    $check_for_video = $db->where('video_id', $video_id)->getValue(T_VIDEOS, 'count(*)');
+    if ($check_for_video > 0) {
+        $video_id = PT_GenerateKey(15, 15);
+    }
+    $link_regex = '/(http\:\/\/|https\:\/\/|www\.)([^\ ]+)/i';
+    $i          = 0;
+    preg_match_all($link_regex, PT_Secure($description), $matches);
+    foreach ($matches[0] as $match) {
+        $match_url           = strip_tags($match);
+        $syntax              = '[a]' . urlencode($match_url) . '[/a]';
+        $description = str_replace($match, $syntax, $description);
+    }
+
+    $video_url = '';
+    try {
+        $links = GetTiktokVideoDownloadLink('https://www.tiktok.com/@'.$author.'/video/'.$video_id_);
+        if (!empty($links) && !empty($links['status']) && $links['status'] == 200) {
+            $video_url = SaveTiktokVideo($links['video_url']);
+        }
+    } catch (Exception $e) {
+        $video_url = '';
+    }
+    if (empty($video_url)) {
+        return array('status' => 400, 'message' => 'Could not download the TikTok video.');
+    }
+
+    $new_thumbnail = 'upload/photos/' . date('Y') . '/' . date('m').'/' . PT_GenerateKey() . ".jpg";
+    if (!empty($thumb) && filter_var($thumb, FILTER_VALIDATE_URL) !== FALSE && @file_put_contents($new_thumbnail, file_get_contents($thumb))) {
+        PT_UploadToS3($new_thumbnail);
+        $thumb = $new_thumbnail;
+    }
+
+    $data_insert = array(
+        'video_id' => $video_id,
+        'user_id' => $user_id,
+        'title' => PT_Secure($title),
+        'description' => PT_Secure($description),
+        'tags' => PT_Secure($tags),
+        'duration' => $duration,
+        'category_id' => $category_id,
+        'video_location' => $video_url,
+        'converted' => 1,
+        'is_short' => 1,
+        'thumbnail' => $thumb,
+        'time' => time(),
+        'registered' => date('Y') . '/' . intval(date('m'))
+    );
+    if (!empty($sub_category) && !empty($category_id)) {
+        $is_found = $db->where('type', PT_Secure($category_id))->where('lang_key', PT_Secure($sub_category))->getValue(T_LANGS,'COUNT(*)');
+        if ($is_found > 0) {
+            $data_insert['sub_category'] = PT_Secure($sub_category);
+        }
+    }
+    $insert = $db->insert(T_VIDEOS, $data_insert);
+    if (!$insert) {
+        return array('status' => 400, 'message' => 'Could not import the video, database error.');
+    }
+
+    return array('status' => 200, 'message' => 'Imported.', 'id' => $insert);
+}
+
+function PT_ProcessImportQueue($limit = 5)
+{
+    global $pt, $db;
+
+    PT_EnsureImportQueueTable();
+
+    $limit = (int) $limit;
+    if ($limit < 1) {
+        $limit = 1;
+    }
+    if ($limit > 20) {
+        $limit = 20;
+    }
+
+    // Reset jobs stuck in processing state (e.g. crashed worker) back to pending.
+    $db->where('status', 1)->where('time', time() - (60 * 30), '<')->update(T_IMPORT_QUEUE, array('status' => 0));
+
+    $jobs = $db->where('status', 0)->orderBy('id', 'ASC')->get(T_IMPORT_QUEUE, $limit);
+    if (empty($jobs)) {
+        return array('processed' => 0);
+    }
+
+    $processed = 0;
+    foreach ($jobs as $job) {
+        // Claim the job atomically so two workers can't process the same row.
+        $db->rawQuery("UPDATE " . T_IMPORT_QUEUE . " SET `status` = 1, `time` = " . time() . " WHERE `id` = " . (int) $job->id . " AND `status` = 0");
+        if ((int) $db->count == 0) {
+            continue;
+        }
+        $processed++;
+        $payload = array();
+        if (!empty($job->payload)) {
+            $payload = json_decode($job->payload, true);
+            if (!is_array($payload)) {
+                $payload = array();
+            }
+        }
+        try {
+            if ($job->source == 'tiktok') {
+                $result = PT_ProcessImportTikTokJob($payload);
+            } else {
+                $result = PT_ProcessImportYouTubeJob($payload);
+            }
+            if ($result['status'] != 200) {
+                throw new Exception($result['message']);
+            }
+            $imported_id = (!empty($result['id'])) ? (int) $result['id'] : 0;
+            $db->where('id', $job->id)->update(T_IMPORT_QUEUE, array('status' => 2, 'video_id' => $imported_id, 'time' => time()));
+        } catch (Exception $e) {
+            $attempts   = (int) $job->attempts + 1;
+            $new_status = ($attempts >= 3) ? 3 : 0;
+            $db->where('id', $job->id)->update(T_IMPORT_QUEUE, array(
+                'status' => $new_status,
+                'attempts' => $attempts,
+                'error' => substr($e->getMessage(), 0, 500),
+                'time' => time()
+            ));
+        }
+    }
+
+    return array('processed' => $processed);
+}
+
+function PT_ImportQueueStats()
+{
+    global $pt, $db;
+
+    PT_EnsureImportQueueTable();
+
+    $stats = array(
+        'pending'    => 0,
+        'processing' => 0,
+        'done'       => 0,
+        'failed'     => 0
+    );
+    try {
+        $rows = $db->rawQuery("SELECT `status`, COUNT(*) as c FROM " . T_IMPORT_QUEUE . " GROUP BY `status`");
+        foreach ($rows as $row) {
+            if ($row->status == 0) {
+                $stats['pending'] = (int) $row->c;
+            } elseif ($row->status == 1) {
+                $stats['processing'] = (int) $row->c;
+            } elseif ($row->status == 2) {
+                $stats['done'] = (int) $row->c;
+            } elseif ($row->status == 3) {
+                $stats['failed'] = (int) $row->c;
+            }
+        }
+    } catch (Exception $e) {
+        $stats = array('pending' => 0, 'processing' => 0, 'done' => 0, 'failed' => 0);
+    }
+
+    $stats['errors'] = array();
+    try {
+        $errors = $db->where('status', 3)->where('error', '', '!=')->orderBy('id', 'DESC')->get(T_IMPORT_QUEUE, 10, array('source', 'error', 'time'));
+        foreach ($errors as $error) {
+            $stats['errors'][] = array(
+                'source' => $error->source,
+                'error'  => $error->error,
+                'time'   => $error->time
+            );
+        }
+    } catch (Exception $e) {
+        $stats['errors'] = array();
+    }
+
+    return $stats;
+}
+
 function cleanConfigData()
 {
     global $pt;

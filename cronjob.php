@@ -59,6 +59,8 @@ foreach ($getCompletedVideos as $key => $video) {
 
 $update_information = PT_UpdateAdminDetails();
 
+$pt_process_queue_result = PT_ProcessImportQueue(5);
+
 $process_queue = $db->get(T_QUEUE, $pt->config->queue_count, "*");
 if (!empty($process_queue) && count($process_queue) > 0) {
     foreach ($process_queue as $key => $value) {

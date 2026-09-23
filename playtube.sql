@@ -2223,6 +2223,23 @@ CREATE TABLE `queue` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `import_queue`
+--
+
+CREATE TABLE `import_queue` (
+  `id` int(11) NOT NULL,
+  `video_id` int(11) NOT NULL DEFAULT '0',
+  `source` varchar(20) NOT NULL DEFAULT '',
+  `payload` text,
+  `status` int(11) NOT NULL DEFAULT '0',
+  `attempts` int(11) NOT NULL DEFAULT '0',
+  `error` varchar(500) NOT NULL DEFAULT '',
+  `time` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `reports`
 --
 
@@ -3084,6 +3101,15 @@ ALTER TABLE `queue`
   ADD KEY `video_res` (`video_res`);
 
 --
+-- Indexes for table `import_queue`
+--
+ALTER TABLE `import_queue`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `video_id` (`video_id`),
+  ADD KEY `status` (`status`),
+  ADD KEY `source` (`source`);
+
+--
 -- Indexes for table `reports`
 --
 ALTER TABLE `reports`
@@ -3557,6 +3583,12 @@ ALTER TABLE `playlist_subscribers`
 -- AUTO_INCREMENT for table `play_list`
 --
 ALTER TABLE `play_list`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `import_queue`
+--
+ALTER TABLE `import_queue`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --

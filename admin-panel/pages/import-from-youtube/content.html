@@ -445,11 +445,42 @@ $(function () {
       $('form').submit();
     <?php } ?>
 });
+var skippedCount = 0;
+var queuedCount = 0;
+var baselineDone = 0;
+var baselineFailed = 0;
+var import_poll_interval = null;
+function import_poll_queue() {
+    $.post('{{LINK aj/ap/import-queue-status}}', {}, function (res) {
+        if (res.status == 200) {
+            var pending    = parseInt(res.pending) || 0;
+            var processing = parseInt(res.processing) || 0;
+            var done       = parseInt(res.done) || 0;
+            var failed     = parseInt(res.failed) || 0;
+            var text = 'Queue: ' + pending + ' waiting, ' + processing + ' processing, ' + done + ' done, ' + failed + ' failed';
+            $('#import-modal').find('.loading').text(text);
+            if (pending > 0) {
+                $.post('{{LINK aj/ap/import-run-queue}}', {limit: 5}, function () {});
+            }
+            var target = baselineDone + baselineFailed + queuedCount;
+            if (pending == 0 && processing == 0 && (done + failed) >= target) {
+                clearInterval(import_poll_interval);
+                var imported = (done - baselineDone);
+                var failed_  = (failed - baselineFailed);
+                $('#import-modal').find('.modal-content').removeClass('modal-col-teal').addClass('modal-col-light-green');
+                $('#import-modal').find('.loading').html('<i class="fa fa-check"></i> '+ imported +' videos imported, '+ failed_ +' failed, '+ skippedCount +' skipped');
+                setTimeout(function () { window.location.reload(false); }, 1800);
+            }
+        }
+    });
+}
 $('.btn-import').on('click', function(event) {
+    event.preventDefault();
     data = new Array();
     $('.btn-import').attr('disabled', true);
     $('.btn-import').text('Please wait..');
     $('#import-modal').modal('show');
+    $('#import-modal').find('.loading').text('Adding videos to the import queue...');
     user_id = $('#user_id_').val();
     $('.youtube-video').each(function(index, el) {
     	var video_id = $(this).attr('data-id');
@@ -467,11 +498,28 @@ $('.btn-import').on('click', function(event) {
     		data.push(object_video);
     	}
     });
-    $.post('{{LINK aj/ap/import-youtube-videos}}', {videos: data, category_id: $('#category_id').val(),sub_category_id: $('#sub_category_id').val(),user_id:user_id}, function () {
-        // $('#import-modal').find('.modal-content').removeClass('modal-col-teal').addClass('modal-col-light-green');
-        // $('#import-modal').find('.loading').html('<i class="fa fa-check"></i> Videos successfully imported, redirecting to next page');
-        // window.location.reload(false);
-        // $('.btn-import').html('Please wait..');
+    if (data.length == 0) {
+        $('.btn-import').attr('disabled', false);
+        $('.btn-import').text('Import selected <span></span>');
+        $('#import-modal').modal('hide');
+        return;
+    }
+    $.post('{{LINK aj/ap/import-youtube-videos}}', {videos: data, category_id: $('#category_id').val(),sub_category_id: $('#sub_category_id').val(),user_id:user_id}, function (res) {
+        if (res.status == 200) {
+            skippedCount = (typeof res.skipped != 'undefined') ? parseInt(res.skipped) : 0;
+            queuedCount  = (typeof res.queued != 'undefined') ? parseInt(res.queued) : 0;
+            $.post('{{LINK aj/ap/import-queue-status}}', {}, function (st) {
+                baselineDone   = (st.status == 200 && typeof st.done != 'undefined') ? parseInt(st.done) : 0;
+                baselineFailed = (st.status == 200 && typeof st.failed != 'undefined') ? parseInt(st.failed) : 0;
+                $('#import-modal').find('.loading').text('Added '+ queuedCount +' videos to the queue ('+ skippedCount +' already imported)');
+                clearInterval(import_poll_interval);
+                import_poll_interval = setInterval(import_poll_queue, 2000);
+                $.post('{{LINK aj/ap/import-run-queue}}', {limit: 5}, function () {});
+            });
+        } else {
+            $('#import-modal').find('.loading').text('Error: ' + ((res.message) ? res.message : 'Something went wrong'));
+            setTimeout(function () { window.location.reload(false); }, 2000);
+        }
     });
 });
 
