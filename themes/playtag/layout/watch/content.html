@@ -562,10 +562,16 @@
 					<?php if ($pt->get_video->is_owner == true) { ?>
 						<a class="btn border-0 btn-share" href="{{LINK edit-video/{{ID}}}}" data-load="?link1=edit-video&id=category&id={{ID}}">
 							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.9459 3.17305C17.5332 2.58578 17.8268 2.29215 18.1521 2.15173C18.6208 1.94942 19.1521 1.94942 19.6208 2.15173C19.946 2.29215 20.2397 2.58578 20.8269 3.17305C21.4142 3.76032 21.7079 4.05395 21.8483 4.37925C22.0506 4.8479 22.0506 5.37924 21.8483 5.84789C21.7079 6.17319 21.4142 6.46682 20.8269 7.05409L15.8054 12.0757C14.5682 13.3129 13.9496 13.9315 13.1748 14.298C12.4 14.6645 11.5294 14.7504 9.78823 14.9222L9 15L9.07778 14.2118C9.24958 12.4706 9.33549 11.6 9.70201 10.8252C10.0685 10.0504 10.6871 9.43183 11.9243 8.19464L16.9459 3.17305Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><path d="M6 15H3.75C2.7835 15 2 15.7835 2 16.75C2 17.7165 2.7835 18.5 3.75 18.5H13.25C14.2165 18.5 15 19.2835 15 20.25C15 21.2165 14.2165 22 13.25 22H11" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG edit_video}}
-						</a>
-					<?php } ?>
-					
-					<?php if (empty($pt->get_video->stream_name)) { ?>
+</a>
+				<?php } ?>
+				
+				<?php if (!empty($pt->get_video->stream_name) && $pt->config->donate_system == 'on' && $pt->get_video->is_owner == false && IS_LOGGED && empty($pt->get_video->live_ended)) { ?>
+					<button class="btn border-0 btn-share" onclick="PT_OpenLiveDonate();">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9C3 8.25231 3 7.87846 3.20096 7.6C3.33261 7.41758 3.52197 7.26609 3.75 7.16077C4.09808 7 4.56538 7 5.5 7H18.5C19.4346 7 19.9019 7 20.25 7.16077C20.478 7.26609 20.6674 7.41758 20.799 7.6C21 7.87846 21 8.25231 21 9C21 9.74769 21 10.1215 20.799 10.4C20.6674 10.5824 20.478 10.7339 20.25 10.8392C19.9019 11 19.4346 11 18.5 11H5.5C4.56538 11 4.09808 11 3.75 10.8392C3.52197 10.7339 3.33261 10.5824 3.20096 10.4C3 10.1215 3 9.74769 3 9Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><path d="M7 10V18M10 10V18M13 10V18M16 10V18M18 7H6M5 7C5 5.89543 5.89543 5 7 5H17C18.1046 5 19 5.89543 19 7V20H5V7Z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 12V3M12 3C11.2998 3 10 4.9943 9.5 5.5M12 3C12.7002 3 14 4.9943 14.5 5.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG live_donate}}
+					</button>
+				<?php } ?>
+				
+				<?php if (empty($pt->get_video->stream_name)) { ?>
 						<?php if (!$pt->is_movie) { ?>
 							<?php
 							   if (($pt->config->payed_subscribers == 'on' && $pt->get_video->owner->subscriber_price > 0 && $pt->is_paid > 0) || ($pt->config->payed_subscribers == 'off') || ($pt->config->payed_subscribers == 'on' && $pt->get_video->owner->subscriber_price == 0) || (($pt->is_paid > 0 || $pt->get_video->sell_video == 0) && $pt->config->stock_videos == 'on' && $pt->get_video->is_stock == 1) ) {
@@ -922,6 +928,60 @@
 		</div>
 	</div>
 </div>
+
+<?php if (!empty($pt->get_video->stream_name) && $pt->config->donate_system == 'on' && $pt->get_video->is_owner == false && IS_LOGGED && empty($pt->get_video->live_ended)) { ?>
+<?php $live_donate_cur = isset($pt->config->currency_symbol_array[$pt->config->payment_currency]) ? $pt->config->currency_symbol_array[$pt->config->payment_currency] : '$'; ?>
+<div class="modal fade" id="live_donate_modal" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">{{LANG live_donate}}</h4>
+			</div>
+			<div class="modal-body">
+				<p class="bold"><?php echo str_replace('{name}', $pt->get_video->owner->name, $lang_array['live_donate_desc']); ?></p>
+				<div class="form-group no-margin">
+					<input id="live_donate_amount" class="form-control" tabindex="1" type="number" min="0.01" step="0.01" placeholder="0.00" autocomplete="off" />
+					<small class="mt-2 d-block text-muted"><?php echo str_replace('{balance}', $live_donate_cur . number_format($pt->user->wallet, 2), $lang_array['live_donate_balance']); ?></small>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-link main px-0" data-dismiss="modal">{{LANG close}}</button>
+				<button type="button" class="btn btn-main" onclick="PT_SendLiveDonate();">{{LANG live_donate_btn}}</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	function PT_OpenLiveDonate() {
+		$('#live_donate_modal').modal('show');
+	}
+	function PT_SendLiveDonate() {
+		var amount = parseFloat($('#live_donate_amount').val());
+		if (!amount || amount <= 0) {
+			Swal.fire({text: '<?php echo $lang_array['please_check_details']; ?>', icon: 'warning'});
+			return false;
+		}
+		$('#live_donate_modal .btn-main').attr('disabled', true);
+		$.post('{{LINK aj/live/donate}}?hash=' + $('.main_session').val(), {post_id: <?php echo $pt->get_video->id; ?>, amount: amount}, function (data) {
+			$('#live_donate_modal .btn-main').removeAttr('disabled');
+			if (data.status == 200) {
+				$('#live_post_comments_<?php echo $pt->get_video->id; ?>').append(data.html);
+				if ($('#live_post_comments_<?php echo $pt->get_video->id; ?> .live_comments').length >= 4) {
+					$('#live_post_comments_<?php echo $pt->get_video->id; ?> .live_comments').first().remove();
+				}
+				$('#live_donate_modal').modal('hide');
+				$('#live_donate_amount').val('');
+				Swal.fire({text: data.message, icon: 'success', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false});
+			} else {
+				Swal.fire({text: (data.message ? data.message : '<?php echo $lang_array['please_check_details']; ?>'), icon: 'error'});
+			}
+		}).fail(function () {
+			Swal.fire({text: '<?php echo $lang_array['please_check_details']; ?>', icon: 'error'});
+			$('#live_donate_modal .btn-main').removeAttr('disabled');
+		});
+	}
+</script>
+<?php } ?>
 
 <?php if ($pt->config->embed_system == 'on' && $pt->get_video->embedding == 0) {?>
 <?php if ($pt->get_video->sell_video == 0) { ?>

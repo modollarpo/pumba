@@ -307,3 +307,70 @@ if ($first == 'live_chating') {
     echo json_encode($data);
     exit();
 }
+if ($first == 'donate') {
+	$data['status'] = 400;
+	if (IS_LOGGED == true && !empty($_POST['post_id']) && is_numeric($_POST['post_id']) && $_POST['post_id'] > 0 && !empty($_POST['amount']) && is_numeric($_POST['amount'])) {
+		$post_id = PT_Secure($_POST['post_id']);
+		$amount = round((float)PT_Secure($_POST['amount']), 2);
+		$live_video = $db->where('id', $post_id)->getOne(T_VIDEOS);
+		if (!empty($live_video) && $live_video->type == 'live' && $live_video->live_ended == 0 && !empty($live_video->stream_name) && $amount > 0 && $live_video->user_id != $pt->user->id) {
+			if ($pt->user->wallet_or < $amount) {
+				$data['message'] = $lang->please_top_up_wallet;
+			}
+			else{
+				$db->where('id', $pt->user->id)->update(T_USERS, array('wallet' => $db->dec($amount)));
+				$db->where('id', $live_video->user_id)->update(T_USERS, array('balance' => $db->inc($amount)));
+				$db->insert(T_VIDEOS_TRSNS, array(
+					'user_id' => $live_video->user_id,
+					'paid_id' => $pt->user->id,
+					'admin_com' => 0,
+					'currency' => $pt->config->payment_currency,
+					'time' => time(),
+					'amount' => $amount,
+					'type' => 'donate'
+				));
+				$currency = !empty($pt->config->currency_symbol_array[$pt->config->payment_currency]) ? $pt->config->currency_symbol_array[$pt->config->payment_currency] : '$';
+				$tipped_text = !empty($lang->live_tipped) ? $lang->live_tipped : 'Donated';
+				$comment_id = $db->insert(T_COMMENTS, array(
+					'user_id' => $pt->user->id,
+					'video_id' => $post_id,
+					'text' => $tipped_text . ' ' . $currency . number_format($amount, 2),
+					'time' => time()
+				));
+				if (!empty($comment_id)) {
+					$get_comment = $db->where('id', $comment_id)->getOne(T_COMMENTS);
+					$user_data = PT_UserData($get_comment->user_id);
+					$pt->is_comment_owner = true;
+					$pt->is_verified = ($user_data->verified == 1) ? true : false;
+					$pt->video_owner = false;
+					$get_comment->text = PT_Duration($get_comment->text);
+					$data['html'] = PT_LoadPage('watch/live_comment', array(
+						'ID' => $get_comment->id,
+						'TEXT' => PT_Markup($get_comment->text),
+						'TIME' => PT_Time_Elapsed_String($get_comment->time),
+						'USER_DATA' => $user_data,
+						'LIKES' => 0,
+						'DIS_LIKES' => 0,
+						'LIKED' => '',
+						'DIS_LIKED' => '',
+						'LIKED_ATTR' => '',
+						'COMM_REPLIES' => '',
+						'VID_ID' => $get_comment->id
+					));
+				}
+				$data['status'] = 200;
+				$data['wallet'] = number_format(($pt->user->wallet_or - $amount), 2);
+				$data['message'] = !empty($lang->live_donate_sent) ? $lang->live_donate_sent : 'Tip sent successfully!';
+			}
+		}
+		else{
+			$data['message'] = $lang->please_check_details;
+		}
+	}
+	else{
+		$data['message'] = $lang->please_check_details;
+	}
+	header("Content-type: application/json");
+	echo json_encode($data);
+	exit();
+}
