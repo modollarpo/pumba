@@ -4358,7 +4358,7 @@ if ($first == 'add_pro_package') {
                 'name' => $_FILES['icon']['name'],
                 'size' => $_FILES["icon"]["size"],
                 'type' => $_FILES["icon"]["type"],
-                'allowed' => 'jpeg,png,jpg,gif,svg',
+                'allowed' => 'jpeg,png,jpg,gif',
                 'crop' => array(
                     'width' => 32,
                     'height' => 32
@@ -4381,7 +4381,7 @@ if ($first == 'add_pro_package') {
                 'name' => $_FILES['night_icon']['name'],
                 'size' => $_FILES["night_icon"]["size"],
                 'type' => $_FILES["night_icon"]["type"],
-                'allowed' => 'jpeg,png,jpg,gif,svg',
+                'allowed' => 'jpeg,png,jpg,gif',
                 'crop' => array(
                     'width' => 32,
                     'height' => 32
