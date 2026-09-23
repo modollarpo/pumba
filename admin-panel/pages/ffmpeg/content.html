@@ -1165,6 +1165,74 @@ if (!isEnabled('shell_exec')) {
             </div>
             <div class="card">
                 <div class="card-body">
+                    <h6 class="card-title">Azure Blob Configuration</h6>
+                    <div class="azure-settings-alert"></div>
+                    <form class="azure-settings" method="POST">
+                        <div class="float-left">
+                            <label for="azure_blob_storage" class="main-label">Azure Blob Storage</label>
+                            <br><small class="admin-info">Enable Azure Blob Storage to store your files in Azure Blob containers.</small>
+                        </div>
+                        <div class="form-group float-right switcher">
+                            <input type="hidden" name="azure_blob_storage" value="off" />
+                            <input type="checkbox" name="azure_blob_storage" id="chck-azure_blob_storage" value="on" <?php echo ($pt->config->azure_blob_storage == 'on') ? 'checked': '';?>>
+                            <label for="chck-azure_blob_storage" class="check-trail"><span class="check-handler"></span></label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Azure Storage Account Name</label>
+                                <input type="text" name="azure_blob_account" class="form-control" value="<?php echo $pt->config->azure_blob_account?>">
+                                <small class="admin-info">Your Azure Storage account name.</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Azure Account Key</label>
+                                <input type="text" name="azure_blob_secret" class="form-control" value="<?php echo $pt->config->azure_blob_secret?>">
+                                <small class="admin-info">Your Azure Storage account key (access key 1/2).</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Azure Container Name</label>
+                                <input type="text" name="azure_blob_bucket_name" class="form-control" value="<?php echo $pt->config->azure_blob_bucket_name?>">
+                                <small class="admin-info">Your Azure Blob container name (bucket).</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Azure Blob Endpoint (Optional)</label>
+                                <input type="text" name="azure_blob_endpoint" class="form-control" value="<?php echo ($pt->config->azure_blob_endpoint);?>">
+                                <small class="admin-info">Leave empty to use https://&lt;account&gt;.blob.core.windows.net</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Azure CDN / Custom Domain (Optional)</label>
+                                <input type="text" name="azure_blob_cdn" class="form-control" value="<?php echo ($pt->config->azure_blob_cdn);?>">
+                                <small class="admin-info">Your Azure CDN / custom domain used to serve files, e.g: https://cdn.yourdomain.com</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="clearfix"></div>
+                        <br>
+                        <div class="alert alert-info">
+                            Make sure your container access level is set to "Container (anonymous read access for containers and blobs)".<br><br>
+                            Before enabling Azure, make sure you upload the whole "upload/" folder to your container.<br><br>
+                            Before disabling Azure, make sure you download the whole "upload/" folder to your server.<br><br>
+                        </div>
+                        <button type="button" class="btn btn-warning m-t-15 waves-effect" onclick="TestAzure()">Test & Verify Connection</button>
+                        <a href="<?php echo PT_LoadAdminLinkSettings('upload-to-storage?storage=azure'); ?>" class="btn btn-success m-t-15 waves-effect">Upload Files To Azure</a>
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
                     <h6 class="card-title">Yandex Configuration</h6>
                     <div class="yandex-settings-alert"></div>
                     <form class="yandex-settings" method="POST">
@@ -1221,7 +1289,7 @@ if (!isEnabled('shell_exec')) {
                             If your site is still brand new, you can escape the upload step, but make sure to click on "Test Connection". <br>
                         </div>
                         <button type="button" class="btn btn-warning m-t-15 waves-effect" onclick="TestYandex()">Test Connection</button>
-                        <a href="<?php echo PT_LoadAdminLinkSettings('upload-to-storage?storage=digitalocean'); ?>" class="btn btn-success m-t-15 waves-effect">Upload Files To Yandex</a>
+                        <a href="<?php echo PT_LoadAdminLinkSettings('upload-to-storage?storage=yandex'); ?>" class="btn btn-success m-t-15 waves-effect">Upload Files To Yandex</a>
                     </form>
                 </div>
             </div>
@@ -1243,6 +1311,26 @@ function TestYandex() {
             $('.yandex-settings-alert').html('<div class="alert alert-danger">'+data.message+'</div>');
         }
         $('form.yandex-settings').find('.btn-warning').text('Test Cloud Connection');
+    });
+}
+function TestAzure() {
+    $('form.azure-settings').find('.btn-warning').text('Please wait..');
+    $('.azure-settings-alert').empty();
+    $.get('{{LINK aj/ap/test_azure}}', function (data) {
+        if (data.status == 200) {
+            $('.azure-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Connection established!</div>');
+            setTimeout(function () {
+                $('.azure-settings-alert').empty();
+            }, 5000);
+        } else if (data.status == 300) {
+            $('.azure-settings-alert').html('<div class="alert alert-danger">Container doesn\'t exists</div>');
+            setTimeout(function () {
+                $('.azure-settings-alert').empty();
+            }, 5000);
+        } else {
+            $('.azure-settings-alert').html('<div class="alert alert-danger">'+data.message+'</div>');
+        }
+        $('form.azure-settings').find('.btn-warning').text('Test & Verify Connection');
     });
 }
 function TestCloud() {

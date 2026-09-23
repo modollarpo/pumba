@@ -154,6 +154,7 @@ $pt->encryptedKeys = [
 	'ftp_password',
 	'wasabi_secret_key',
 	'yandex_secret',
+	'azure_blob_secret',
 	'facebook_app_key',
 	'twitter_app_key',
 	'google_app_key',

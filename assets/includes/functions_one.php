@@ -541,6 +541,18 @@ function PT_GetMedia($media = '', $is_upload = false){
     elseif ($pt->config->yandex_storage == 'on' && !empty($pt->config->yandex_name)) {
         return 'https://storage.yandexcloud.net/'.$pt->config->yandex_name.'/' . $media;
     }
+    elseif ($pt->config->azure_blob_storage == 'on' && !empty($pt->config->azure_blob_bucket_name)) {
+        if (!empty($pt->config->azure_blob_cdn) && filter_var($pt->config->azure_blob_cdn, FILTER_VALIDATE_URL)) {
+            return rtrim($pt->config->azure_blob_cdn, '/') . '/' . ltrim($media, '/');
+        }
+        $azure_blob_endpoint = $pt->config->azure_blob_endpoint;
+        if (empty($azure_blob_endpoint) && !empty($pt->config->azure_blob_account)) {
+            $azure_blob_endpoint = 'https://' . $pt->config->azure_blob_account . '.blob.core.windows.net';
+        }
+        if (!empty($azure_blob_endpoint) && filter_var($azure_blob_endpoint, FILTER_VALIDATE_URL)) {
+            return rtrim($azure_blob_endpoint, '/') . '/' . $pt->config->azure_blob_bucket_name . '/' . ltrim($media, '/');
+        }
+    }
 
     return $media_url;
 }
@@ -1216,6 +1228,96 @@ function PT_CheckMainSession($hash = '') {
     }
     return false;
 }
+function PT_AzureBlobRequest($method = 'GET', $blobPath = '', $body = null, $bodyLength = 0, $queryString = '') {
+    global $pt;
+
+    $account     = $pt->config->azure_blob_account;
+    $account_key = base64_decode($pt->config->azure_blob_secret);
+    if (empty($account) || empty($account_key)) {
+        return false;
+    }
+
+    $endpoint = $pt->config->azure_blob_endpoint;
+    if (empty($endpoint)) {
+        $endpoint = 'https://' . $account . '.blob.core.windows.net';
+    }
+    $container = $pt->config->azure_blob_bucket_name;
+    $url       = rtrim($endpoint, '/') . '/' . $container . ($blobPath ? '/' . ltrim($blobPath, '/') : '') . (!empty($queryString) ? '?' . $queryString : '');
+
+    $date      = gmdate('D, d M Y H:i:s', time()) . ' GMT';
+    $headers   = array(
+        'x-ms-date'    => $date,
+        'x-ms-version' => '2021-02-12'
+    );
+
+    $canonicalHeaders = '';
+    $msHeaders        = array();
+    foreach ($headers as $key => $val) {
+        $key = strtolower(trim($key));
+        $msHeaders[$key] = trim($val);
+    }
+    ksort($msHeaders);
+    foreach ($msHeaders as $key => $val) {
+        $canonicalHeaders .= $key . ':' . $val . "\n";
+    }
+
+    $canonicalizedResource = '/' . $account . '/' . $container . ($blobPath ? '/' . rawurldecode(ltrim($blobPath, '/')) : '');
+    if (!empty($queryString)) {
+        $canonicalizedResource .= "\n" . $queryString;
+    }
+
+    $contentLength = ($method == 'PUT' && $bodyLength > 0) ? $bodyLength : '';
+    $contentType   = ($method == 'PUT') ? 'application/octet-stream' : '';
+    $string_to_sign = $method . "\n" .
+        "\n" . // Content-Encoding
+        "\n" . // Content-Language
+        $contentLength . "\n" .
+        "\n" . // Content-MD5
+        $contentType . "\n" .
+        "\n" . // Date
+        "\n" . // If-Modified-Since
+        "\n" . // If-Match
+        "\n" . // If-None-Match
+        "\n" . // If-Unmodified-Since
+        "\n" . // Range
+        $canonicalHeaders .
+        $canonicalizedResource;
+
+    $signature = base64_encode(hash_hmac('sha256', $string_to_sign, $account_key, true));
+    $authorization = 'SharedKey ' . $account . ':' . $signature;
+
+    $curlHeaders = array(
+        'Authorization: ' . $authorization,
+        'x-ms-date: ' . $date,
+        'x-ms-version: ' . $headers['x-ms-version']
+    );
+    if ($method == 'PUT') {
+        $curlHeaders[] = 'Content-Type: application/octet-stream';
+    }
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $curlHeaders);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+    if ($method == 'HEAD') {
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+    }
+    if ($method == 'PUT' && is_resource($body)) {
+        curl_setopt($ch, CURLOPT_UPLOAD, true);
+        curl_setopt($ch, CURLOPT_INFILE, $body);
+        curl_setopt($ch, CURLOPT_INFILESIZE, $bodyLength);
+    }
+    curl_exec($ch);
+    $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    if (is_resource($body)) {
+        @fclose($body);
+    }
+
+    return ($status >= 200 && $status < 300);
+}
+
 function PT_UploadToS3($filename, $config = array()) {
     global $pt;
 
@@ -1423,6 +1525,14 @@ function PT_UploadToS3($filename, $config = array()) {
         } else {
             return true;
         }
+    } elseif ($pt->config->azure_blob_storage == 'on' && !empty($pt->config->azure_blob_account) && !empty($pt->config->azure_blob_secret) && !empty($pt->config->azure_blob_bucket_name)) {
+        $upload = PT_AzureBlobRequest('PUT', $filename, fopen($filename, 'r'), filesize($filename));
+        if ($upload) {
+            if (empty($config['delete'])) {
+                @unlink($filename);
+            }
+            return true;
+        }
     } else {
         include_once('assets/libs/s3-lib/vendor/autoload.php');
         $s3Config = (
@@ -1593,6 +1703,12 @@ function PT_DeleteFromToS3($filename, $config = array()) {
             return false;
         }
     } 
+    elseif ($pt->config->azure_blob_storage == 'on' && !empty($pt->config->azure_blob_account) && !empty($pt->config->azure_blob_secret) && !empty($pt->config->azure_blob_bucket_name)) {
+        $deleted = PT_AzureBlobRequest('DELETE', $filename);
+        if ($deleted) {
+            return true;
+        }
+    }
     else if ($pt->config->s3_upload = "on") {
         include_once('assets/libs/s3-lib/vendor/autoload.php');
         $s3Config = (

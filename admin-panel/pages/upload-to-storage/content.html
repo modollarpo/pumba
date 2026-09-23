@@ -1,6 +1,6 @@
 <?php 
-$storages = ['amazon', 'digitalocean', 'backblaze', 'wasabi'];
-$stroageAjax = ['amazon' => 'testS3', 'digitalocean'  => 'test_spaces', 'backblaze' => 'test_backblaze', 'wasabi' => 'test_wasabi'];
+$storages = ['amazon', 'digitalocean', 'backblaze', 'wasabi', 'azure'];
+$stroageAjax = ['amazon' => 'testS3', 'digitalocean'  => 'test_spaces', 'backblaze' => 'test_backblaze', 'wasabi' => 'test_wasabi', 'azure' => 'test_azure'];
 
 if(empty($_GET['storage'])) {
 	header("Location: " . PT_Link('admin-cp'));
@@ -34,6 +34,12 @@ if ($_GET['storage'] == 'backblaze') {
 if ($_GET['storage'] == 'digitalocean') {
     if ($pt->config->spaces == "off") {
         $error = "digitalocean is disabled or not configured, please configure it first.";
+    }
+}
+
+if ($_GET['storage'] == 'azure') {
+    if ($pt->config->azure_blob_storage == "off") {
+        $error = "Azure is disabled or not configured, please configure it first.";
     }
 }
 ?>

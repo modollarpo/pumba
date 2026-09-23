@@ -730,7 +730,13 @@ INSERT INTO `config` (`id`, `name`, `value`) VALUES
 (436, 'yt_api_url', ''),
 (437, 'tiktok_api_url', ''),
 (438, 'mediamtx_auth_secret', ''),
-(439, 'mediamtx_recordings_retention', '7');
+(439, 'mediamtx_recordings_retention', '7'),
+(440, 'azure_blob_storage', 'off'),
+(441, 'azure_blob_account', ''),
+(442, 'azure_blob_secret', ''),
+(443, 'azure_blob_bucket_name', ''),
+(444, 'azure_blob_endpoint', ''),
+(445, 'azure_blob_cdn', '');
 
 -- --------------------------------------------------------
 

@@ -217,6 +217,7 @@ if ($first == 'save-settings') {
             'backblaze_storage',
             'cloud_upload',
             'yandex_storage',
+            'azure_blob_storage',
         ];
         foreach ($submit_data as $key => $value) {
             if (!empty($value) && in_array($key, $pt->encryptedKeys)) {
@@ -4252,6 +4253,36 @@ if ($first == 'test_yandex') {
     }
 
     catch (Exception $e) {
+        $data['status']  = 400;
+        $data['message'] = $e->getMessage();
+    }
+    header("Content-type: application/json");
+    echo json_encode($data);
+    exit();
+}
+if ($first == 'test_azure') {
+    if ($pt->config->azure_blob_storage == 'off' || empty($pt->config->azure_blob_account) || empty($pt->config->azure_blob_secret) || empty($pt->config->azure_blob_bucket_name)) {
+        $data['message'] = 'Please enable Azure Blob Storage and fill all fields.';
+    }
+
+    try {
+        if (PT_AzureBlobRequest('HEAD', '', null, 0, 'restype=container')) {
+            $data['status'] = 200;
+            $array          = array(
+                'upload/photos/d-cover.jpg',
+                'upload/photos/d-avatar.jpg',
+                'upload/photos/f-avatar.png',
+                'upload/photos/thumbnail.jpg',
+            );
+            foreach ($array as $key => $value) {
+                $upload = PT_UploadToS3($value, array(
+                    'delete' => 'no'
+                ));
+            }
+        } else {
+            $data['status'] = 300;
+        }
+    } catch (Exception $e) {
         $data['status']  = 400;
         $data['message'] = $e->getMessage();
     }
