@@ -1920,7 +1920,8 @@ INSERT INTO `langs` (`id`, `lang_key`, `type`, `english`, `arabic`, `dutch`, `fr
 (1024, '_time_w', '', 'w', 'في', 'In', 'Dans', 'In', 'В', 'En', 'İçinde', 'में', '在', 'میں', 'Di dalam', 'U', 'ב', 'ভিতরে', 'で', 'Em', 'In', 'که در', 'I', 'TRONG', 'I', 'Sa'),
 (1025, '_time_y', '', 'y', 'و', 'En', 'et', 'Und', 'и', 'y', 'Ve', 'और', '和', 'اور', 'Dan', 'i', 'ו', 'এবং', 'そして', 'e', 'E', 'و', 'och', 'Và', 'og', 'at'),
 (1026, '_time_yrs', '', 'yrs', 'سنوات', 'jaar', 'années', 'Jahre', 'годы', 'años', 'yıllar', 'वर्षीय', '年', 'سال', 'tahun', 'god', 'שנים', 'বছর', '年', 'anos', 'anni', 'سال', 'år', 'năm', 'år', 'taon'),
-(1027, 'now', '', 'now', 'الآن', 'nu', 'maintenant', 'Jetzt', 'сейчас', 'ahora', 'Şimdi', 'अब', '现在', 'ابھی', 'Sekarang', 'sada', 'עַכשָׁיו', 'এখন', '今', 'agora', 'Ora', 'اکنون', 'nu', 'Hiện nay', 'nu', 'ngayon');
+(1027, 'now', '', 'now', 'الآن', 'nu', 'maintenant', 'Jetzt', 'сейчас', 'ahora', 'Şimdi', 'अब', '现在', 'ابھی', 'Sekarang', 'sada', 'עַכשָׁיו', 'এখন', '今', 'agora', 'Ora', 'اکنون', 'nu', 'Hiện nay', 'nu', 'ngayon'),
+(1028, 'live_link', '', 'Live link', 'رابط مباشر', 'Live link', 'Lien en direct', 'Live-Link', 'Ссылка на эфир', 'Enlace en vivo', 'Canlı yayın linki', 'लाइव लिंक', '直播链接', 'لائیو لنک', 'Tautan langsung', 'Izravna poveznica', 'קישור חי', 'লাইভ লিংক', 'ライブリンク', 'Link ao vivo', 'Link dal vivo', 'لینک زنده', 'Live-länk', 'Liên kết trực tiếp', 'Live link', 'Live link');
 
 -- --------------------------------------------------------
 

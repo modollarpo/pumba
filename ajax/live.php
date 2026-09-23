@@ -21,12 +21,14 @@ if ($first == 'create') {
         if (!empty($_POST['video_name'])) {
             $video_name = PT_Secure($_POST['video_name']);
         }
-		$post_id = $db->insert(T_VIDEOS,array('user_id' => $pt->user->id,
+        $short_id = PT_GenerateKey(6, 6);
+        $post_id = $db->insert(T_VIDEOS,array('user_id' => $pt->user->id,
                                              'type' => 'live',
                                              'title' => $video_name,
                                              'stream_name' => PT_Secure($_POST['stream_name']),
                                              'registered' => date('Y') . '/' . intval(date('m')),
                                              'video_id' => $video_id,
+                                             'short_id' => $short_id,
                                              'time' => time()));
         PT_RunInBackground(array('status' => 200,
                                  'post_id' => $post_id));
@@ -34,6 +36,7 @@ if ($first == 'create') {
         pt_push_channel_notifiations($post_id,'started_live_video');
         $data['status'] = 200;
         $data['post_id'] = $post_id;
+        $data['url'] = PT_Link('v/' . $short_id);
 
 	}
 	header("Content-type: application/json");
