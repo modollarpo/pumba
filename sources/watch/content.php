@@ -1101,6 +1101,13 @@ if ($pt->get_video->converted != 1) {
     $pt->converted = false;
 }
 $SUBS = $db->where('user_id', $user_data->id)->getValue(T_SUBSCRIPTIONS, "count(*)");
+$video_tags_html = '';
+if (!empty($get_video->tags)) {
+    $tags = array_values(array_filter(array_map('trim', explode(',', $get_video->tags))));
+    foreach ($tags as $tag) {
+        $video_tags_html .= '<a class="hash main small" href="' . PT_Link('search?keyword=' . urlencode($tag)) . '" data-load="?link1=search&keyword=' . urlencode($tag) . '">#' . $tag . '</a>';
+    }
+}
 $pt->content = PT_LoadPage("watch/$content_page", array(
     'ID' => $get_video->id,
     'KEY' => $get_video->video_id,
@@ -1155,6 +1162,7 @@ $pt->content = PT_LoadPage("watch/$content_page", array(
     'ENCODED_URL' => urlencode($get_video->url),
     'CATEGORY' => $get_video->category_name,
     'CATEGORY_ID' => $get_video->category_id,
+    'TAGS_HTML' => $video_tags_html,
     'TIME' => $get_video->time_alpha,
     'VAST_URL' => $vast_url,
     'VAST_TYPE' => $vast_type,

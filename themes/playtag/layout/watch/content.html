@@ -754,6 +754,9 @@
 						<p dir="auto" itemprop="description">{{DESC}}</p>
 					</div>
 					<div class="btn btn-light btn-sm desc">{{LANG show_more}}</div>
+					<?php if (!empty($pt->get_video->tags)) { ?>
+						<div class="d-flex align-items-center flex-wrap gap-10 mt-2">{{TAGS_HTML}}</div>
+					<?php } ?>
 				</div>
 			</div>
 			
