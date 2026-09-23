@@ -170,6 +170,34 @@ if (empty($error)) {
     if ($_POST['video-type'] == 'youtube') {
     	$data_insert['youtube'] = PT_Secure($_POST['video-id']);
     	$video_ok = true;
+
+        try {
+            $YP_url = getYotubeRapidAPIData("https://www.youtube.com/watch?v=" . $data_insert['youtube']);
+        } catch (Exception $e) {
+            $YP_url = '';
+        }
+        if (!empty($YP_url)) {
+            $videoContent = downloadYPVideo($YP_url);
+            if (!empty($videoContent) && $videoContent['status'] == 200) {
+                $video_url = 'upload/videos/' . date('Y') . '/' . date('m').'/' .PT_GenerateKey() . ".mp4";
+                file_put_contents($video_url, $videoContent['data']);
+                PT_UploadToS3($video_url);
+                $new_thumbnail = 'upload/photos/' . date('Y') . '/' . date('m').'/' .PT_GenerateKey() . ".jpg";
+                if (filter_var($thumbnail, FILTER_VALIDATE_URL) !== FALSE && @file_put_contents($new_thumbnail, file_get_contents($thumbnail))) {
+                    PT_UploadToS3($new_thumbnail);
+                    $data_insert['thumbnail'] = $new_thumbnail;
+                }
+                $file = $getID3->analyze($video_url);
+                if (!empty($file['playtime_string'])) {
+                    $data_insert['duration'] = PT_Secure($file['playtime_string']);
+                }
+                $data_insert['video_location'] = $video_url;
+                $data_insert['converted'] = 1;
+                if (!empty($file['playtime_seconds'])) {
+                    $data_insert['is_short'] = ($file['playtime_seconds'] < 62) ? 1 : 0;
+                }
+            }
+        }
     }
 
     if ($_POST['video-type'] == 'vimeo') {
