@@ -47,10 +47,17 @@ if ($page == 'vast') {
                         <div class="form-group form-float">
                             <div class="form-line">
                                 <label class="form-label"><?php echo $page_link ?></label>
-                                <input type="text" id="link" name="link" class="form-control">
-                                
+<input type="text" id="link" name="link" class="form-control">
+                                    
+                                </div>
                             </div>
                         </div>
+                        <?php if ($page == 'vast') { ?>
+                        <div class="form-group" id="vast_verify_group">
+                            <button type="button" class="btn btn-warning waves-effect" id="vast_verify_btn"><i class="fa fa-check"></i> Verify VAST tag</button>
+                            <div id="vast_verify_result" class="m-t-10"></div>
+                        </div>
+                        <?php } ?>
                         <?php if ($page != 'vast') { ?>
                         <div class="form-group form-float">
                             <div class="form-line">
@@ -89,6 +96,29 @@ if ($page == 'vast') {
 <script>
 $(function() {
     var form_ads_settings = $('form.ads-settings');
+    var vast_verify_btn = $('#vast_verify_btn');
+    if (vast_verify_btn.length) {
+        vast_verify_btn.on('click', function () {
+            var url = $('#link').val();
+            $('#vast_verify_result').empty();
+            if (!url) {
+                $('#vast_verify_result').html('<div class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> Please enter the VAST XML link first.</div>');
+                return false;
+            }
+            $(this).attr('disabled', true).text('Checking...');
+            $.get('{{LINK aj/ap/check-vast-tag}}', {url: url}, function (data) {
+                if (data.status == 200) {
+                    $('#vast_verify_result').html('<div class="alert alert-success"><i class="fa fa-check"></i> ' + data.message + '</div>');
+                } else {
+                    $('#vast_verify_result').html('<div class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> ' + data.message + '</div>');
+                }
+                vast_verify_btn.attr('disabled', false).text('Verify VAST tag');
+            }).fail(function () {
+                $('#vast_verify_result').html('<div class="alert alert-danger"><i class="fa fa-exclamation-triangle"></i> Could not reach the verification service.</div>');
+                vast_verify_btn.attr('disabled', false).text('Verify VAST tag');
+            });
+        });
+    }
 
     form_ads_settings.ajaxForm({
         url: '{{LINK aj/ap/create-ads}}',

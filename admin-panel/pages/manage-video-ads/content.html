@@ -139,6 +139,10 @@ $get_ads = $db->get(T_VIDEO_ADS);
                                             <td>
                                                 <a class="btn bg-success admn_table_btn" href="<?php echo PT_LoadAdminLinkSettings('edit-video-ad?id=' . $video_ad->id); ?>">Edit</a>
                                                 <button class="btn bg-danger admn_table_btn" data-id="<?php echo $video_ad->id ?>" onclick="DeleteVideoAd('<?php echo $video_ad->id ?>','hide')">Delete</button>
+                                                <?php if (!empty($video_ad->vast_xml_link)) { ?>
+                                                <button class="btn bg-info admn_table_btn" type="button" onclick="CheckVast(this)" data-url="<?php echo htmlspecialchars($video_ad->vast_xml_link, ENT_QUOTES); ?>">Check</button>
+                                                <span class="vast-check-result"></span>
+                                                <?php } ?>
                                             </td>
                                         </tr>
                                         <?php
@@ -202,6 +206,28 @@ $get_ads = $db->get(T_VIDEO_ADS);
     </div>
 </div>
 <script>
+function CheckVast(el) {
+  var url = $(el).data('url');
+  var sp = $(el).closest('td').find('.vast-check-result');
+  if (!url) {
+      return false;
+  }
+  sp.html('<i class="fa fa-spinner fa-spin"></i> Checking...');
+  $(el).attr('disabled', true);
+  $.get('{{LINK aj/ap/check-vast-tag}}', {url: url}, function(data) {
+      $(el).attr('disabled', false);
+      if (data.status == 200) {
+          sp.html('<span class="badge bg-success">OK</span>');
+      } else {
+          sp.html('<span class="badge bg-warning">Invalid</span>');
+          alert(data.message);
+      }
+  }).fail(function() {
+      $(el).attr('disabled', false);
+      sp.html('<span class="badge bg-warning">Error</span>');
+      alert('Could not reach the verification service.');
+  });
+}
 function DeleteVideoAd(id,type = 'show') {
   if (!id) {
       return false;

@@ -795,6 +795,45 @@ if ($first == 'create-ads') {
         }
     }
 }
+if ($first == 'check-vast-tag') {
+    if (empty($_GET['url']) || filter_var($_GET['url'], FILTER_VALIDATE_URL) === FALSE) {
+        $data = array('status' => 400, 'message' => 'The XML link is invalid');
+    } else {
+        $url = $_GET['url'];
+        $host = parse_url($url, PHP_URL_HOST);
+        $ip = gethostbyname($host);
+        if (empty($host) || $host == 'localhost' || $ip == $host || filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+            $data = array('status' => 400, 'message' => 'The URL is invalid or not publicly accessible');
+        } else {
+            $ch = curl_init($url);
+            curl_setopt_array($ch, array(
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_MAXREDIRS => 3,
+                CURLOPT_CONNECTTIMEOUT => 5,
+                CURLOPT_TIMEOUT => 10,
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_USERAGENT => 'Mozilla/5.0 (PlayTube VAST Verifier)'
+            ));
+            $body = curl_exec($ch);
+            $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curl_error = curl_error($ch);
+            curl_close($ch);
+            if (!empty($curl_error)) {
+                $data = array('status' => 400, 'message' => 'Could not fetch the VAST URL: ' . $curl_error);
+            } else if ($code < 200 || $code >= 300) {
+                $data = array('status' => 400, 'message' => 'The VAST URL returned HTTP ' . $code . '. Please make sure the tag is publicly accessible.');
+            } else if (empty($body)) {
+                $data = array('status' => 400, 'message' => 'The VAST URL returned an empty response.');
+            } else if (stripos($body, '<VAST') === false || stripos($body, '<Ad') === false) {
+                $data = array('status' => 203, 'message' => 'The URL responded but the content does not look like a valid VAST XML (<VAST>/<Ad> tags not found). Ads may not play.');
+            } else {
+                $data = array('status' => 200, 'message' => 'VAST tag verified successfully.');
+            }
+        }
+    }
+}
 
 if ($first == 'edit-ads') {
     if (!empty($_POST['type']) && !empty($_POST['id'])) {
