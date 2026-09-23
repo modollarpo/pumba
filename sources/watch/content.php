@@ -1012,7 +1012,7 @@ if (!empty($get_video->geo_blocking) && $pt->config->geo_blocking == 'on') {
 
 $video_type = 'video/mp4';
 
-if (!empty($get_video->youtube)) {
+if (!empty($get_video->youtube) && $get_video->converted != 1) {
     $video_type = 'video/youtube';
 }
 if (strpos($get_video->video_location, ".m3u8") !== false) {

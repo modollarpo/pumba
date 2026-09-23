@@ -348,7 +348,7 @@ function PT_GetVideoByID($video_id = '', $add_views = 0, $likes_dislikes = 0, $r
 
         }
         $get_video->type         = 'video';
-        if (!empty($get_video->youtube) && $get_video->is_short == 0) {
+        if (!empty($get_video->youtube) && $get_video->is_short == 0 && $get_video->converted != 1) {
             $get_video->video_type     = 'video/youtube';
             $get_video->video_location = 'https://www.youtube.com/watch?v=' . $get_video->youtube;
             $get_video->video_id_      = $get_video->youtube;

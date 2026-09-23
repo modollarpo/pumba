@@ -86,7 +86,7 @@ if (strpos($get_video->video_location, 'pload/videos') !== false) {
 else{
     $get_video->video_location = urldecode($get_video->video_location);
 }
-if (!empty($get_video->youtube)) {
+if (!empty($get_video->youtube) && $get_video->converted != 1) {
     $video_type                = 'video/youtube';
     $get_video->video_location = 'https://www.youtube.com/watch?v=' . $get_video->youtube;
     $video_id_                 = $get_video->youtube;

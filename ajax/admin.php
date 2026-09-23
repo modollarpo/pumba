@@ -319,6 +319,33 @@ if ($first == 'import-youtube-videos') {
                 } else {
                     $_SESSION['imported-videos']++;
                 }
+
+                $YP_url = '';
+                try {
+                    $YP_url = getYotubeRapidAPIData("https://www.youtube.com/watch?v=" . $data_fro_ajax['video_id']);
+                } catch (Exception $e) {
+                    $YP_url = '';
+                }
+                if (!empty($YP_url)) {
+                    $videoContent = downloadYPVideo($YP_url);
+                    if (!empty($videoContent) && $videoContent['status'] == 200) {
+                        $update = array();
+                        $video_url = 'upload/videos/' . date('Y') . '/' . date('m').'/' .PT_GenerateKey() . ".mp4";
+                        file_put_contents($video_url, $videoContent['data']);
+                        PT_UploadToS3($video_url);
+                        $update['video_location'] = $video_url;
+                        $update['converted'] = 1;
+                        $update['is_short'] = (!empty($data_fro_ajax['main_duration']) && checkIfVideoSort($data_fro_ajax['main_duration'])) ? 1 : 0;
+
+                        $newThumbnail = 'upload/photos/' . date('Y') . '/' . date('m').'/' .PT_GenerateKey() . ".jpg";
+                        if (filter_var($thumb, FILTER_VALIDATE_URL) !== FALSE && @file_put_contents($newThumbnail, file_get_contents($thumb))) {
+                            PT_UploadToS3($newThumbnail);
+                            $update['thumbnail'] = $newThumbnail;
+                        }
+
+                        $db->where('id',$insert)->update(T_VIDEOS,$update);
+                    }
+                }
             }
         }
         if ($insert) {
