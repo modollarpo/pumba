@@ -3397,7 +3397,7 @@ function GetTiktokVideoDownloadLink($url='')
         return $result;
     }
 
-    $api_response = connect_to_url($tiktok_api_url . '/api/tiktok/info?video_url=' . rawurlencode($url));
+    $api_response = connect_to_url($tiktok_api_url . '/api/tiktok/info?video_url=' . rawurlencode($url), array('bearer' => (isset($pt->config->tiktok_api_token) ? $pt->config->tiktok_api_token : '')));
     if (!empty($api_response)) {
         $json = json_decode($api_response, true);
         if (!empty($json['success']) && !empty($json['video_url'])) {
@@ -4695,7 +4695,7 @@ function getYotubeRapidAPIData($id='')
         }
     }
 
-    $response = connect_to_url($yt_api_url . '/api/video/download?id=' . rawurlencode($id));
+    $response = connect_to_url($yt_api_url . '/api/video/download?id=' . rawurlencode($id), array('bearer' => (isset($pt->config->yt_api_token) ? $pt->config->yt_api_token : '')));
     if (empty($response)) {
         return '';
     }

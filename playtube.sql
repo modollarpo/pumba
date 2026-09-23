@@ -736,7 +736,9 @@ INSERT INTO `config` (`id`, `name`, `value`) VALUES
 (442, 'azure_blob_secret', ''),
 (443, 'azure_blob_bucket_name', ''),
 (444, 'azure_blob_endpoint', ''),
-(445, 'azure_blob_cdn', '');
+(445, 'azure_blob_cdn', ''),
+(446, 'yt_api_token', ''),
+(447, 'tiktok_api_token', '');
 
 -- --------------------------------------------------------
 

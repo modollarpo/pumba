@@ -1,0 +1,18 @@
+security: enforce bearer token + rate limit on downloader APIs
+
+Mirror the existing youtube app.js protection into the tiktok API and
+wire the whole PlayTube site to authenticate:
+
+- tiktok-downloader-api: require API_TOKEN (Bearer header) on all
+  /api routes + in-memory sliding-window rate limiting; reject auth
+  with 401 when the token is unset/blank (secure-by-default, mirrors
+  youtube) and 429 on bursts.
+- ajax/fetch-video.php, ajax/ap.php, ajax/admin.php,
+  assets/includes/functions_one.php: pass the configured
+  yt_api_token/tiktok_api_token to every downloader API call via the
+  Authorization: Bearer header (connect_to_url 'bearer' option) so the
+  hardened APIs can be called.
+- admin-panel/pages/ffmpeg/content.html: add yt_api_token /
+  tiktok_api_token fields next to the API URL inputs so admins can
+  configure the secrets.
+- playtube.sql: seed yt_api_token and tiktok_api_token config keys.

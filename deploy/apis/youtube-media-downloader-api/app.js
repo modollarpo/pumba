@@ -7,6 +7,64 @@ require('dotenv').config();
 
 const app = express();
 
+const crypto = require('crypto');
+
+// --- API hardening: token auth + rate limiting ---
+// Token is read from env (API_TOKEN). The PlayTube site sends it via the
+// Authorization: Bearer header (connect_to_url 'bearer' option) — never in the
+// URL or access logs. Compare with timingSafeEqual to avoid timing leaks.
+const API_TOKEN = process.env.API_TOKEN || '';
+if (!API_TOKEN) {
+    console.warn('[SECURITY] API_TOKEN is not set. Requests will be rejected until you set it in .env and in the PlayTube admin (see playtube.sql config keys yt_api_token).');
+}
+const RATE_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60000;
+const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX, 10) || 60;
+const hits = new Map();
+
+function safeTokenEquals(a, b) {
+    const ba = Buffer.from(String(a || ''));
+    const bb = Buffer.from(String(b || ''));
+    if (ba.length !== bb.length) return false;
+    return crypto.timingSafeEqual(ba, bb);
+}
+
+function clientKey(req) {
+    const fwd = String(req.headers['x-forwarded-for'] || '');
+    const ip = fwd ? fwd.split(',')[0].trim() : (req.connection && req.connection.remoteAddress) || req.ip || '';
+    return (ip || 'unknown').toLowerCase();
+}
+
+function rateLimiter(req, res, next) {
+    const key = clientKey(req);
+    const now = Date.now();
+    let rec = hits.get(key);
+    if (!rec || now - rec.windowStart > RATE_WINDOW_MS) {
+        rec = { windowStart: now, count: 0 };
+        hits.set(key, rec);
+    }
+    rec.count += 1;
+    if (rec.count > RATE_LIMIT_MAX) {
+        return res.status(429).json({ success: false, message: 'Too many requests. Please try again later.' });
+    }
+    next();
+}
+
+function authRequired(req, res, next) {
+    let token = String(req.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
+    if (!token && req.query.token) token = String(req.query.token).trim();
+    if (!token && req.get('x-api-token')) token = String(req.get('x-api-token')).trim();
+    if (!API_TOKEN || !safeTokenEquals(token, API_TOKEN)) {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    next();
+}
+
+// Static /files (downloaded media served to the site for playback) stays public.
+app.use((req, res, next) => {
+    if (String(req.path).startsWith('/files')) return next();
+    rateLimiter(req, res, () => authRequired(req, res, next));
+});
+
 const API_KEY = process.env.YOUTUBE_API_KEY;
 const YTDLP_BIN = process.env.YTDLP_BIN || 'yt-dlp';
 const DOWNLOAD_DIR = process.env.DOWNLOAD_DIR || path.join(__dirname, 'downloads');

@@ -92,8 +92,7 @@ if ($first == 'load-more-youtube')  {
             } else {
                 $api_url .= '&query=' . rawurlencode($query);
             }
-            $api_response = connect_to_url($api_url);
-            $get_videos = (!empty($api_response)) ? json_decode($api_response) : null;
+            $api_response = connect_to_url($api_url, array('bearer' => (isset($pt->config->yt_api_token) ? $pt->config->yt_api_token : '')));
             if (!empty($get_videos) && !empty($get_videos->success) && !empty($get_videos->results)) {
                 $next_token = (!empty($get_videos->token)) ? $get_videos->token : '';
                 $videos_html = '';
