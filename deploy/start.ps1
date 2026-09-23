@@ -13,6 +13,8 @@ param(
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $PSScriptRoot
 $LogDir = Join-Path $Root 'deploy\logs'
+if (-not $YouTubeDir) { $YouTubeDir = Join-Path $Root 'deploy\apis\youtube-media-downloader-api' }
+if (-not $TikTokDir)  { $TikTokDir  = Join-Path $Root 'deploy\apis\tiktok-downloader-api' }
 New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 
 $Start = Get-Date

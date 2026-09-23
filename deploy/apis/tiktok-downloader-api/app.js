@@ -1,0 +1,195 @@
+const express = require('express');
+const puppeteer = require('puppeteer');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+function deepFindItemStructs(obj, results) {
+    if (obj === null || typeof obj !== 'object') {
+        return;
+    }
+    if (Array.isArray(obj)) {
+        for (const item of obj) {
+            deepFindItemStructs(item, results);
+        }
+        return;
+    }
+    if (obj.itemStruct && obj.itemStruct.video && obj.itemStruct.video.id) {
+        results.push(obj.itemStruct);
+    }
+    for (const key of Object.keys(obj)) {
+        deepFindItemStructs(obj[key], results);
+    }
+}
+
+function secondsToIso(seconds) {
+    const s = Math.max(0, parseInt(seconds, 10) || 0);
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    return 'PT' + (h > 0 ? h + 'H' : '') + (m > 0 || h > 0 ? m + 'M' : '') + sec + 'S';
+}
+
+function mapItemStruct(itemStruct) {
+    const v = itemStruct.video || {};
+    const author = itemStruct.author || {};
+    return {
+        id: v.id || itemStruct.id || '',
+        title: author.nickname || itemStruct.desc || '',
+        desc: itemStruct.desc || '',
+        thumbnail: (v.cover && typeof v.cover === 'object' ? v.cover.urlList[0] : v.cover) || '',
+        duration: secondsToIso(v.duration),
+        author: author.uniqueId || author.nickname || '',
+        video_url: (v.downloadAddr && v.downloadAddr.urlList[0]) || v.downloadAddr || ''
+    };
+}
+
+async function extractFromUniversalData(videoUrl) {
+    let browser;
+    try {
+        browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+        const page = await browser.newPage();
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+        await page.goto(videoUrl, { waitUntil: 'networkidle2', timeout: 60000 });
+
+        const universal = await page.evaluate(() => {
+            const script = document.querySelector('script[data-e2e="parser-data"]');
+            if (script && script.innerText) {
+                try {
+                    const data = JSON.parse(script.innerText);
+                    return data.__UNIVERSAL_DATA_FOR_REHYDRATION__ || null;
+                } catch (e) {
+                    return null;
+                }
+            }
+            return null;
+        });
+
+        await browser.close();
+
+        if (!universal) {
+            return [];
+        }
+
+        const structs = [];
+        deepFindItemStructs(universal, structs);
+        const seen = new Set();
+        const items = [];
+        for (const struct of structs) {
+            const id = (struct.video && struct.video.id) || struct.id;
+            if (!id || seen.has(id)) {
+                continue;
+            }
+            seen.add(id);
+            items.push(mapItemStruct(struct));
+        }
+        return items;
+    } catch (err) {
+        if (browser) await browser.close();
+        throw err;
+    }
+}
+
+app.get('/api/tiktok/info', async (req, res) => {
+    try {
+        const videoUrl = req.query.video_url;
+        if (!videoUrl) {
+            return res.status(400).json({ success: false, message: 'video_url is required' });
+        }
+
+        let browser;
+        try {
+            browser = await puppeteer.launch({
+                headless: true,
+                args: ['--no-sandbox', '--disable-setuid-sandbox']
+            });
+            const page = await browser.newPage();
+            await page.goto(videoUrl, { waitUntil: 'networkidle2', timeout: 60000 });
+
+            // Try to extract __UNIVERSAL_DATA_FOR_REHYDRATION__ from parser-data script
+            const videoInfo = await page.evaluate(() => {
+                const script = document.querySelector('script[data-e2e="parser-data"]');
+                if (script && script.innerText) {
+                    try {
+                        const data = JSON.parse(script.innerText);
+                        return data.__UNIVERSAL_DATA_FOR_REHYDRATION__ || null;
+                    } catch (e) {
+                        return null;
+                    }
+                }
+                return null;
+            });
+
+            await browser.close();
+
+            if (videoInfo && videoInfo.videoData && videoInfo.videoData.itemStruct && videoInfo.videoData.itemStruct.video) {
+                const mapped = mapItemStruct(videoInfo.videoData.itemStruct);
+                res.json({
+                    success: true,
+                    video_url: mapped.video_url,
+                    cover: mapped.thumbnail,
+                    id: mapped.id,
+                    title: mapped.title,
+                    desc: mapped.desc
+                });
+            } else if (videoInfo) {
+                const structs = [];
+                deepFindItemStructs(videoInfo, structs);
+                if (structs.length > 0) {
+                    const mapped = mapItemStruct(structs[0]);
+                    res.json({
+                        success: true,
+                        video_url: mapped.video_url,
+                        cover: mapped.thumbnail,
+                        id: mapped.id,
+                        title: mapped.title,
+                        desc: mapped.desc
+                    });
+                } else {
+                    res.status(404).json({ success: false, message: 'Could not extract video info' });
+                }
+            } else {
+                res.status(404).json({ success: false, message: 'Could not extract video info' });
+            }
+        } catch (err) {
+            if (browser) await browser.close();
+            res.status(500).json({ success: false, message: 'Error: ' + err.message });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.get('/api/tiktok/search', async (req, res) => {
+    try {
+        const query = req.query.query;
+        const limit = Math.min(parseInt(req.query.limit, 10) || 30, 60);
+        if (!query) {
+            return res.status(400).json({ success: false, message: 'query is required' });
+        }
+        const items = await extractFromUniversalData('https://www.tiktok.com/search?q=' + encodeURIComponent(query));
+        res.json({ success: true, limit: limit, results: items.slice(0, limit) });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.get('/api/tiktok/user', async (req, res) => {
+    try {
+        let username = (req.query.username || '').trim().replace(/^@/, '');
+        const limit = Math.min(parseInt(req.query.limit, 10) || 30, 60);
+        if (!username) {
+            return res.status(400).json({ success: false, message: 'username is required' });
+        }
+        const items = await extractFromUniversalData('https://www.tiktok.com/@' + encodeURIComponent(username));
+        res.json({ success: true, username: username, limit: limit, results: items.slice(0, limit) });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`TikTok downloader API running on port ${PORT}`);
+});

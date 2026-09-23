@@ -8,8 +8,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOG_DIR="$ROOT/deploy/logs"
 mkdir -p "$LOG_DIR"
 
-YOUTUBE_DIR=""
-TIKTOK_DIR=""
+YOUTUBE_DIR="$ROOT/deploy/apis/youtube-media-downloader-api"
+TIKTOK_DIR="$ROOT/deploy/apis/tiktok-downloader-api"
 MEDIAMTX=""
 MEDIAMTX_CONFIG=""
 YOUTUBE_PORT=3000

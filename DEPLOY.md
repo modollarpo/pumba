@@ -49,8 +49,10 @@ INSERT IGNORE INTO config (id, name, value) VALUES
 
 ## 3. Deploy the YouTube API
 
+Both APIs are vendored in the repo under `deploy/apis/`.
+
 ```bash
-cd youtube-media-downloader-api
+cd deploy/apis/youtube-media-downloader-api
 npm install
 ```
 
@@ -85,7 +87,7 @@ curl "http://127.0.0.1:3000/api/video/download?id=VIDEO_ID"   # triggers first-t
 ## 4. Deploy the TikTok API
 
 ```bash
-cd tiktok-downloader-api
+cd deploy/apis/tiktok-downloader-api
 npm install      # installs Puppeteer (downloads Chromium on first run)
 ```
 
@@ -226,16 +228,20 @@ and PlayTube `/` returns 200.
 
 ## 8. Quick start (all services at once)
 
+The start scripts default the API directories to the vendored
+`deploy/apis/youtube-media-downloader-api` and `deploy/apis/tiktok-downloader-api`
+(override with `-YouTubeDir` / `--youtube-dir`), so they run from the repo as-is.
+
 **Windows (PowerShell):**
 
 ```powershell
-.\deploy\start.ps1 -YouTubeDir "C:\path\to\youtube-media-downloader-api" -TikTokDir "C:\path\to\tiktok-downloader-api" -MediaMTX "C:\path\to\mediamtx.exe" -MediaMTXConfig "C:\path\to\mediamtx.yml"
+.\deploy\start.ps1 -MediaMTX "C:\path\to\mediamtx.exe" -MediaMTXConfig "C:\path\to\mediamtx.yml"
 ```
 
 **Linux:**
 
 ```bash
-bash deploy/start.sh --youtube-dir /opt/youtube-api --tiktok-dir /opt/tiktok-api --mediamtx /usr/local/bin/mediamtx --mediamtx-config /etc/mediamtx.yml
+bash deploy/start.sh --mediamtx /usr/local/bin/mediamtx --mediamtx-config /etc/mediamtx.yml
 ```
 
 Logs go to `deploy/logs/`. Ctrl+C stops the foreground processes.
