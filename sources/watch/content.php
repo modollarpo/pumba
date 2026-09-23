@@ -1050,8 +1050,10 @@ if (!canUseFeature($get_video->user_id,'who_can_donate')) {
 
 $get_video->is_still_live = false;
 $get_video->live_sub_users = 0;
+$get_video->live_read_token = '';
 if (!empty($get_video->stream_name) && !empty($get_video->live_time) && $get_video->live_time >= (time() - 10) && $get_video->live_ended == 0) {
     $get_video->is_still_live = true;
+    $get_video->live_read_token = PT_LiveStreamToken($get_video->stream_name, 'read', 3600);
     $get_video->live_sub_users = $db->where('post_id',$get_video->id)->where('time',time()-6,'>=')->getValue(T_LIVE_SUB,'COUNT(*)');
 }
 if (!empty($get_video->stream_name) && !empty($get_video->video_location)) {

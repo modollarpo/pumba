@@ -132,6 +132,51 @@ Recordings are written by MediaMTX into `./recordings/stream_*/`, and PlayTube's
 cron (`admin-panel/autoload.php`) moves them into `upload/videos/...` when a stream ends
 (requires the "Live Streaming Strorage" option enabled).
 
+### Optional: signed, revocable auth
+
+By default streams are protected only by the unguessable `stream_*` name. To
+require official tokens for every publish/read/record request:
+
+1. Set a secret in **Admin → Live → MediaMTX Configuration → Auth Secret**
+   (leave empty to keep the open behaviour).
+2. Add the external auth block to `mediamtx.yml` next to the binary:
+
+   ```yaml
+   authMethod: http
+   authHTTPAddress: http://server-ip/mediamtx_auth.php
+   authHTTPExclude:
+   - api
+   - metrics
+   - pprof
+   ```
+
+   `mediamtx_auth.php` ships at the webroot; only `stream_*` paths are checked,
+   and MediaMTX is denied with a non-2xx status otherwise. When the secret is
+   empty or the DB is unreachable the endpoint fails **open** so playback is
+   never killed by a DB outage.
+3. Restart MediaMTX. PlayTube already attaches a signed `Authorization:
+   Bearer <token>` header to every WHIP and HLS request (via videojs VHS
+   `beforeRequest`), so broadcasters and viewers keep working unmodified.
+
+Ending a stream sets `live_ended = 1`, after which `read` tokens are rejected
+server-side within ~30s, instantly killing all HLS sessions.
+
+> RTMP caveat: the browser WHIP/HLS flows attach the signed token
+> automatically. External RTMP encoders (OBS) cannot easily, so under hardened
+> auth prefer the app's built-in WHIP broadcaster or keep auth off when RTMP
+> relay is required.
+
+### Recording retention
+
+Set **Admin → Live → MediaMTX Configuration → Recordings Retention (days)** to
+have the admin cron (`admin-panel/autoload.php`, runs on every admin page load)
+prune `.ts`/`.mp4`/`.m4s` files older than N days from the Recordings Path (`0`
+disables). External cron users can call the helper directly:
+
+```php
+PT_CleanLiveRecordings('./recordings', 7);
+```
+
 > Firewall: open 8888 (HLS, public), 8889 (WHIP), 1935 (RTMP, optional). Do **not** map the
 > Web panel (`api` is disabled by default in the shipped config).
 
@@ -201,7 +246,7 @@ Logs go to `deploy/logs/`. Ctrl+C stops the foreground processes.
 
 - **Process managers:** use `systemd` units (Linux) or NSSM/Task Scheduler (Windows) instead of the foreground scripts.
 - **ffmpeg:** ensure `ffmpeg` is on the PHP process PATH for uploads/conversion.
-- **Recordings cleanup:** add a cron to prune old `./recordings/*` files; PlayTube moves finished recordings to `upload/videos/` but doesn't delete MediaMTX's working files automatically.
+- **Recordings cleanup:** use the built-in retention (see §5) — set *Recordings Retention* in Admin → Live, which prunes old files on admin loads. External cron: `PT_CleanLiveRecordings('./recordings', 7)`.
 - **Security:** keep `YOUTUBE_API_KEY` and `.env` out of the web root and git (the Node `.gitignore` files already exclude `.env`).
 - **TikTok rate limits:** TikTok aggressively rate-limits/awards captcha on web scraping. Set conservative `limit` values in the admin import page and expect occasional failures — the import handler falls back cleanly.
 

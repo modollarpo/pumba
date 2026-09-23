@@ -1,11 +1,28 @@
 # Sample MediaMTX configuration for PlayTube live streaming.
 #
-# No auth is used on purpose: each broadcaster's "stream name" is an
+# By default no auth is enforced: each broadcaster's "stream name" is an
 # unguessable secret (stream_{userid}_{random}), which acts as the access
 # key. Broadcasters publish via WHIP (WebRTC) or RTMP, viewers watch via
 # HLS. Recordings are saved locally under ./recordings and moved to the
 # script's upload/videos folder when the live stream ends (config option
 # "Live Streaming Strorage" must be enabled).
+#
+# Optional hardened mode: set a secret in the admin panel (Live > MediaMTX
+# Configuration > Auth Secret). Then enable external HTTP auth below and
+# every publish/read/record request is validated against the signed,
+# expiring per-stream token issued by PlayTube (mediamtx_auth.php). Ending a
+# stream instantly revokes all of its HLS sessions.
+#
+#   authMethod: http
+#   authHTTPAddress: http://your-server-ip/mediamtx_auth.php
+#
+# The callback only checks stream_* paths, so api/metrics/pprof can keep
+# using the built-in auth or stay open:
+#
+#   authHTTPExclude:
+#   - api
+#   - metrics
+#   - pprof
 
 # HLS base URL used by viewers (mediamtx_url setting)
 hlsAddress: :8888

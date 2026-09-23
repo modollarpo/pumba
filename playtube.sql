@@ -727,7 +727,9 @@ INSERT INTO `config` (`id`, `name`, `value`) VALUES
 (434, 'switch_account', 'on'),
 (435, 'switch_account_counts', '3'),
 (436, 'yt_api_url', ''),
-(437, 'tiktok_api_url', '');
+(437, 'tiktok_api_url', ''),
+(438, 'mediamtx_auth_secret', ''),
+(439, 'mediamtx_recordings_retention', '7');
 
 -- --------------------------------------------------------
 

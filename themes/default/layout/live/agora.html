@@ -5,7 +5,19 @@
 
 	var channelName = "<?php echo($pt->stream_name) ?>";
 	var mediamtxWhipUrl = "<?php echo(trim($pt->config->mediamtx_whip_url, '/')) ?>";
+	var publishToken = "<?php echo(PT_Secure($pt->stream_token)) ?>";
 	var whipPublishUrl = mediamtxWhipUrl + '/' + channelName + '/whip';
+
+	function whipAuthHeaders(extraHeaders) {
+	  var headers = {};
+	  if (extraHeaders) {
+	    headers = extraHeaders;
+	  }
+	  if (publishToken) {
+	    headers['Authorization'] = 'Bearer ' + publishToken;
+	  }
+	  return headers;
+	}
 
 	var devices = {cameras: [], mics: []};
 
@@ -157,26 +169,26 @@
 	  var offer = await pc.createOffer();
 	  await pc.setLocalDescription(offer);
 
-	  pc.onicecandidate = function (ev) {
-	    if (ev.candidate && whipResourceUrl) {
-	      fetch(whipResourceUrl, {method: 'POST', headers: {'Content-Type': 'application/trickle-ice-candidate'}, body: JSON.stringify(ev.candidate.toJSON())}).catch(function () {});
-	    }
-	  };
+pc.onicecandidate = function (ev) {
+    if (ev.candidate && whipResourceUrl) {
+      fetch(whipResourceUrl, {method: 'POST', headers: whipAuthHeaders({'Content-Type': 'application/trickle-ice-candidate'}), body: JSON.stringify(ev.candidate.toJSON())}).catch(function () {});
+    }
+  };
 
-	  var res = await fetch(whipPublishUrl, {method: 'POST', headers: {'Content-Type': 'application/sdp'}, body: offer.sdp});
-	  if (!res.ok) {
-	    throw new Error('WHIP HTTP ' + res.status);
-	  }
-	  whipResourceUrl = res.headers.get('Location') || '';
-	  var answer = await res.text();
-	  await pc.setRemoteDescription({type: 'answer', sdp: answer});
-	}
+  var res = await fetch(whipPublishUrl, {method: 'POST', headers: whipAuthHeaders({'Content-Type': 'application/sdp'}), body: offer.sdp});
+  if (!res.ok) {
+    throw new Error('WHIP HTTP ' + res.status);
+  }
+  whipResourceUrl = res.headers.get('Location') || '';
+  var answer = await res.text();
+  await pc.setRemoteDescription({type: 'answer', sdp: answer});
+}
 
-	function stopPublish() {
-	  if (whipResourceUrl) {
-	    fetch(whipResourceUrl, {method: 'DELETE'}).catch(function () {});
-	    whipResourceUrl = '';
-	  }
+function stopPublish() {
+  if (whipResourceUrl) {
+    fetch(whipResourceUrl, {method: 'DELETE', headers: whipAuthHeaders({})}).catch(function () {});
+    whipResourceUrl = '';
+  }
 	  if (whipPc) {
 	    whipPc.onicecandidate = null;
 	    whipPc.close();

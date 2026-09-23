@@ -21,5 +21,6 @@ $pt->title       = $lang->live . ' | ' . $pt->config->title;
 $pt->page        = "live";
 $pt->description = $pt->config->description;
 $pt->keyword     = @$pt->config->keyword;
-$pt->stream_name = 'stream_' . intval($pt->user->id) . '_' . rand(111111, 999999);
+$pt->stream_name = 'stream_' . intval($pt->user->id) . '_' . bin2hex(random_bytes(8));
+$pt->stream_token = PT_LiveStreamToken($pt->stream_name, 'publish', 3600);
 $pt->content     = PT_LoadPage('live/content');

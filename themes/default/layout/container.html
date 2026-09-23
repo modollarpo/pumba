@@ -99,7 +99,7 @@
         <script src="https://js.braintreegateway.com/web/dropin/1.36.0/js/dropin.js"></script>
         <?php } ?>
       <script>
-         function RunLiveStream(streamName,DIV_ID,hlsUrl) {
+         function RunLiveStream(streamName,DIV_ID,hlsUrl,hlsToken) {
            var video_id = $('#video-id').val();
            if (!video_id) {
               return false;
@@ -109,7 +109,14 @@
               return false;
            }
            $('#'+DIV_ID).html('<div class="wow_liv_counter"><span id="live_word_'+video_id+'">{{LANG live}}</span> <span id="live_count_'+video_id+'"> 0</span></div><div id="live_post_comments_'+video_id+'" class="wow_liv_comments_feed user-comments"></div><video id="'+vidId+'" class="video-js vjs-big-play-centered" controls preload="auto" autoplay playsinline style="width:100%;height:100%;object-fit:contain;background:#000;position:relative;"><source src="'+hlsUrl+'" type="application/x-mpegURL"></video>');
-           videojs(vidId, {html5: {vhs: {overrideNative: true}}, autoplay: true, liveui: true}).play();
+           var vjsOpts = {html5: {vhs: {overrideNative: true}}, autoplay: true, liveui: true};
+           if (hlsToken) {
+              vjsOpts.html5.vhs.beforeRequest = function (options) {
+                 options.headers = options.headers || {};
+                 options.headers['Authorization'] = 'Bearer ' + hlsToken;
+              };
+           }
+           videojs(vidId, vjsOpts).play();
          }
            <?php if (IS_LOGGED == true && $pt->config->server == 'nodejs') {?>
               const socket = io('{{CONFIG hostname}}:{{CONFIG server_port}}');

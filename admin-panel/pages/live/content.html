@@ -128,13 +128,29 @@
                        </div>
                    </div>
                    <hr>
-                   <div class="form-group form-float">
-                       <div class="form-line">
-                           <label class="form-label">Recordings Path</label>
-                           <input type="text" name="mediamtx_recordings_path" class="form-control" value="<?php echo ($pt->config->mediamtx_recordings_path);?>">
-                           <small class="admin-info">Local folder where MediaMTX stores recorded streams (recordPath). Must be readable by this script on the same server. Example: <code>./recordings</code></small>
-                       </div>
-                   </div>
+<div class="form-group form-float">
+                        <div class="form-line">
+                            <label class="form-label">Recordings Path</label>
+                            <input type="text" name="mediamtx_recordings_path" class="form-control" value="<?php echo ($pt->config->mediamtx_recordings_path);?>">
+                            <small class="admin-info">Local folder where MediaMTX stores recorded streams (recordPath). Must be readable by this script on the same server. Example: <code>./recordings</code></small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <label class="form-label">Auth Secret</label>
+                            <input type="text" name="mediamtx_auth_secret" class="form-control" value="<?php echo ($pt->config->mediamtx_auth_secret);?>">
+                            <small class="admin-info">Optional shared secret that enables signed, revocable per-stream tokens. Leave empty to keep the current open behaviour. When set, enable external HTTP auth in MediaMTX: <code>authMethod: http</code>, <code>authHTTPAddress: http://your-server-ip/mediamtx_auth.php</code> and add <code>/stream_…</code> paths. Broadcasters and viewers then use expiring <code>Bearer</code> tokens automatically; ending a stream instantly revokes all live sessions.</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <label class="form-label">Recordings Retention (days)</label>
+                            <input type="text" name="mediamtx_recordings_retention" class="form-control" value="<?php echo ($pt->config->mediamtx_recordings_retention);?>">
+                            <small class="admin-info">Delete recorded stream segments older than this many days from the Recordings Path. <code>0</code> disables the cleanup. Runs automatically on admin panel loads.</small>
+                        </div>
+                    </div>
                </form>
            </div>
        </div>

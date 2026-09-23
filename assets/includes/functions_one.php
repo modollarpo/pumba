@@ -2315,6 +2315,48 @@ function PT_SaveLiveRecording($post_id)
     }
     return false;
 }
+function PT_LiveStreamToken($path, $action, $ttl = 300)
+{
+    global $pt;
+    $secret = !empty($pt->config->mediamtx_auth_secret) ? $pt->config->mediamtx_auth_secret : '';
+    if (empty($secret)) {
+        return '';
+    }
+    $exp = time() + intval($ttl);
+    $data = $action . '|' . $path . '|' . $exp;
+    return $exp . '.' . hash_hmac('sha256', $data, $secret);
+}
+function PT_CleanLiveRecordings($record_path, $retention_days = 7)
+{
+    global $pt;
+    if (empty($record_path) || !is_dir($record_path) || intval($retention_days) < 1) {
+        return 0;
+    }
+    $record_path = rtrim($record_path, '/\\');
+    $cutoff      = time() - (intval($retention_days) * 86400);
+    $deleted     = 0;
+    $directory   = new RecursiveDirectoryIterator($record_path, RecursiveDirectoryIterator::SKIP_DOTS);
+    $iterator    = new RecursiveIteratorIterator($directory, RecursiveIteratorIterator::LEAVES_ONLY);
+    foreach ($iterator as $file) {
+        if ($file->isFile() && in_array(strtolower($file->getExtension()), array('ts', 'mp4', 'm4s'))) {
+            if ($file->getMTime() < $cutoff && @unlink($file->getPathname())) {
+                $deleted++;
+            }
+        }
+    }
+    $sub_dirs = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($record_path, RecursiveDirectoryIterator::SKIP_DOTS), RecursiveIteratorIterator::SELF_FIRST);
+    $dirs = array();
+    foreach ($sub_dirs as $dir) {
+        if ($dir->isDir()) {
+            $dirs[] = $dir->getPathname();
+        }
+    }
+    rsort($dirs);
+    foreach ($dirs as $d) {
+        @rmdir($d);
+    }
+    return $deleted;
+}
 function GetVideoTime($first,$second)
 {
     $first_date = new DateTime();

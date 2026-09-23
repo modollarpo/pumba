@@ -149,6 +149,11 @@ if ($pt->config->live_video == 1) {
 
         }
     }
+
+    $retention = (int) $pt->config->mediamtx_recordings_retention;
+    if ($retention > 0 && !empty($pt->config->mediamtx_recordings_path)) {
+        PT_CleanLiveRecordings((string) $pt->config->mediamtx_recordings_path, $retention);
+    }
 }
 $notify_count = $db->where('recipient_id',0)->where('admin',1)->where('seen',0)->getValue(T_NOTIFICATIONS,'COUNT(*)');
 $notifications = $db->where('recipient_id',0)->where('admin',1)->where('seen',0)->orderBy('id','DESC')->get(T_NOTIFICATIONS);
