@@ -211,13 +211,13 @@ Run the provided scripts after all services are up:
 **Windows (PowerShell):**
 
 ```powershell
-.\deploy\smoke-test.ps1 -YouTubeApi "http://127.0.0.1:3000" -TikTokApi "http://127.0.0.1:3000" -MediaMTX "http://127.0.0.1:8888"
+.\deploy\smoke-test.ps1 -YouTubeApi "http://127.0.0.1:3000" -TikTokApi "http://127.0.0.1:3001" -MediaMTX "http://127.0.0.1:8888"
 ```
 
 **Linux:**
 
 ```bash
-bash deploy/smoke-test.sh --youtube http://127.0.0.1:3000 --tiktok http://127.0.0.1:3000 --mediamtx http://127.0.0.1:8888
+bash deploy/smoke-test.sh --youtube http://127.0.0.1:3000 --tiktok http://127.0.0.1:3001 --mediamtx http://127.0.0.1:8888
 ```
 
 The script checks: YouTube search/info/download headers, TikTok info/user/search, MediaMTX
@@ -251,6 +251,7 @@ Logs go to `deploy/logs/`. Ctrl+C stops the foreground processes.
 ## 9. Production notes
 
 - **Process managers:** use `systemd` units (Linux) or NSSM/Task Scheduler (Windows) instead of the foreground scripts.
+- **Batch imports / long downloads:** PlayTube already runs with unlimited `max_execution_time`/memory (`app_start.php`), so PHP won't time out, but a reverse proxy (nginx `proxy_read_timeout`, Apache `ProxyTimeout`) still can when a large batch downloads several videos serially. Raise those timeouts (e.g. nginx `proxy_read_timeout 600s`) or import in smaller batches.
 - **ffmpeg:** ensure `ffmpeg` is on the PHP process PATH for uploads/conversion.
 - **Recordings cleanup:** use the built-in retention (see §5) — set *Recordings Retention* in Admin → Live, which prunes old files on admin loads. External cron: `PT_CleanLiveRecordings('./recordings', 7)`.
 - **Security:** keep `YOUTUBE_API_KEY` and `.env` out of the web root and git (the Node `.gitignore` files already exclude `.env`).
