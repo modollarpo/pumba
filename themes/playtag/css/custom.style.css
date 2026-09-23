@@ -3,3 +3,59 @@
 Add here your custom css styles Example: p { text-align: center; color: red; } 
 
 */
+
+/* Emoji reactions picker (videos + comments + replies) */
+.react-btn,
+.comment-react,
+.reply-react {
+	position: relative;
+	cursor: pointer;
+}
+.react-picker {
+	position: absolute;
+	bottom: 100%;
+	left: 0;
+	z-index: 50;
+	display: none;
+	align-items: center;
+	gap: 4px;
+	padding: 8px 12px;
+	background: #ffffff;
+	border: 1px solid #e9ecef;
+	border-radius: 40px;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+	margin-bottom: 8px;
+	white-space: nowrap;
+}
+.react-btn:hover .react-picker,
+.comment-react:hover .react-picker,
+.reply-react:hover .react-picker {
+	display: flex;
+}
+.react-picker button {
+	border: 0;
+	background: transparent;
+	font-size: 22px;
+	line-height: 1;
+	padding: 2px 5px;
+	transition: transform .15s ease;
+}
+.react-picker button:hover {
+	transform: scale(1.35);
+}
+.react-caret {
+	margin-left: 4px;
+	color: #6c757d;
+	display: inline-flex;
+}
+.react-emoji {
+	font-size: 18px;
+	line-height: 1;
+	display: inline-flex;
+}
+@media (max-width: 575.98px) {
+	.react-picker {
+		left: auto;
+		right: 0;
+	}
+}

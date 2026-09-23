@@ -1745,6 +1745,18 @@ function PT_UpdateUserCustomData($user_id, $update_data, $loggedin = true) {
     return $query;
 }
 
+function PT_ReactionEmoji($reaction = 'like'){
+    $reactions = array(
+        'like' => '&#128077;',
+        'love' => '&#10084;&#65039;',
+        'haha' => '&#128514;',
+        'wow' => '&#128562;',
+        'sad' => '&#128546;',
+        'angry' => '&#128545;'
+    );
+    return (!empty($reactions[$reaction])) ? $reactions[$reaction] : '&#128077;';
+}
+
 function pt_comm_object_data($comment = null,$pinned = null){
     global $pt,$user,$db;
     if (empty($comment)) {
@@ -1804,9 +1816,24 @@ function pt_comm_object_data($comment = null,$pinned = null){
 
 
 
+        $reply->text = PT_Markup(PT_Duration($reply->text));
+        $reply_reaction      = '';
+        $reply_reaction_emoji = '&#128077;';
+        if (IS_LOGGED == true) {
+            $db->where('reply_id', $reply->id);
+            $db->where('user_id', $user->id);
+            $db->where('type', 1);
+            $reply_reaction = $db->getValue(T_COMMENTS_LIKES, 'reaction');
+            if (!empty($reply_reaction)) {
+                $reply_reaction_emoji = PT_ReactionEmoji($reply_reaction);
+            } else {
+                $reply_reaction = '';
+            }
+        }
+
         $replies    .= PT_LoadPage('watch/replies', array(
             'ID' => $reply->id,
-            'TEXT' => PT_Markup(PT_Duration($reply->text)),
+            'TEXT' => $reply->text,
             'TIME' => PT_Time_Elapsed_String($reply->time),
             'USER_DATA' => $reply_user_data,
             'COMM_ID' => $comment->id,
@@ -1814,6 +1841,8 @@ function pt_comm_object_data($comment = null,$pinned = null){
             'DIS_LIKES' => $reply_dislikes,
             'LIKED' => $is_liked_reply,
             'DIS_LIKED' => $is_disliked_reply,
+            'REACTION' => $reply_reaction,
+            'REACTION_EMOJI' => $reply_reaction_emoji,
         ));
     }
 
@@ -1832,6 +1861,12 @@ function pt_comm_object_data($comment = null,$pinned = null){
         $db->where('user_id', $user->id);
         $db->where('type', 2);
         $is_comment_disliked = ($db->getValue(T_COMMENTS_LIKES, 'count(*)') > 0) ? 'active' : '';
+
+        $comment_reaction = '';
+        $db->where('comment_id', $comment->id);
+        $db->where('user_id', $user->id);
+        $db->where('type', 1);
+        $comment_reaction = $db->getValue(T_COMMENTS_LIKES, 'reaction');
 
         if ($user->id == $comment->user_id) {
             $pt->is_comment_owner = true;
@@ -1854,6 +1889,8 @@ function pt_comm_object_data($comment = null,$pinned = null){
         'DIS_LIKES' => $comment->dis_likes,
         'LIKED' => $is_liked_comment,
         'DIS_LIKED' => $is_comment_disliked,
+        'REACTION' => $comment_reaction,
+        'REACTION_EMOJI' => (!empty($comment_reaction)) ? PT_ReactionEmoji($comment_reaction) : '&#128077;',
         'COMM_REPLIES' => $replies,
         'VID_ID' => $comment->video_id
     ));

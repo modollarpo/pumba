@@ -257,7 +257,8 @@ CREATE TABLE `comments_likes` (
   `video_id` int(15) NOT NULL DEFAULT '0',
   `post_id` int(15) NOT NULL DEFAULT '0',
   `time` int(11) NOT NULL DEFAULT '0',
-  `type` int(11) NOT NULL DEFAULT '1'
+  `type` int(11) NOT NULL DEFAULT '1',
+  `reaction` varchar(25) NOT NULL DEFAULT 'like'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -1986,6 +1987,7 @@ CREATE TABLE `likes_dislikes` (
   `post_id` int(11) NOT NULL DEFAULT '0',
   `activity_id` int(11) NOT NULL DEFAULT '0',
   `type` int(11) NOT NULL DEFAULT '0',
+  `reaction` varchar(25) NOT NULL DEFAULT 'like',
   `time` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

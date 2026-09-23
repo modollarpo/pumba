@@ -420,23 +420,24 @@
                            <div>
                               <?php if (($pt->config->sell_videos_system == 'on') || $pt->get_video->sell_video == 0 ) { ?>
                               <div class="video-likes pull-right">
-                                 <div class="like-btn {{LIKE_ACTIVE_CLASS}}" id="likes-bar" onclick="Wo_LikeSystem('{{ID}}', 'like', this, 'is_ajax')" data-likes="{{RAEL_LIKES}}" {{ISLIKED}}>
-                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up">
-                                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-                                 </svg>
+                                 <div class="like-btn react-btn {{LIKE_ACTIVE_CLASS}}" id="likes-bar" data-likes="{{RAEL_LIKES}}" data-reaction="{{VIDEO_REACTION}}" {{ISLIKED}} onclick="PT_ReactVideoToggle({{ID}}, event)">
+                                 <span class="react-emoji">{{VIDEO_REACTION_EMOJI}}</span>
                                  <span class="likes" id="likes">{{LIKES}}</span>
+                                 <span class="react-caret"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
+                                 <div class="react-picker">
+                                    <button type="button" data-react="like" title="{{LANG like}}" onclick="PT_ReactVideo({{ID}},'like',event)">&#128077;</button>
+                                    <button type="button" data-react="love" title="Love" onclick="PT_ReactVideo({{ID}},'love',event)">&#10084;&#65039;</button>
+                                    <button type="button" data-react="haha" title="Haha" onclick="PT_ReactVideo({{ID}},'haha',event)">&#128514;</button>
+                                    <button type="button" data-react="wow" title="Wow" onclick="PT_ReactVideo({{ID}},'wow',event)">&#128562;</button>
+                                    <button type="button" data-react="sad" title="Sad" onclick="PT_ReactVideo({{ID}},'sad',event)">&#128546;</button>
+                                    <button type="button" data-react="angry" title="Angry" onclick="PT_ReactVideo({{ID}},'angry',event)">&#128545;</button>
+                                 </div>
                               </div>
                               <div class="video-info-element pull-right">
                                  <div class="views-bar" style="width: {{DISLIKES_P}}%"></div>
                                  <div class="views-bar blue" style="width: {{LIKES_P}}%"></div>
                                  <div class="clear"></div>
                               </div>
-                              <div class="like-btn text-right {{DIS_ACTIVE_CLASS}}" id="dislikes-bar" onclick="Wo_LikeSystem('{{ID}}', 'dislike', this, 'is_ajax')" data-likes="{{RAEL_DISLIKES}}" {{ISDISLIKED}}>
-                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-down">
-                                 <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
-                              </svg>
-                              <span class="likes" id="dislikes">{{DISLIKES}}</span>
-                           </div>
                            <div class="clear"></div>
                         </div>
                         <?php } ?>

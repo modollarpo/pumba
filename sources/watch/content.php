@@ -461,6 +461,13 @@ if (!empty($get_video_comments)) {
                 $db->where('user_id', $user->id);
                 $db->where('type', 2);
                 $is_disliked_reply = ($db->getValue(T_COMMENTS_LIKES, 'count(*)') > 0) ? 'active' : '';
+
+                $db->where('reply_id', $reply->id);
+                $db->where('user_id', $user->id);
+                $db->where('type', 1);
+                $reply_reaction = $db->getValue(T_COMMENTS_LIKES, 'reaction');
+            } else {
+                $reply_reaction = '';
             }
 
             if ($reply_user_data->verified == 1) {
@@ -487,6 +494,8 @@ if (!empty($get_video_comments)) {
                 'DIS_LIKES' => $reply_dislikes,
                 'LIKED' => $is_liked_reply,
                 'DIS_LIKED' => $is_disliked_reply,
+                'REACTION' => $reply_reaction,
+                'REACTION_EMOJI' => (!empty($reply_reaction)) ? PT_ReactionEmoji($reply_reaction) : '&#128077;',
             ));
         }
 
@@ -504,9 +513,16 @@ if (!empty($get_video_comments)) {
             $db->where('type', 2);
             $is_comment_disliked = ($db->getValue(T_COMMENTS_LIKES, 'count(*)') > 0) ? 'active' : '';
 
+            $db->where('comment_id', $comment->id);
+            $db->where('user_id', $user->id);
+            $db->where('type', 1);
+            $comment_reaction = $db->getValue(T_COMMENTS_LIKES, 'reaction');
+
             if ($user->id == $comment->user_id || $pt->video_owner) {
                 $pt->is_comment_owner = true;
             }
+        } else {
+            $comment_reaction = '';
         }
         if (!empty($get_video->stream_name) && $comment->time <= $get_video->live_time) {
             $video_time = GetVideoTime($get_video->time,$comment->time);
@@ -525,6 +541,8 @@ if (!empty($get_video_comments)) {
             'DIS_LIKES' => $comment->dis_likes,
             'LIKED' => $is_liked_comment,
             'DIS_LIKED' => $is_comment_disliked,
+            'REACTION' => $comment_reaction,
+            'REACTION_EMOJI' => (!empty($comment_reaction)) ? PT_ReactionEmoji($comment_reaction) : '&#128077;',
             'COMM_REPLIES' => $replies,
             'VID_ID' => $get_video->id
         ));
@@ -1108,6 +1126,14 @@ if (!empty($get_video->tags)) {
         $video_tags_html .= '<a class="hash main small" href="' . PT_Link('search?keyword=' . urlencode($tag)) . '" data-load="?link1=search&keyword=' . urlencode($tag) . '">#' . $tag . '</a>';
     }
 }
+$video_reaction = '';
+if (IS_LOGGED == true) {
+    $db->where('user_id', $user->id);
+    $db->where('video_id', $get_video->id);
+    $db->where('type', 1);
+    $video_reaction = $db->getValue(T_DIS_LIKES, 'reaction');
+}
+
 $pt->content = PT_LoadPage("watch/$content_page", array(
     'ID' => $get_video->id,
     'KEY' => $get_video->video_id,
@@ -1144,6 +1170,8 @@ $pt->content = PT_LoadPage("watch/$content_page", array(
     'DISLIKES_P' => $get_video->dislikes_percent,
     'RAEL_LIKES' => $get_video->likes,
     'RAEL_DISLIKES' => $get_video->dislikes,
+    'VIDEO_REACTION' => $video_reaction,
+    'VIDEO_REACTION_EMOJI' => (!empty($video_reaction)) ? PT_ReactionEmoji($video_reaction) : '&#128077;',
     'ISLIKED' => ($get_video->is_liked > 0) ? 'liked="true"' : '',
     'ISDISLIKED' => ($get_video->is_disliked > 0) ? 'disliked="true"' : '',
     'LIKE_ACTIVE_CLASS' => ($get_video->is_liked > 0) ? 'active' : '',

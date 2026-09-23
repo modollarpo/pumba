@@ -92,6 +92,63 @@ if (!empty($_GET['first']) && !empty($_POST['id'])) {
             }
         }
 
+        elseif ($_GET['first'] == 'react') {
+            $reactions = array('like', 'love', 'haha', 'wow', 'sad', 'angry');
+            $reaction  = (!empty($_POST['reaction'])) ? PT_Secure($_POST['reaction']) : '';
+            if (!in_array($reaction, $reactions)) {
+                $data = array(
+                    'status' => 400,
+                    'type' => '',
+                    'error' => 'Invalid reaction'
+                );
+            } 
+            else {
+                $db->where('user_id', $user->id);
+                $db->where('reply_id', $id);
+                $db->where('type', 2);
+                $delete = $db->delete(T_COMMENTS_LIKES);
+
+                $db->where('user_id', $user->id);
+                $db->where('reply_id', $id);
+                $db->where('type', 1);
+                $existing = $db->getOne(T_COMMENTS_LIKES, array('id','reaction'));
+                if (!empty($existing)) {
+                    if ($existing->reaction == $reaction) {
+                        $db->where('id', $existing->id)->delete(T_COMMENTS_LIKES);
+                        $data = array(
+                            'status' => 200,
+                            'type' => 'deleted_like',
+                            'reaction' => $reaction
+                        );
+                    } else {
+                        $db->where('id', $existing->id)->update(T_COMMENTS_LIKES, array('reaction' => $reaction));
+                        $data = array(
+                            'status' => 200,
+                            'type' => 'updated',
+                            'reaction' => $reaction
+                        );
+                    }
+                } else {
+                    $insert_data = array(
+                        'user_id' => $user->id,
+                        'reply_id' => $id,
+                        'time' => time(),
+                        'type' => 1,
+                        'reaction' => $reaction
+                    );
+
+                    $insert = $db->insert(T_COMMENTS_LIKES, $insert_data);
+                    if ($insert) {
+                        $data = array(
+                            'status' => 200,
+                            'type' => 'added_like',
+                            'reaction' => $reaction
+                        );
+                    }
+                }
+            }
+        }
+
         if (in_array($data['type'], array('added_like','added_dislike'))) {
             if ($reply_data->user_id != $user->id) {
                 $type       = ($data['type'] == 'added_like') ? 'liked_ur_comment' : 'disliked_ur_comment';

@@ -1071,6 +1071,97 @@ function PT_LikeReplies(self,type,reply_id){
   })
 }
 
+function PT_ReactionEmoji(reaction) {
+  var map = {like: '👍', love: '❤️', haha: '😂', wow: '😮', sad: '😢', angry: '😡'};
+  return map[reaction] || '👍';
+}
+
+function PT_NeedLogin() {
+  if (!$('#main-container').attr('data-logged') && $('#main-url').val()) {
+    window.location.href = PT_Ajax_Requests_File() + 'login?to=' + $('#main-url').val();
+    return true;
+  }
+  return false;
+}
+
+function PT_ReactVideo(video_id, reaction, event) {
+  if (event) { event.stopPropagation(); }
+  if (PT_NeedLogin()) { return false; }
+  var likes_bar = $('#likes-bar');
+  $.post('{{LINK aj/like-system/}}' + 'react', {id: video_id, reaction: reaction}, function(data) {
+    if (data.status == 200) {
+      $('#likes').text(numberWithCommas(data.count));
+      likes_bar.attr('data-likes', data.count).attr('data-reaction', data.reaction);
+      likes_bar.find('.react-emoji').text(PT_ReactionEmoji(data.reaction));
+      if (data.type == 'deleted_like') {
+        likes_bar.removeClass('active');
+      } else {
+        likes_bar.addClass('active');
+      }
+    } else {
+      swal('Error!', 'Something went wrong.Please try again later!', 'error');
+    }
+  }).fail(function() { console.log("error"); });
+}
+
+function PT_ReactVideoToggle(video_id, event) {
+  if (event) { event.stopPropagation(); }
+  var reaction = $('#likes-bar').attr('data-reaction') || 'like';
+  PT_ReactVideo(video_id, reaction, event);
+}
+
+function PT_ReactComment(comment_id, reaction, event) {
+  if (event) { event.stopPropagation(); }
+  if (PT_NeedLogin()) { return false; }
+  var btn = $(event.currentTarget).closest('.comment-react');
+  $.post('{{LINK aj/comment-like-system/}}' + 'react', {id: comment_id, reaction: reaction}, function(data) {
+    if (data.status == 200) {
+      btn.attr('data-reaction', data.reaction);
+      btn.find('.react-emoji').text(PT_ReactionEmoji(data.reaction));
+      btn.find('.react-count').text(data.up);
+      if (data.type == 'deleted_like') {
+        btn.removeClass('active');
+      } else {
+        btn.addClass('active');
+      }
+    } else {
+      swal('Error!', 'Something went wrong.Please try again later!', 'error');
+    }
+  }).fail(function() { console.log("error"); });
+}
+
+function PT_ReactCommentToggle(comment_id, event) {
+  if (event) { event.stopPropagation(); }
+  var reaction = $(event.currentTarget).attr('data-reaction') || 'like';
+  PT_ReactComment(comment_id, reaction, event);
+}
+
+function PT_ReactReply(reply_id, reaction, event) {
+  if (event) { event.stopPropagation(); }
+  if (PT_NeedLogin()) { return false; }
+  var btn = $(event.currentTarget).closest('.reply-react');
+  $.post('{{LINK aj/reply-like-system/}}' + 'react', {id: reply_id, reaction: reaction}, function(data) {
+    if (data.status == 200) {
+      btn.attr('data-reaction', data.reaction);
+      btn.find('.react-emoji').text(PT_ReactionEmoji(data.reaction));
+      btn.find('.react-count').text(data.up);
+      if (data.type == 'deleted_like') {
+        btn.removeClass('active');
+      } else {
+        btn.addClass('active');
+      }
+    } else {
+      swal('Error!', 'Something went wrong.Please try again later!', 'error');
+    }
+  }).fail(function() { console.log("error"); });
+}
+
+function PT_ReactReplyToggle(reply_id, event) {
+  if (event) { event.stopPropagation(); }
+  var reaction = $(event.currentTarget).attr('data-reaction') || 'like';
+  PT_ReactReply(reply_id, reaction, event);
+}
+
 function pt_hide_announcement(id){
   if (!id) { return false; }
   $("#announcement-"+id).slideUp('fast',function(){

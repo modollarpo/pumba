@@ -24,12 +24,22 @@
 					<div class="comment-text">{{TEXT}}</div>
 				</div>
 				
+				<?php
+					$pt_pin_reaction = (!empty($data['REACTION'])) ? $data['REACTION'] : '';
+					$pt_pin_emoji = (!empty($data['REACTION_EMOJI'])) ? $data['REACTION_EMOJI'] : '&#128077;';
+				?>
 				<div class="bold small text-muted d-flex align-items-center gap-15 px-3 mt-1">
-					<span type="button" class="{{LIKED}}" onclick="PT_LikeComments(this,'up','{{ID}}');" data-comment-likes="{{ID}}">
-						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 12C2 10.8954 2.89543 10 4 10C5.65685 10 7 11.3431 7 13V17C7 18.6569 5.65685 20 4 20C2.89543 20 2 19.1046 2 18V12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15.4787 7.30626L15.2124 8.16634C14.9942 8.87111 14.8851 9.22349 14.969 9.5018C15.0369 9.72695 15.1859 9.92102 15.389 10.0487C15.64 10.2065 16.0197 10.2065 16.7791 10.2065H17.1831C19.7532 10.2065 21.0382 10.2065 21.6452 10.9673C21.7145 11.0542 21.7762 11.1467 21.8296 11.2437C22.2965 12.0921 21.7657 13.2351 20.704 15.5211C19.7297 17.6189 19.2425 18.6678 18.338 19.2852C18.2505 19.3449 18.1605 19.4013 18.0683 19.4541C17.116 20 15.9362 20 13.5764 20H13.0646C10.2057 20 8.77628 20 7.88814 19.1395C7 18.2789 7 16.8939 7 14.1239V13.1503C7 11.6946 7 10.9668 7.25834 10.3006C7.51668 9.63441 8.01135 9.08664 9.00069 7.99112L13.0921 3.46056C13.1947 3.34694 13.246 3.29012 13.2913 3.25075C13.7135 2.88328 14.3652 2.92464 14.7344 3.34235C14.774 3.3871 14.8172 3.44991 14.9036 3.57554C15.0388 3.77205 15.1064 3.87031 15.1654 3.96765C15.6928 4.83913 15.8524 5.87436 15.6108 6.85715C15.5838 6.96692 15.5488 7.0801 15.4787 7.30626Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg> <span>{{LIKES}}</span>
-					</span>
-					<span type="button" class="{{DIS_LIKED}}" onclick="PT_LikeComments(this,'down','{{ID}}');" data-comment-dislikes="{{ID}}">
-						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 11C2 12.1046 2.89543 13 4 13C5.65685 13 7 11.6569 7 10V6C7 4.34315 5.65685 3 4 3C2.89543 3 2 3.89543 2 5V11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15.4787 15.6937L15.2124 14.8337C14.9942 14.1289 14.8851 13.7765 14.969 13.4982C15.0369 13.2731 15.1859 13.079 15.389 12.9513C15.64 12.7935 16.0197 12.7935 16.7791 12.7935H17.1831C19.7532 12.7935 21.0382 12.7935 21.6452 12.0327C21.7145 11.9458 21.7762 11.8533 21.8296 11.7563C22.2965 10.9079 21.7657 9.76487 20.704 7.4789C19.7297 5.38111 19.2425 4.33222 18.338 3.71485C18.2505 3.65508 18.1605 3.5987 18.0683 3.54586C17.116 3 15.9362 3 13.5764 3H13.0646C10.2057 3 8.77628 3 7.88814 3.86053C7 4.72106 7 6.10607 7 8.87607V9.84966C7 11.3054 7 12.0332 7.25834 12.6994C7.51668 13.3656 8.01135 13.9134 9.00069 15.0089L13.0921 19.5394C13.1947 19.6531 13.246 19.7099 13.2913 19.7493C13.7135 20.1167 14.3652 20.0754 14.7344 19.6577C14.774 19.6129 14.8172 19.5501 14.9036 19.4245C15.0388 19.228 15.1064 19.1297 15.1654 19.0323C15.6928 18.1609 15.8524 17.1256 15.6108 16.1429C15.5838 16.0331 15.5488 15.9199 15.4787 15.6937Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg> <span>{{DIS_LIKES}}</span>
+					<span type="button" class="comment-react {{LIKED}}" data-reaction="<?php echo $pt_pin_reaction; ?>" onclick="PT_ReactCommentToggle({{ID}}, event)">
+						<span class="react-emoji"><?php echo $pt_pin_emoji; ?></span>
+						<span class="react-count">{{LIKES}}</span>
+						<span class="react-picker">
+							<button type="button" data-react="like" title="{{LANG like}}" onclick="PT_ReactComment({{ID}},'like',event)">&#128077;</button>
+							<button type="button" data-react="love" title="Love" onclick="PT_ReactComment({{ID}},'love',event)">&#10084;&#65039;</button>
+							<button type="button" data-react="haha" title="Haha" onclick="PT_ReactComment({{ID}},'haha',event)">&#128514;</button>
+							<button type="button" data-react="wow" title="Wow" onclick="PT_ReactComment({{ID}},'wow',event)">&#128562;</button>
+							<button type="button" data-react="sad" title="Sad" onclick="PT_ReactComment({{ID}},'sad',event)">&#128546;</button>
+							<button type="button" data-react="angry" title="Angry" onclick="PT_ReactComment({{ID}},'angry',event)">&#128545;</button>
+						</span>
 					</span>
 					<span type="button" class="comms-reply" onclick="PT_Reply('{{ID}}');">
 						{{LANG reply}}
