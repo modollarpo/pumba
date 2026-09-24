@@ -1065,6 +1065,35 @@ function PT_DeleteVideo($id = 0) {
     $size = $get_video->size;
     $db->where('id', $get_video->user_id)->update(T_USERS,array('uploads' => ($user_->uploads - $size)));
 
+    // Best-effort CDN invalidation: the blob was already deleted above, but
+    // edges fronted by azure_blob_cdn may keep serving stale copies until
+    // their TTL expires, so issue a PURGE for every media key we removed.
+    if ($pt->config->azure_blob_storage == 'on' && !empty($pt->config->azure_blob_cdn)) {
+        $purge_targets = array();
+        if (isset($get_video->thumbnail) && $get_video->thumbnail != 'upload/photos/thumbnail.jpg') {
+            $purge_targets[] = $get_video->thumbnail;
+        }
+        if (!empty($get_video->video_location)) {
+            $purge_targets[] = $get_video->video_location;
+            if (!empty($explode_video)) {
+                foreach (array('240p', '360p', '480p', '720p', '1080p', '4096p', '2048p') as $q) {
+                    if (!empty($get_video->{$q})) {
+                        $purge_targets[] = $explode_video[0] . '_video_' . $q . '_converted.mp4';
+                    }
+                }
+                if (!empty($get_video->demo)) {
+                    $purge_targets[] = $get_video->demo;
+                }
+                if (!empty($get_video->gif)) {
+                    $purge_targets[] = $get_video->gif;
+                }
+            }
+        }
+        foreach ($purge_targets as $target) {
+            PT_AzureCDNPurge($target);
+        }
+    }
+
     $get_comments = $db->where('video_id', $id)->get(T_COMMENTS);
     foreach ($get_comments as $key => $comment) {
         $delete  = $db->where('comment_id', $comment->id)->delete(T_COMMENTS_LIKES);
@@ -1315,6 +1344,32 @@ function PT_AzureBlobRequest($method = 'GET', $blobPath = '', $body = null, $bod
         @fclose($body);
     }
 
+    return ($status >= 200 && $status < 300);
+}
+
+function PT_AzureCDNPurge($media = '') {
+    // Best-effort CDN invalidation for a deleted blob when azure_blob_cdn is
+    // configured. Sends an HTTP PURGE to the CDN URL; unreachable/unlimited
+    // CDNs simply return 404/405 and are ignored so deletes never fail.
+    // Note: if the CDN exposes a vendor API instead (e.g. Azure Front Door),
+    // front your CDN origin with a layer that honors PURGE.
+    global $pt;
+    if (empty($media)) {
+        return false;
+    }
+    $cdn = isset($pt->config->azure_blob_cdn) ? rtrim(trim($pt->config->azure_blob_cdn), '/') : '';
+    if (empty($cdn)) {
+        return false;
+    }
+    $url = $cdn . '/' . ltrim($media, '/');
+    $ch  = curl_init($url);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PURGE');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_NOBODY, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    curl_exec($ch);
+    $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
     return ($status >= 200 && $status < 300);
 }
 
