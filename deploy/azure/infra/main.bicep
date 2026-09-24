@@ -95,6 +95,9 @@ param vmSize string = 'Standard_B1s'
 @description('Blob container holding site media (azure_blob_storage target).')
 param mediaContainerName string = 'media'
 
+@description('Enable the free-consumption Function timer that calls cronjob.php (needed for imports/encode on F1).')
+param deployCron bool = true
+
 module data 'modules/data.bicep' = {
   name: 'data'
   params: {
@@ -141,6 +144,24 @@ module vm 'modules/vm.bicep' = if (deployVm) {
   }
 }
 
+module cron 'modules/cron.bicep' = if (deployCron) {
+  name: 'cron'
+  dependsOn: [
+    appsvc
+    data
+  ]
+  params: {
+    location: location
+    environment: environment
+    customer: customer
+    functionAppName: 'func-cron-${customer}-${environment}'
+    planName: 'plan-cron-${customer}-${environment}'
+    storageAccountName: data.outputs.storageAccount
+    storageAccountKey: data.outputs.storageAccountKey
+    siteUrl: appsvc.outputs.playtubeUrl
+  }
+}
+
 output playtubeUrl string = appsvc.outputs.playtubeUrl
 output ytApiUrl string = appsvc.outputs.ytApiUrl
 output ttApiUrl string = appsvc.outputs.ttApiUrl
@@ -150,3 +171,4 @@ output mediaEndpoint string = data.outputs.mediaEndpoint
 // BCP318 is a known lint false-positive: the ternary guard matches the module
 // condition (no-deploy => ''), so this is safe at runtime.
 output vmPublicIp string = deployVm ? vm.outputs.publicIp : ''
+output cronFuncName string = deployCron ? cron.outputs.funcName : ''

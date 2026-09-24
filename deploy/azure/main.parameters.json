@@ -18,6 +18,7 @@
     "siteUrl": { "value": "" },
     "purchaseCode": { "value": "" },
     "deployVm": { "value": false },
+    "deployCron": { "value": true },
     "vmAdminUser": { "value": "playtube" },
     "vmAdminSshPublicKey": { "value": "" }
   }

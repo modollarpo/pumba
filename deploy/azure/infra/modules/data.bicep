@@ -75,7 +75,7 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     name: 'Standard_LRS'
   }
   properties: {
-    allowBlobPublicAccess: false
+    allowBlobPublicAccess: true
     minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
   }
@@ -94,10 +94,14 @@ resource mediaContainer 'Microsoft.Storage/storageAccounts/blobServices/containe
   parent: blobService
   name: mediaContainerName
   properties: {
-    publicAccess: 'None'
+    publicAccess: 'Blob'
   }
 }
 
+var storageKey = listKeys(storage.id, '2022-09-01').keys[0].value
+
 output sqlHost string = '${sqlServerName}.mysql.database.azure.com'
 output storageAccount string = storage.name
+output storageAccountKey string = storageKey
+output storageConnectionString string = 'DefaultEndpointsProtocol=https;AccountName=${storage.name};AccountKey=${storageKey};EndpointSuffix=core.windows.net'
 output mediaEndpoint string = '${storage.properties.primaryEndpoints.blob}${mediaContainerName}'
