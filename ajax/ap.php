@@ -1469,14 +1469,7 @@ if ($first == 'test_backblaze') {
 if ($first == 'testS3') {
     include_once('assets/libs/s3-lib/vendor/autoload.php');
     try {
-        $s3Client = S3Client::factory(array(
-            'version' => 'latest',
-            'region' => $pt->config->region,
-            'credentials' => array(
-                'key' => $pt->config->amazone_s3_key,
-                'secret' => $pt->config->amazone_s3_s_key
-            )
-        ));
+        $s3Client = PT_StorageS3Client('', $pt->config->region, $pt->config->amazone_s3_key, $pt->config->amazone_s3_s_key);
 
         $buckets  = $s3Client->listBuckets();
         if (!empty($buckets)) {
@@ -1548,15 +1541,7 @@ if ($first == 'test_wasabi') {
 
     include_once('assets/libs/s3-lib/vendor/autoload.php');
     try {
-        $s3Client = S3Client::factory(array(
-            'version' => 'latest',
-            'region' => $pt->config->wasabi_bucket_region,
-            'endpoint' => 'https://s3.' . $pt->config->wasabi_bucket_region . '.wasabisys.com',
-            'credentials' => array(
-                'key' => $pt->config->wasabi_access_key,
-                'secret' => $pt->config->wasabi_secret_key
-            )
-        ));
+        $s3Client = PT_StorageS3Client('https://s3.' . $pt->config->wasabi_bucket_region . '.wasabisys.com', $pt->config->wasabi_bucket_region, $pt->config->wasabi_access_key, $pt->config->wasabi_secret_key);
 
         $buckets  = $s3Client->listBuckets();
         if (!empty($buckets)) {
@@ -1595,15 +1580,7 @@ if ($first == 'test_wasabi') {
 if ($first == 'test_spaces') {
     include_once('assets/libs/s3-lib/vendor/autoload.php');
     try {
-        $s3Client = S3Client::factory(array(
-            'version' => 'latest',
-            'region' => $pt->config->space_region,
-            'endpoint' => 'https://' . $pt->config->space_region . '.digitaloceanspaces.com',
-            'credentials' => array(
-                'key' => $pt->config->spaces_key,
-                'secret' => $pt->config->spaces_secret
-            )
-        ));
+        $s3Client = PT_StorageS3Client('https://' . $pt->config->space_region . '.digitaloceanspaces.com', $pt->config->space_region, $pt->config->spaces_key, $pt->config->spaces_secret);
 
         $buckets  = $s3Client->listBuckets();
         if (!empty($buckets)) {
@@ -4216,15 +4193,7 @@ if ($first == 'test_yandex') {
 
     include_once('assets/libs/s3-lib/vendor/autoload.php');
     try {
-        $s3Client = S3Client::factory(array(
-            'version' => 'latest',
-            'endpoint' => 'https://storage.yandexcloud.net',
-            'region' => $pt->config->yandex_region,
-            'credentials' => array(
-                'key' => $pt->config->yandex_key,
-                'secret' => $pt->config->yandex_secret
-            )
-        ));
+        $s3Client = PT_StorageS3Client('https://storage.yandexcloud.net', $pt->config->yandex_region, $pt->config->yandex_key, $pt->config->yandex_secret);
 
         $buckets  = $s3Client->listBuckets();
         if (!empty($buckets)) {

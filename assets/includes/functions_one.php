@@ -1344,6 +1344,45 @@ function PT_AzureCDNPurge($media = '') {
     return ($status >= 200 && $status < 300);
 }
 
+// Single source of truth for "is any remote storage provider configured?".
+// Mirrors the flag set the admin panel toggles so future providers only need
+// to be added here instead of at every call site.
+function PT_RemoteStorageActive() {
+    global $pt;
+    return ($pt->config->s3_upload == 'on' || $pt->config->ftp_upload == 'on' || $pt->config->spaces == 'on' || $pt->config->wasabi_storage == 'on' || $pt->config->backblaze_storage == 'on' || $pt->config->cloud_upload == 'on' || $pt->config->yandex_storage == 'on' || $pt->config->azure_blob_storage == 'on') ? true : false;
+}
+
+// Builds an S3-compatible client for the supplied provider settings.
+// Previously each upload/delete branch constructed this object inline with the
+// same boilerplate; keep the params in one place so endpoint/credentials stay
+// consistent across PT_UploadToS3, PT_DeleteFromToS3 and any future callers.
+function PT_StorageS3Client($endpoint = '', $region = '', $key = '', $secret = '') {
+    include_once('assets/libs/s3-lib/vendor/autoload.php');
+    $client_config = array(
+        'version'     => 'latest',
+        'region'      => $region,
+        'credentials' => array(
+            'key'    => $key,
+            'secret' => $secret
+        )
+    );
+    if (!empty($endpoint)) {
+        $client_config['endpoint'] = $endpoint;
+    }
+    return new S3Client($client_config);
+}
+
+// Builds the streaming URL for a converted quality rendition. The base comes
+// from video_location in the DB (relative 'upload/videos/...' or an absolute
+// URL depending on storage mode); PT_GetMedia maps relative paths to the
+// active provider/CDN while leaving already-absolute URLs untouched.
+// $kind wraps the file name segment ('' for normal videos, 'shorts' for the
+// 'upload/videos/.../xxx_video_shorts_720p_converted.mp4' naming scheme).
+function PT_QualityVideoUrl($base, $quality, $kind = '') {
+    $segment = ($kind !== '') ? '_video_' . $kind . '_' . $quality . 'p_converted.mp4' : '_video_' . $quality . 'p_converted.mp4';
+    return PT_GetMedia($base . $segment);
+}
+
 function PT_UploadToS3($filename, $config = array()) {
     global $pt;
 
@@ -1398,21 +1437,12 @@ function PT_UploadToS3($filename, $config = array()) {
     }
     elseif ($pt->config->spaces == 'on' && !empty($pt->config->spaces_key) && !empty($pt->config->spaces_secret) && !empty($pt->config->space_name) && !empty($pt->config->space_region)) {
 
-        include_once('assets/libs/s3-lib/vendor/autoload.php');
         $key = $pt->config->spaces_key;
         $secret = $pt->config->spaces_secret;
         $space_name = $pt->config->space_name;
         $region = $pt->config->space_region;
 
-        $s3 = new S3Client(array(
-                'version' => 'latest',
-                'endpoint' => 'https://' . $region . '.digitaloceanspaces.com',
-                'region' => $region,
-                'credentials' => array(
-                    'key' => $pt->config->spaces_key,
-                    'secret' => $pt->config->spaces_secret
-                )
-            ));
+        $s3 = PT_StorageS3Client('https://' . $region . '.digitaloceanspaces.com', $region, $key, $secret);
         $s3->putObject(array(
             'Bucket' => $pt->config->space_name,
             'Key' => $filename,
@@ -1432,17 +1462,7 @@ function PT_UploadToS3($filename, $config = array()) {
         }
     } elseif ($pt->config->wasabi_storage == 'on' && !empty($pt->config->wasabi_bucket_name)) {
 
-       include_once('assets/libs/s3-lib/vendor/autoload.php');
-
-        $s3 = new S3Client(array(
-                'version' => 'latest',
-                'endpoint' => 'https://s3.' . $pt->config->wasabi_bucket_region . '.wasabisys.com',
-                'region' => $pt->config->wasabi_bucket_region,
-                'credentials' => array(
-                    'key' => $pt->config->wasabi_access_key,
-                    'secret' => $pt->config->wasabi_secret_key
-                )
-            ));
+        $s3 = PT_StorageS3Client('https://s3.' . $pt->config->wasabi_bucket_region . '.wasabisys.com', $pt->config->wasabi_bucket_region, $pt->config->wasabi_access_key, $pt->config->wasabi_secret_key);
         $s3->putObject(array(
             'Bucket' => $pt->config->wasabi_bucket_name,
             'Key' => $filename,
@@ -1525,15 +1545,7 @@ function PT_UploadToS3($filename, $config = array()) {
     } elseif ($pt->config->yandex_storage == 'on') {
         include_once('assets/libs/s3-lib/vendor/autoload.php');
 
-        $s3 = new S3Client(array(
-                'version' => 'latest',
-                'endpoint' => 'https://storage.yandexcloud.net',
-                'region' => $pt->config->yandex_region,
-                'credentials' => array(
-                    'key' => $pt->config->yandex_key,
-                    'secret' => $pt->config->yandex_secret
-                )
-            ));
+        $s3 = PT_StorageS3Client('https://storage.yandexcloud.net', $pt->config->yandex_region, $pt->config->yandex_key, $pt->config->yandex_secret);
         $s3->putObject(array(
             'Bucket' => $pt->config->yandex_name,
             'Key' => $filename,
@@ -1576,14 +1588,7 @@ function PT_UploadToS3($filename, $config = array()) {
         if ($s3Config){
             return false;
         }
-        $s3 = new S3Client(array(
-                'version' => 'latest',
-                'region' => $pt->config->region,
-                'credentials' => array(
-                    'key' => $pt->config->amazone_s3_key,
-                    'secret' => $pt->config->amazone_s3_s_key
-                )
-            ));
+        $s3 = PT_StorageS3Client('', $pt->config->region, $pt->config->amazone_s3_key, $pt->config->amazone_s3_s_key);
         $s3->putObject(array(
             'Bucket' => $pt->config->s3_bucket_name,
             'Key' => $filename,
@@ -1637,21 +1642,12 @@ function PT_DeleteFromToS3($filename, $config = array()) {
         }
     }
     elseif ($pt->config->spaces == 'on' && !empty($pt->config->spaces_key) && !empty($pt->config->spaces_secret) && !empty($pt->config->space_name) && !empty($pt->config->space_region)) {
-        include_once('assets/libs/s3-lib/vendor/autoload.php');
         $key = $pt->config->spaces_key;
         $secret = $pt->config->spaces_secret;
         $space_name = $pt->config->space_name;
         $region = $pt->config->space_region;
 
-        $s3 = new S3Client(array(
-                'version' => 'latest',
-                'endpoint' => 'https://' . $region . '.digitaloceanspaces.com',
-                'region' => $region,
-                'credentials' => array(
-                    'key' => $pt->config->spaces_key,
-                    'secret' => $pt->config->spaces_secret
-                )
-            ));
+        $s3 = PT_StorageS3Client('https://' . $region . '.digitaloceanspaces.com', $region, $key, $secret);
         $s3->deleteObject(array(
             'Bucket' => $pt->config->space_name,
             'Key' => $filename
@@ -1665,15 +1661,7 @@ function PT_DeleteFromToS3($filename, $config = array()) {
             return false;
         }
         include_once('assets/libs/s3-lib/vendor/autoload.php');
-        $s3 = new S3Client(array(
-                'version' => 'latest',
-                'endpoint' => 'https://s3.' . $pt->config->wasabi_bucket_region . '.wasabisys.com',
-                'region' => $pt->config->wasabi_bucket_region,
-                'credentials' => array(
-                    'key' => $pt->config->wasabi_access_key,
-                    'secret' => $pt->config->wasabi_secret_key
-                )
-            ));
+        $s3 = PT_StorageS3Client('https://s3.' . $pt->config->wasabi_bucket_region . '.wasabisys.com', $pt->config->wasabi_bucket_region, $pt->config->wasabi_access_key, $pt->config->wasabi_secret_key);
         $s3->deleteObject(array(
             'Bucket' => $pt->config->wasabi_bucket_name,
             'Key' => $filename
@@ -1757,14 +1745,7 @@ function PT_DeleteFromToS3($filename, $config = array()) {
         if ($s3Config){
             return false;
         }
-        $s3 = new S3Client([
-            'version'     => 'latest',
-            'region'      => $pt->config->region,
-            'credentials' => [
-                'key'    => $pt->config->amazone_s3_key,
-                'secret' => $pt->config->amazone_s3_s_key,
-            ]
-        ]);
+        $s3 = PT_StorageS3Client('', $pt->config->region, $pt->config->amazone_s3_key, $pt->config->amazone_s3_s_key);
 
         $s3->deleteObject([
             'Bucket' => $pt->config->s3_bucket_name,
@@ -1780,15 +1761,7 @@ function PT_DeleteFromToS3($filename, $config = array()) {
             return false;
         }
         include_once('assets/libs/s3-lib/vendor/autoload.php');
-        $s3 = new S3Client(array(
-                'version' => 'latest',
-                'endpoint' => 'https://storage.yandexcloud.net',
-                'region' => $pt->config->yandex_region,
-                'credentials' => array(
-                    'key' => $pt->config->yandex_key,
-                    'secret' => $pt->config->yandex_secret
-                )
-            ));
+        $s3 = PT_StorageS3Client('https://storage.yandexcloud.net', $pt->config->yandex_region, $pt->config->yandex_key, $pt->config->yandex_secret);
         $s3->deleteObject(array(
             'Bucket' => $pt->config->yandex_name,
             'Key' => $filename
@@ -1800,15 +1773,7 @@ function PT_DeleteFromToS3($filename, $config = array()) {
 
     if ($pt->config->amazone_s3_2 == 1 && $pt->config->backblaze_storage == 'off' && $pt->config->live_video == 1 && !empty($pt->config->region_2) && !empty($pt->config->amazone_s3_key_2)) {
         include_once('assets/libs/s3-lib/vendor/autoload.php');
-        $s3 = new S3Client(array(
-                'version' => 'latest',
-                'endpoint' => 'https://s3.' . $pt->config->region_2,
-                'region' => $pt->config->region_2,
-                'credentials' => array(
-                    'key' => $pt->config->amazone_s3_key_2,
-                    'secret' => $pt->config->amazone_s3_s_key_2
-                )
-            ));
+        $s3 = PT_StorageS3Client('https://s3.' . $pt->config->region_2, $pt->config->region_2, $pt->config->amazone_s3_key_2, $pt->config->amazone_s3_s_key_2);
         $s3->deleteObject(array(
             'Bucket' => $pt->config->bucket_name_2,
             'Key' => $filename

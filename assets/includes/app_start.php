@@ -583,7 +583,7 @@ if ($pt->config->filesVersion != $pt->config->version) {
     error_reporting(0);
 }
 $pt->page_url_ = PT_Link('');
-$pt->remoteStorage = ($pt->config->s3_upload == 'on' || $pt->config->ftp_upload == 'on' || $pt->config->spaces == 'on' || $pt->config->wasabi_storage == 'on' || $pt->config->backblaze_storage == 'on' || $pt->config->cloud_upload == 'on' || $pt->config->yandex_storage == 'on' || $pt->config->azure_blob_storage == 'on') ? true : false;
+$pt->remoteStorage = PT_RemoteStorageActive();
 try {
     $pt->pro_packages       = GetAllProInfo();
 } catch (\Throwable $th) {

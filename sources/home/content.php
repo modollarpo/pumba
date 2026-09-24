@@ -273,16 +273,16 @@ $pt->video_720 = 0;
 if ($pt->config->ffmpeg_system == 'on') {
     $explode_video = explode('_video', $get_video->video_location);
     if ($get_video->{"240p"} == 1) {
-        $pt->video_240 = $explode_video[0] . '_video_240p_converted.mp4';
+        $pt->video_240 = PT_QualityVideoUrl($explode_video[0], '240');
     }
     if ($get_video->{"360p"} == 1) {
-        $pt->video_360 = $explode_video[0] . '_video_360p_converted.mp4';
+        $pt->video_360 = PT_QualityVideoUrl($explode_video[0], '360');
     }
     if ($get_video->{"480p"} == 1) {
-        $pt->video_480 = $explode_video[0] . '_video_480p_converted.mp4';
+        $pt->video_480 = PT_QualityVideoUrl($explode_video[0], '480');
     }
     if ($get_video->{"720p"} == 1) {
-        $pt->video_720 = $explode_video[0] . '_video_720p_converted.mp4';
+        $pt->video_720 = PT_QualityVideoUrl($explode_video[0], '720');
     }
 }
 

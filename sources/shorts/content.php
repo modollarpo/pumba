@@ -126,25 +126,25 @@ foreach ($videos as $key => $value) {
 		if ($pt->config->ffmpeg_system == 'on') {
 			$explode_video = explode('_video', $get_video->video_location);
 			if ($get_video->{"240p"} == 1) {
-		        $pt->video_240 = $explode_video[0] . '_video_shorts_240p_converted.mp4';
+		        $pt->video_240 = PT_QualityVideoUrl($explode_video[0], '240', 'shorts');
 		    }
 		    if ($get_video->{"360p"} == 1) {
-		        $pt->video_360 = $explode_video[0] . '_video_shorts_360p_converted.mp4';
+		        $pt->video_360 = PT_QualityVideoUrl($explode_video[0], '360', 'shorts');
 		    }
 		    if ($get_video->{"480p"} == 1) {
-		        $pt->video_480 = $explode_video[0] . '_video_shorts_480p_converted.mp4';
+		        $pt->video_480 = PT_QualityVideoUrl($explode_video[0], '480', 'shorts');
 		    }
 		    if ($get_video->{"720p"} == 1) {
-		        $pt->video_720 = $explode_video[0] . '_video_shorts_720p_converted.mp4';
+		        $pt->video_720 = PT_QualityVideoUrl($explode_video[0], '720', 'shorts');
 		    }
 		    if ($get_video->{"1080p"} == 1) {
-		        $pt->video_1080 = $explode_video[0] . '_video_shorts_1080p_converted.mp4';
+		        $pt->video_1080 = PT_QualityVideoUrl($explode_video[0], '1080', 'shorts');
 		    }
 		    if ($get_video->{"4096p"} == 1) {
-		        $pt->video_4096 = $explode_video[0] . '_video_shorts_4096p_converted.mp4';
+		        $pt->video_4096 = PT_QualityVideoUrl($explode_video[0], '4096', 'shorts');
 		    }
 		    if ($get_video->{"2048p"} == 1) {
-		        $pt->video_2048 = $explode_video[0] . '_video_shorts_2048p_converted.mp4';
+		        $pt->video_2048 = PT_QualityVideoUrl($explode_video[0], '2048', 'shorts');
 		    }
 		}
 		$video_type = 'video/mp4';

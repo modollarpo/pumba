@@ -830,14 +830,7 @@ if ($first == 'backup') {
 
 if ($first == 'testS3') {
     try {
-        $s3Client = S3Client::factory(array(
-            'version' => 'latest',
-            'region' => $pt->config->region,
-            'credentials' => array(
-                'key' => $pt->config->amazone_s3_key,
-                'secret' => $pt->config->amazone_s3_s_key
-            )
-        ));
+        $s3Client = PT_StorageS3Client('', $pt->config->region, $pt->config->amazone_s3_key, $pt->config->amazone_s3_s_key);
 
         $buckets  = $s3Client->listBuckets();
         if (!empty($buckets)) {
