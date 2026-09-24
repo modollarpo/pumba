@@ -5285,3 +5285,316 @@ function checkIfVideoSort($youtube_time) {
     $total_seconds = $start->getTimestamp();
     return ($total_seconds < 62);
 }
+
+function PT_ProcessQueueVideo($queue_item)
+{
+    global $pt, $db;
+
+    // Nothing to do when handed an empty/invalid queue row.
+    if (empty($queue_item) || empty($queue_item->id) || empty($queue_item->video_id)) {
+        return array('status' => 'skipped', 'message' => 'empty queue item');
+    }
+
+    // Atomically claim the row so two workers (or cron + worker) can't encode
+    // the same video at once. Rows already claimed stay untouched until the
+    // owner deletes them.
+    $db->rawQuery("UPDATE " . T_QUEUE . " SET `processing` = 1 WHERE `id` = " . (int) $queue_item->id . " AND `processing` = 0");
+    if ((int) $db->count == 0) {
+        return array('status' => 'skipped', 'message' => 'already processing');
+    }
+
+    $video = $db->where("id", (int) $queue_item->video_id)->getOne(T_VIDEOS);
+    if (empty($video)) {
+        $db->where("video_id", (int) $queue_item->video_id)->delete(T_QUEUE);
+        return array('status' => 'skipped', 'message' => 'video missing');
+    }
+
+    $video_id = $video->id;
+
+    // turnOffVideoQuality() mutates $pt->config permanently; snapshot the
+    // quality flags so a long-running worker doesn't leak one video's state
+    // into the next.
+    $quality_flags = array('p4096', 'p2048', 'p1080', 'p720', 'p480', 'p360', 'p240');
+    $quality_snapshot = array();
+    foreach ($quality_flags as $flag) {
+        $quality_snapshot[$flag] = (isset($pt->config->{$flag})) ? $pt->config->{$flag} : 'on';
+    }
+
+    try {
+        $video_res      = $queue_item->video_res;
+        $ffmpeg_b       = $pt->config->ffmpeg_binary_file;
+        $filepath       = explode(".", $video->video_location)[0];
+        $full_dir       = dirname(__DIR__, 2);
+        $video_file_full_path = $full_dir . "/" . $video->video_location;
+
+        $video_time     = '';
+        $demo_video     = '';
+        $gif_video      = '';
+        $gif_time       = 3;
+        $gif_video_time = '-t ' . $gif_time . '  -async 1';
+        $have_demo      = false;
+        if ($pt->config->demo_video == 'on' && !empty($video->sell_video)) {
+            $getID3  = new getID3;
+            $analyze = $getID3->analyze($video_file_full_path);
+            if (!empty($analyze) && empty($analyze['error']) && !empty($analyze['playtime_seconds']) && $analyze['playtime_seconds'] > 0) {
+                $video_time = round((10 * round($analyze['playtime_seconds'], 0)) / 100, 0);
+                $video_time = '-t ' . $video_time . '  -async 1';
+                $have_demo  = true;
+            }
+        }
+
+        if ($pt->config->gif_system == 'on') {
+            $gif_video = substr($filepath, 0, strpos($filepath, '_video') - 10) . sha1(time()) . "_small_video_.gif";
+            $shell     = shell_exec("$ffmpeg_b $gif_video_time -y -i $video_file_full_path " . $full_dir . '/' . $gif_video);
+            PT_UploadToS3($gif_video);
+            $db->where('id', $video->id);
+            $db->update(T_VIDEOS, array(
+                'gif' => $gif_video
+            ));
+        }
+
+        if ($video->is_short == 1) {
+            turnOffVideoQuality($video_res);
+        }
+
+        if ($pt->config->p240 == "on") {
+            $video_output_full_path_240 = $full_dir . "/" . $filepath . "_240p_converted.mp4";
+
+            convertVideoUsingFFMPEG(array(
+                'ffmpeg_b' => $ffmpeg_b,
+                'video_file_full_path' => $video_file_full_path,
+                'video_output_full_path' => $video_output_full_path_240,
+                'filepath' => $filepath . "_240p_converted.mp4",
+                'video_id' => $video->id,
+                'scale' => 426,
+                'col' => '240p',
+            ));
+
+            if ($pt->config->demo_video == 'on' && empty($demo_video) && $have_demo == true) {
+                $demo_video = substr($filepath, 0, strpos($filepath, '_video') - 10) . sha1(time()) . "_video_240p_demo.mp4";
+
+                createDemoVideo(array(
+                    'ffmpeg_b' => $ffmpeg_b,
+                    'video_time' => $video_time,
+                    'video_file_full_path' => $video_file_full_path,
+                    'demo_video_full_path' => $full_dir . "/" . $demo_video,
+                    'demo_video' => $demo_video,
+                    'video_id' => $video->id,
+                    'scale' => 426,
+                ));
+            }
+        }
+
+        if ($video->is_stock == 1) {
+            $water = $full_dir . "/themes/youplay/img/icon.png";
+            $demo_video = substr($filepath, 0, strpos($filepath, '_video') - 10) . sha1(time()) . "_video_demo.mp4";
+
+            createDemoSellVideo(array(
+                'ffmpeg_b' => $ffmpeg_b,
+                'video_file_full_path' => $video_file_full_path,
+                'water' => $water,
+                'demo_video' => $demo_video,
+                'video_id' => $video->id,
+            ));
+        }
+
+        if ($video_res >= 3840 && $pt->config->p4096 == "on") {
+            $video_output_full_path_4096 = $full_dir . "/" . $filepath . "_4096p_converted.mp4";
+
+            convertVideoUsingFFMPEG(array(
+                'ffmpeg_b' => $ffmpeg_b,
+                'video_file_full_path' => $video_file_full_path,
+                'video_output_full_path' => $video_output_full_path_4096,
+                'filepath' => $filepath . "_4096p_converted.mp4",
+                'video_id' => $video->id,
+                'scale' => 3840,
+                'col' => '4096p',
+            ));
+
+            if ($pt->config->demo_video == 'on' && empty($demo_video) && $have_demo == true) {
+                $demo_video = substr($filepath, 0, strpos($filepath, '_video') - 10) . sha1(time()) . "_video_4096p_demo.mp4";
+
+                createDemoVideo(array(
+                    'ffmpeg_b' => $ffmpeg_b,
+                    'video_time' => $video_time,
+                    'video_file_full_path' => $video_file_full_path,
+                    'demo_video_full_path' => $full_dir . "/" . $demo_video,
+                    'demo_video' => $demo_video,
+                    'video_id' => $video->id,
+                    'scale' => 3840,
+                ));
+            }
+
+            if ($pt->config->gif_system == 'on' && empty($gif_video)) {
+                $gif_video = substr($filepath, 0, strpos($filepath, '_video') - 10) . sha1(time()) . "_video_4096p_gif.mp4";
+
+                createGifVideo(array(
+                    'ffmpeg_b' => $ffmpeg_b,
+                    'gif_video_time' => $gif_video_time,
+                    'video_file_full_path' => $video_file_full_path,
+                    'gif_video_full_path' => $full_dir . "/" . $gif_video,
+                    'video_id' => $video->id,
+                ));
+            }
+        }
+
+        if ($video_res >= 2048 && $pt->config->p2048 == "on") {
+            $video_output_full_path_2048 = $full_dir . "/" . $filepath . "_2048p_converted.mp4";
+
+            convertVideoUsingFFMPEG(array(
+                'ffmpeg_b' => $ffmpeg_b,
+                'video_file_full_path' => $video_file_full_path,
+                'video_output_full_path' => $video_output_full_path_2048,
+                'filepath' => $filepath . "_2048p_converted.mp4",
+                'video_id' => $video->id,
+                'scale' => 2048,
+                'col' => '2048p',
+            ));
+
+            if ($pt->config->demo_video == 'on' && empty($demo_video) && $have_demo == true) {
+                $demo_video = substr($filepath, 0, strpos($filepath, '_video') - 10) . sha1(time()) . "_video_2048p_demo.mp4";
+
+                createDemoVideo(array(
+                    'ffmpeg_b' => $ffmpeg_b,
+                    'video_time' => $video_time,
+                    'video_file_full_path' => $video_file_full_path,
+                    'demo_video_full_path' => $full_dir . "/" . $demo_video,
+                    'demo_video' => $demo_video,
+                    'video_id' => $video->id,
+                    'scale' => 2048,
+                ));
+            }
+        }
+
+        if (($video_res >= 1920 || $video_res == 0) && $pt->config->p1080 == "on") {
+            $video_output_full_path_1080 = $full_dir . "/" . $filepath . "_1080p_converted.mp4";
+
+            convertVideoUsingFFMPEG(array(
+                'ffmpeg_b' => $ffmpeg_b,
+                'video_file_full_path' => $video_file_full_path,
+                'video_output_full_path' => $video_output_full_path_1080,
+                'filepath' => $filepath . "_1080p_converted.mp4",
+                'video_id' => $video->id,
+                'scale' => 1920,
+                'col' => '1080p',
+            ));
+
+            if ($pt->config->demo_video == 'on' && empty($demo_video) && $have_demo == true) {
+                $demo_video = substr($filepath, 0, strpos($filepath, '_video') - 10) . sha1(time()) . "_video_1080p_demo.mp4";
+
+                createDemoVideo(array(
+                    'ffmpeg_b' => $ffmpeg_b,
+                    'video_time' => $video_time,
+                    'video_file_full_path' => $video_file_full_path,
+                    'demo_video_full_path' => $full_dir . "/" . $demo_video,
+                    'demo_video' => $demo_video,
+                    'video_id' => $video->id,
+                    'scale' => 1920,
+                ));
+            }
+        }
+
+        if (($video_res >= 1280 || $video_res == 0) && $pt->config->p720 == "on") {
+            $video_output_full_path_720 = $full_dir . "/" . $filepath . "_720p_converted.mp4";
+
+            convertVideoUsingFFMPEG(array(
+                'ffmpeg_b' => $ffmpeg_b,
+                'video_file_full_path' => $video_file_full_path,
+                'video_output_full_path' => $video_output_full_path_720,
+                'filepath' => $filepath . "_720p_converted.mp4",
+                'video_id' => $video->id,
+                'scale' => 1280,
+                'col' => '720p',
+            ));
+
+            if ($pt->config->demo_video == 'on' && empty($demo_video) && $have_demo == true) {
+                $demo_video = substr($filepath, 0, strpos($filepath, '_video') - 10) . sha1(time()) . "_video_720p_demo.mp4";
+
+                createDemoVideo(array(
+                    'ffmpeg_b' => $ffmpeg_b,
+                    'video_time' => $video_time,
+                    'video_file_full_path' => $video_file_full_path,
+                    'demo_video_full_path' => $full_dir . "/" . $demo_video,
+                    'demo_video' => $demo_video,
+                    'video_id' => $video->id,
+                    'scale' => 1280,
+                ));
+            }
+        }
+
+        if (($video_res >= 854 || $video_res == 0) && $pt->config->p480 == "on") {
+            $video_output_full_path_480 = $full_dir . "/" . $filepath . "_480p_converted.mp4";
+
+            convertVideoUsingFFMPEG(array(
+                'ffmpeg_b' => $ffmpeg_b,
+                'video_file_full_path' => $video_file_full_path,
+                'video_output_full_path' => $video_output_full_path_480,
+                'filepath' => $filepath . "_480p_converted.mp4",
+                'video_id' => $video->id,
+                'scale' => 854,
+                'col' => '480p',
+            ));
+
+            if ($pt->config->demo_video == 'on' && empty($demo_video) && $have_demo == true) {
+                $demo_video = substr($filepath, 0, strpos($filepath, '_video') - 10) . sha1(time()) . "_video_480p_demo.mp4";
+
+                createDemoVideo(array(
+                    'ffmpeg_b' => $ffmpeg_b,
+                    'video_time' => $video_time,
+                    'video_file_full_path' => $video_file_full_path,
+                    'demo_video_full_path' => $full_dir . "/" . $demo_video,
+                    'demo_video' => $demo_video,
+                    'video_id' => $video->id,
+                    'scale' => 854,
+                ));
+            }
+        }
+
+        if (($video_res >= 640 || $video_res == 0) && $pt->config->p360 == "on") {
+            $video_output_full_path_360 = $full_dir . "/" . $filepath . "_360p_converted.mp4";
+
+            convertVideoUsingFFMPEG(array(
+                'ffmpeg_b' => $ffmpeg_b,
+                'video_file_full_path' => $video_file_full_path,
+                'video_output_full_path' => $video_output_full_path_360,
+                'filepath' => $filepath . "_360p_converted.mp4",
+                'video_id' => $video->id,
+                'scale' => 640,
+                'col' => '360p',
+            ));
+
+            if ($pt->config->demo_video == 'on' && empty($demo_video) && $have_demo == true) {
+                $demo_video = substr($filepath, 0, strpos($filepath, '_video') - 10) . sha1(time()) . "_video_360p_demo.mp4";
+
+                createDemoVideo(array(
+                    'ffmpeg_b' => $ffmpeg_b,
+                    'video_time' => $video_time,
+                    'video_file_full_path' => $video_file_full_path,
+                    'demo_video_full_path' => $full_dir . "/" . $demo_video,
+                    'demo_video' => $demo_video,
+                    'video_id' => $video->id,
+                    'scale' => 640,
+                ));
+            }
+        }
+
+        if (file_exists($video->video_location)) {
+            unlink($video->video_location);
+        }
+        $db->where("video_id", $video->id)->delete(T_QUEUE);
+        pt_push_channel_notifiations($video_id);
+
+        return array('status' => 'ok', 'video_id' => (int) $video_id);
+    } catch (Exception $e) {
+        $db->where("video_id", $video_id)->delete(T_QUEUE);
+        if (file_exists($video->video_location)) {
+            unlink($video->video_location);
+        }
+        return array('status' => 'error', 'video_id' => (int) $video_id, 'message' => $e->getMessage());
+    } finally {
+        // Restore quality flags so one video's state never poisons the next.
+        foreach ($quality_snapshot as $flag => $value) {
+            $pt->config->{$flag} = $value;
+        }
+    }
+}

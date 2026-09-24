@@ -17,8 +17,9 @@ built-in `ZipArchive`.
 
 ## What it does (in order)
 
-1. Bootstraps the app exactly like the web app (`assets/includes/app_start.php`
-   - same `$db` and `$pt->config`). No separate credentials file.
+1. Bootstraps the app through `assets/init.php` + `decryptConfigData()` (the
+   same path `cronjob.php`/`ajax.php` use — same `$db` and `$pt->config`,
+   including the decrypted Azure keys). No separate credentials file.
 2. Pure-PHP DB dump -> `backups/<YYYY-MM-DD>/<date>-playtube-db.sql.gz`
 3. Archives the MediaMTX recordings dir (if `mediamtx_recordings_path` is set)
    into `backups/<YYYY-MM-DD>/<date>-recordings.zip`

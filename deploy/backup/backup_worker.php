@@ -29,9 +29,14 @@ if (PHP_SAPI !== 'cli') {
 define('PT_BACKUP_START', microtime(true));
 
 // ------------------------------------------------------------
-// 1) Bootstrap the app exactly like the web app does
+// 1) Bootstrap the app through assets/init.php (same as cronjob/ajax):
+//    app_start.php must NOT be required directly - it calls PT_GetConfig()
+//    at runtime, which is only defined once functions_one.php is loaded,
+//    and decryptConfigData() is required for the encrypted config keys.
 // ------------------------------------------------------------
-require realpath(__DIR__ . '/../../assets/includes/app_start.php');
+chdir(realpath(__DIR__ . '/../..'));
+require_once './assets/init.php';
+decryptConfigData();
 
 if (empty($pt) || empty($db)) {
     fwrite(STDERR, '[backup] bootstrap failed: no $pt/$db' . PHP_EOL);

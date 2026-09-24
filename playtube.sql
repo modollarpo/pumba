@@ -739,7 +739,9 @@ INSERT INTO `config` (`id`, `name`, `value`) VALUES
 (445, 'azure_blob_cdn', ''),
 (446, 'yt_api_token', ''),
 (447, 'tiktok_api_token', ''),
-(448, 'backup_retention_days', '30');
+(448, 'backup_retention_days', '30'),
+(449, 'import_worker_heartbeat', '0'),
+(450, 'import_worker_interval', '60');
 
 -- --------------------------------------------------------
 

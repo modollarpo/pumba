@@ -51,14 +51,17 @@ INSERT IGNORE INTO config (id, name, value) VALUES
   (443, 'azure_blob_bucket_name', ''),
   (444, 'azure_blob_endpoint', ''),
   (445, 'azure_blob_cdn', ''),
-  (446, 'yt_api_token', ''),
+(446, 'yt_api_token', ''),
   (447, 'tiktok_api_token', ''),
-  (448, 'backup_retention_days', '30');
+  (448, 'backup_retention_days', '30'),
+  (449, 'import_worker_heartbeat', '0'),
+  (450, 'import_worker_interval', '60');
 ```
 
 Row 446/447 are the downloader API tokens — set them to the same value as the `API_TOKEN`
 in each Node `.env` (see Step 3). Row 448 sets how many days of `backups/` blobs the
-backup worker keeps (see `deploy/backup/README.md`).
+backup worker keeps (see `deploy/backup/README.md`). Rows 449-450 are the import/encoding
+worker's heartbeat + resident-loop interval (see `deploy/import/README.md`).
 
 ---
 
@@ -372,6 +375,8 @@ Logs go to `deploy/logs/`. Ctrl+C stops the foreground processes.
 ## 9. Production notes
 
 - **Process managers:** use `systemd` units (Linux) or NSSM/Task Scheduler (Windows) instead of the foreground scripts.
+- **Background queues:** run the import/encoding worker for imports and conversions (`deploy/import/import_worker.php`, see `deploy/import/README.md`). Schedule it with `--once` every minute via cron/Task Scheduler, or run it as a resident loop. Encoding jobs are claimed atomically, so it is safe to run alongside `cronjob.php`. Its per-pass heartbeat lives in config key `import_worker_heartbeat`.
+- **Backups:** run the backup worker daily (`deploy/backup/backup_worker.php`, see `deploy/backup/README.md`) to push an encrypted DB dump + recordings archive to the site's own Azure blob container.
 - **Batch imports / long downloads:** PlayTube already runs with unlimited `max_execution_time`/memory (`app_start.php`), so PHP won't time out, but a reverse proxy (nginx `proxy_read_timeout`, Apache `ProxyTimeout`) still can when a large batch downloads several videos serially. Raise those timeouts (e.g. nginx `proxy_read_timeout 600s`) or import in smaller batches.
 - **ffmpeg:** ensure `ffmpeg` is on the PHP process PATH for uploads/conversion.
 - **Recordings cleanup:** use the built-in retention (see §5) — set *Recordings Retention* in Admin → Live, which prunes old files on admin loads. External cron: `PT_CleanLiveRecordings('./recordings', 7)`.
