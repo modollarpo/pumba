@@ -203,6 +203,24 @@ PT_CleanLiveRecordings('./recordings', 7);
 > service/uptime/`tokenSet` — use it with uptime monitors or a load balancer health check.
 > For YouTube, it also reports the `yt-dlp` binary version (or `unreachable`).
 
+### Downloader API auth (HMAC) ###
+
+The downloader APIs accept request signing instead of a static Bearer token:
+
+- The site (`connect_to_url`) signs every request with
+  `Authorization: HMAC <sig>` plus `X-Auth-Timestamp` (unix seconds) and
+  `X-Auth-Nonce` (random hex). `sig` = HMAC-SHA256(API_TOKEN,
+  `METHOD + SP + path?query + LF + timestamp + LF + nonce`).
+
+- The API rejects requests whose timestamp is older/newer than 5 minutes and
+  replays of the same nonce, so a captured request cannot be re-sent.
+
+- Plain `Authorization: Bearer` (or `?token=` / `x-api-token`) still works as a
+  fallback, so old clients keep functioning during rollout.
+
+- Both sides must be within 5 minutes of each other (NTP). If requests start
+  returning 401, check clock skew between the PHP host and the Node host.
+
 > If PlayTube and the Node APIs run on separate machines, use the LAN/server IP instead of
 > `127.0.0.1` and make sure CORS/visibility allows PHP's `connect_to_url()` to reach them.
 

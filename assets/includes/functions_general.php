@@ -1164,7 +1164,25 @@ function connect_to_url($url = '', $config = array()) {
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $config['POST']);
     }
-    if (!empty($config['bearer'])) {
+    if (!empty($config['hmac'])) {
+        // HMAC-signed request: secret never travels on the wire. The caller
+        // provides the shared secret via $config['hmac']; a short-lived
+        // signature (timestamp + nonce) is derived per-request instead of a
+        // static Bearer token, so a captured request cannot be replayed or
+        // reused to mint new ones. See the downloader APIs' authRequired().
+        $ts     = time();
+        $nonce  = bin2hex(random_bytes(8));
+        $p      = parse_url($url);
+        $path   = isset($p['path']) ? $p['path'] : '/';
+        $query  = isset($p['query']) ? $p['query'] : '';
+        $raw    = 'GET ' . $path . ($query !== '' ? '?' . $query : '') . "\n" . $ts . "\n" . $nonce;
+        $sig    = hash_hmac('sha256', $raw, (string) $config['hmac']);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+            'Authorization: HMAC ' . $sig,
+            'X-Auth-Timestamp: ' . $ts,
+            'X-Auth-Nonce: ' . $nonce
+        ));
+    } elseif (!empty($config['bearer'])) {
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(
             'Authorization: Bearer ' . $config['bearer']
         ));

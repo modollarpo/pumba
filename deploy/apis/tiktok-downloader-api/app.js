@@ -29,8 +29,44 @@ function clientKey(req) {
     return (ip || 'unknown').toLowerCase();
 }
 
+// --- HMAC request signing (preferred) with Bearer fallback ----------------
+// The PlayTube site signs each request with a per-request HMAC
+// (Authorization: HMAC <sig>, X-Auth-Timestamp, X-Auth-Nonce) derived from
+// API_TOKEN, so the raw token never travels on the wire. A timestamp window
+// (+-5 min) plus a nonce replay cache block captured-request re-use.
+const AUTH_CLOCK_SKEW_MS = 5 * 60 * 1000;
+const seenNonces = new Map();
+
+function hmacSig(req) {
+    const ts = String(req.get('x-auth-timestamp') || '').trim();
+    const nonce = String(req.get('x-auth-nonce') || '').trim();
+    if (!/^\d{9,11}$/.test(ts) || !/^[0-9a-f]{8,64}$/.test(nonce)) return null;
+    if (Math.abs(Date.now() - parseInt(ts, 10) * 1000) > AUTH_CLOCK_SKEW_MS) return null;
+    if (seenNonces.has(nonce)) return null; // replay
+    // bind signature to method + path + query exactly as received
+    const raw = req.method + ' ' + req.originalUrl + '\n' + ts + '\n' + nonce;
+    const sig = crypto.createHmac('sha256', API_TOKEN).update(raw, 'utf8').digest('hex');
+    seenNonces.set(nonce, Date.now());
+    if (seenNonces.size > 20000) {
+        for (const [k, v] of seenNonces) {
+            if (Date.now() - v > AUTH_CLOCK_SKEW_MS) seenNonces.delete(k);
+        }
+    }
+    return sig;
+}
+
 function authRequired(req, res, next) {
-    let token = String(req.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
+    const header = String(req.get('authorization') || '');
+    if (header.startsWith('HMAC ')) {
+        const provided = header.slice(5).trim();
+        const expected = hmacSig(req);
+        if (!API_TOKEN || !expected || !safeTokenEquals(provided, expected)) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+        return next();
+    }
+    // backward-compatible fallback: plain Bearer / query / header token
+    let token = header.replace(/^Bearer\s+/i, '').trim();
     if (!token && req.query.token) token = String(req.query.token).trim();
     if (!token && req.get('x-api-token')) token = String(req.get('x-api-token')).trim();
     if (!API_TOKEN || !safeTokenEquals(token, API_TOKEN)) {

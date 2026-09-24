@@ -188,7 +188,7 @@ if (!empty($_POST['link'])) {
 	    		if (empty($yt_api_url)) {
 	    			throw new Exception('YouTube API URL is not configured.');
 	    		}
-	    		$api_response = connect_to_url($yt_api_url . '/api/video/info?id=' . rawurlencode($re_data['youtube']), array('bearer' => (isset($pt->config->yt_api_token) ? $pt->config->yt_api_token : '')));
+	    		$api_response = connect_to_url($yt_api_url . '/api/video/info?id=' . rawurlencode($re_data['youtube']), array('hmac' => (isset($pt->config->yt_api_token) ? $pt->config->yt_api_token : '')));
 	    		$get_videos = (!empty($api_response)) ? json_decode($api_response) : null;
 	    		if (empty($get_videos) || empty($get_videos->success)) {
 	    			throw new Exception((!empty($get_videos->message)) ? $get_videos->message : 'Could not load video.');
