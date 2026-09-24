@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0",
+  "parameters": {
+    "location": { "value": "eastus" },
+    "environment": { "value": "free" },
+    "customer": { "value": "storegrill" },
+    "playtubeImage": { "value": "playtube/playtube:latest" },
+    "ytApiImage": { "value": "playtube/yt-api:latest" },
+    "ttApiImage": { "value": "playtube/tt-api:latest" },
+    "sqlAdminUser": { "value": "playtube_admin" },
+    "sqlAdminPassword": { "value": "" },
+    "sqlDbName": { "value": "playtube" },
+    "mysqlAllowedIps": { "value": [] },
+    "ytApiKey": { "value": "" },
+    "ytApiToken": { "value": "" },
+    "ttApiToken": { "value": "" },
+    "siteUrl": { "value": "" },
+    "purchaseCode": { "value": "" },
+    "deployVm": { "value": false },
+    "vmAdminUser": { "value": "playtube" },
+    "vmAdminSshPublicKey": { "value": "" }
+  }
+}
