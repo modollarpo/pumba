@@ -17,3 +17,8 @@ logs
 .htaccess.user
 composer.lock
 .env
+# Prebuilt binary is 47MB; the Dockerfile installs ffmpeg via apt instead.
+assets/libs/ffmpeg
+assets/libs/social-login/composer.phar
+**/*.js.map
+**/*.map

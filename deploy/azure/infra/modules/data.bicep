@@ -15,8 +15,11 @@ param mysqlAllowedIps array = []
 
 param mediaContainerName string
 
-var sqlServerName = 'mysql-${customer}-${environment}'
-var storageName = 'st${customer}${environment}'
+@description('Optional unique suffix appended to resource names (use when a stale ARM record blocks the default name in another region).')
+param nameSuffix string = ''
+
+var sqlServerName = 'mysql-${customer}-${environment}${nameSuffix}'
+var storageName = 'st${customer}${environment}${nameSuffix}'
 
 resource mysql 'Microsoft.DBforMySQL/flexibleServers@2022-01-01' = {
   name: sqlServerName

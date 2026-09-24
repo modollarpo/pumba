@@ -12,6 +12,7 @@ targetScope = 'resourceGroup'
 @allowed([
   'eastus'
   'eastus2'
+  'centralus'
   'westus'
   'westus2'
   'westus3'
@@ -34,13 +35,19 @@ param customer string = 'storegrill'
 
 // --- App Service containers (one F1 Linux plan, three apps) ------------------
 
-@description('Docker Hub image for the PlayTube PHP app.')
+@description('Existing ACR holding the container images (playtubeacrfree).')
+param registryName string = 'playtubeacrfree'
+
+@description('Full image ref for the PlayTube PHP app in ACR (unused unless usePlaytubeContainer is set).')
 param playtubeImage string = 'playtube/playtube:latest'
 
-@description('Docker Hub image for the YouTube downloader API.')
+@description('When true, run the PHP app as a container; default false = built-in PHP 8.2 runtime (avoids uploading the 266MB PHP context to ACR).')
+param usePlaytubeContainer bool = false
+
+@description('YouTube downloader API image (repository:tag) in ACR.')
 param ytApiImage string = 'playtube/yt-api:latest'
 
-@description('Docker Hub image for the TikTok downloader API.')
+@description('TikTok downloader API image (repository:tag) in ACR.')
 param ttApiImage string = 'playtube/tt-api:latest'
 
 // --- MySQL Flexible Server (B1ms, 12-month free) -----------------------------
@@ -98,6 +105,9 @@ param mediaContainerName string = 'media'
 @description('Enable the free-consumption Function timer that calls cronjob.php (needed for imports/encode on F1).')
 param deployCron bool = true
 
+@description('Optional unique suffix appended to data resource names (avoids stale ARM name conflicts after a failed regional deploy).')
+param dataNameSuffix string = ''
+
 module data 'modules/data.bicep' = {
   name: 'data'
   params: {
@@ -108,6 +118,7 @@ module data 'modules/data.bicep' = {
     sqlAdminPassword: sqlAdminPassword
     mysqlAllowedIps: mysqlAllowedIps
     mediaContainerName: mediaContainerName
+    nameSuffix: dataNameSuffix
   }
 }
 
@@ -118,8 +129,12 @@ module appsvc 'modules/appservice.bicep' = {
     environment: environment
     customer: customer
     playtubeImage: playtubeImage
+    usePlaytubeContainer: usePlaytubeContainer
     ytApiImage: ytApiImage
     ttApiImage: ttApiImage
+    registryServer: acr.outputs.loginServer
+    registryUsername: acr.outputs.username
+    registryPassword: acr.outputs.password
     sqlHost: data.outputs.sqlHost
     sqlAdminUser: sqlAdminUser
     sqlAdminPassword: sqlAdminPassword
@@ -129,6 +144,13 @@ module appsvc 'modules/appservice.bicep' = {
     ytApiKey: ytApiKey
     ytApiToken: ytApiToken
     ttApiToken: ttApiToken
+  }
+}
+
+module acr 'modules/acr.bicep' = {
+  name: 'acr'
+  params: {
+    registryName: registryName
   }
 }
 
