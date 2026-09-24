@@ -49,11 +49,11 @@ Reuses the existing Azure settings; only the retention key may be new:
 | `mediamtx_recordings_path`   | recordings dir to archive                  |         |
 | `backup_retention_days`      | how many days of `backups/` blobs to keep  | 30      |
 
-Add `backup_retention_days` to the config table with the other seeds if you
-want something other than 30 days:
+`backup_retention_days` is already seeded with the other config rows in
+`playtube.sql`. To change it later:
 
 ```sql
-INSERT INTO `config` (`config_name`, `config_value`) VALUES ('backup_retention_days', '30');
+UPDATE `config` SET `value` = '60' WHERE `name` = 'backup_retention_days';
 ```
 
 (MediaMTX live-recording retention is handled by the existing

@@ -42,8 +42,23 @@ For an already-installed site, insert the new rows manually:
 ```sql
 INSERT IGNORE INTO config (id, name, value) VALUES
   (436, 'yt_api_url', ''),
-  (437, 'tiktok_api_url', '');
+  (437, 'tiktok_api_url', ''),
+  (438, 'mediamtx_auth_secret', ''),
+  (439, 'mediamtx_recordings_retention', '7'),
+  (440, 'azure_blob_storage', 'off'),
+  (441, 'azure_blob_account', ''),
+  (442, 'azure_blob_secret', ''),
+  (443, 'azure_blob_bucket_name', ''),
+  (444, 'azure_blob_endpoint', ''),
+  (445, 'azure_blob_cdn', ''),
+  (446, 'yt_api_token', ''),
+  (447, 'tiktok_api_token', ''),
+  (448, 'backup_retention_days', '30');
 ```
+
+Row 446/447 are the downloader API tokens — set them to the same value as the `API_TOKEN`
+in each Node `.env` (see Step 3). Row 448 sets how many days of `backups/` blobs the
+backup worker keeps (see `deploy/backup/README.md`).
 
 ---
 
