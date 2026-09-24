@@ -106,6 +106,10 @@ cd deploy/apis/tiktok-downloader-api
 npm install      # installs Puppeteer (downloads Chromium on first run)
 ```
 
+> If you only need the auth/quota contract (not actual TikTok scraping), the
+> auth middleware needs no browser — install without the Chromium download:
+> `PUPPETEER_SKIP_DOWNLOAD=1 npm install puppeteer-core@23.5.0`.
+
 No `.env` is required. Default `PORT=3000`; override with an environment variable if it collides.
 
 Start:
@@ -293,6 +297,10 @@ timestamp variants are rejected. Requires PHP's curl ext:
 ```bash
 PORT=3100 TOKEN=test-secret php deploy/tests/hmac-php-runtime-test.php
 ```
+
+Both test files work against either API (point `PORT` at the YouTube or TikTok
+app). The full contract — auth, quota, replay, and PHP↔Node signing — has been
+runtime-verified against both services.
 
 ---
 
