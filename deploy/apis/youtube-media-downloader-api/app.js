@@ -135,11 +135,13 @@ function failAuth(req, res) {
 }
 
 // Static /files (downloaded media served to the site for playback) and the
-// /health probe stay public; everything else is rate-limited + token gated.
+// /health probe stay public; everything else is token gated + rate-limited
+// per identity. Auth runs first so req.authToken is set before rateLimiter
+// buckets by it (per-token quota); failAuth independently throttles bad creds.
 app.use((req, res, next) => {
     const p = String(req.path);
     if (p.startsWith('/files') || p.startsWith('/health')) return next();
-    rateLimiter(req, res, () => authRequired(req, res, next));
+    authRequired(req, res, () => rateLimiter(req, res, next));
 });
 
 const API_KEY = process.env.YOUTUBE_API_KEY;

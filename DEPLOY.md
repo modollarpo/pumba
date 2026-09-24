@@ -265,6 +265,25 @@ With this, the primary consumer gets 120 requests/min, the importer bot 30/min,
 and both are isolated from each other. HMAC signing always uses `API_TOKEN`
 (both sides must match); extra `API_TOKENS` authenticate via Bearer fallback.
 
+> **Order matters:** the API authenticates *first* so per-token buckets are keyed
+> by the caller's identity, then rate-limits. The brute-force guard
+> (`AUTH_FAIL_LIMIT`) throttles bad credentials independently.
+
+#### Runtime auth/quota test
+
+`deploy/tests/auth-quota-e2e.mjs` verifies the auth + quota contract against a
+live API (no upstream needed). Start the API with a test token, then:
+
+```bash
+PORT=3100 TOKEN=test-secret QUOTED_TOKEN=bot npm start &
+PORT=3100 TOKEN=test-secret QUOTED_TOKEN=bot node deploy/tests/auth-quota-e2e.mjs
+```
+
+It asserts: valid HMAC passes auth, wrong signature / stale+future timestamps /
+empty nonce / missing headers are rejected, a replayed nonce is rejected, and
+(when `QUOTED_TOKEN` is set) that token hits 429 after its quota while the
+primary token stays unthrottled. Exit 0 = pass.
+
 ---
 
 ## 7. Smoke Test (all-in-one)
