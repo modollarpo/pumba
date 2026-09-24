@@ -284,6 +284,16 @@ empty nonce / missing headers are rejected, a replayed nonce is rejected, and
 (when `QUOTED_TOKEN` is set) that token hits 429 after its quota while the
 primary token stays unthrottled. Exit 0 = pass.
 
+`deploy/tests/hmac-php-runtime-test.php` does the same check but from the other
+side of the contract: it reproduces the exact signing that the PHP site's
+`connect_to_url()` `hmac` branch produces (including a URL-encoded query) and
+asserts the Node API accepts it, while tampered signature / empty nonce / stale
+timestamp variants are rejected. Requires PHP's curl ext:
+
+```bash
+PORT=3100 TOKEN=test-secret php deploy/tests/hmac-php-runtime-test.php
+```
+
 ---
 
 ## 7. Smoke Test (all-in-one)
