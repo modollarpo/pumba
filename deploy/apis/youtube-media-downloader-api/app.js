@@ -231,13 +231,17 @@ async function doSearch({ query, channelId, limit, pageToken }) {
 // API route to fetch videos from a YouTube channel
 app.get('/api/channel/videos', async (req, res) => {
     const { channelId, sortBy } = req.query;
+    const chId = String(channelId || '').trim();
+    if (!chId) {
+        return res.status(400).json({ success: false, message: 'channelId is required' });
+    }
     const apiKey = process.env.YOUTUBE_API_KEY;
 
     try {
         const response = await axios.get(`${GOOGLE}/search`, {
             params: {
                 part: 'snippet',
-                channelId: channelId,
+                channelId: chId,
                 order: sortBy || 'date',
                 key: apiKey
             }
@@ -245,17 +249,22 @@ app.get('/api/channel/videos', async (req, res) => {
 
         res.json({ success: true, data: response.data });
     } catch (error) {
-        res.json({ success: false, message: 'Error fetching videos', error: error.message });
+        res.status(500).json({ success: false, message: 'Error fetching videos', error: error.message });
     }
 });
 
 app.get('/api/videos/search', async (req, res) => {
     try {
         const { query, channelId, limit, pageToken } = req.query;
-        const isChannel = !!(channelId && !query);
+        const q = String(query || '').trim();
+        const cid = String(channelId || '').trim();
+        if (!q && !cid) {
+            return res.status(400).json({ success: false, message: 'query or channelId is required' });
+        }
+        const isChannel = !!(cid && !q);
         const out = await doSearch({
-            query: isChannel ? undefined : (query || ''),
-            channelId: isChannel ? channelId : undefined,
+            query: isChannel ? undefined : q,
+            channelId: isChannel ? cid : undefined,
             limit,
             pageToken
         });

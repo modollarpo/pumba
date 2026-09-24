@@ -302,6 +302,20 @@ Both test files work against either API (point `PORT` at the YouTube or TikTok
 app). The full contract — auth, quota, replay, and PHP↔Node signing — has been
 runtime-verified against both services.
 
+`deploy/tests/api-error-paths-e2e.mjs` asserts the error path for the YouTube
+API: every route returns `400 { success: false }` when its required param is
+missing (`id`, `channelId`, `query`), and a traversal-shaped id is sanitized
+(stripped to a safe token) instead of reaching the filesystem. Run it like the
+auth test — it needs only an up API, no upstream key. (It also documents the
+required-param validation rules the API enforces: `/api/channel/videos` 400s
+without `channelId`, `/api/videos/search` 400s without `query`/`channelId` —
+matching the `id` validation already on `/api/video/info` and
+`/api/video/download`.)
+
+```bash
+PORT=3100 TOKEN=test-secret node deploy/tests/api-error-paths-e2e.mjs
+```
+
 ---
 
 ## 7. Smoke Test (all-in-one)
