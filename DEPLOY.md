@@ -325,7 +325,7 @@ Logs go to `deploy/logs/`. Ctrl+C stops the foreground processes.
 - **ffmpeg:** ensure `ffmpeg` is on the PHP process PATH for uploads/conversion.
 - **Recordings cleanup:** use the built-in retention (see §5) — set *Recordings Retention* in Admin → Live, which prunes old files on admin loads. External cron: `PT_CleanLiveRecordings('./recordings', 7)`.
 - **Security:** keep `YOUTUBE_API_KEY` and `.env` out of the web root and git (the Node `.gitignore` files already exclude `.env`).
-- **CDN cache invalidation:** with Azure blob storage behind a CDN, set `azure_blob_cdn` (Admin → ffmpeg) and the site sends an HTTP `PURGE` for every media key when a video is deleted (`PT_AzureCDNPurge`), so edges don't keep serving stale copies until TTL. If the CDN exposes a vendor purge API instead of `PURGE` (e.g. Azure Front Door management-plane purge), front the CDN origin with a layer that honors `PURGE`, or purge manually.
+- **CDN cache invalidation:** with Azure blob storage behind a CDN, set `azure_blob_cdn` (Admin → ffmpeg) and the site sends an HTTP `PURGE` for every media key when a video is deleted (`PT_AzureCDNPurge`), so edges don't keep serving stale copies until TTL — and again on every re-upload (`PT_UploadToS3` → Azure) so replaced thumbnails/renditions refresh immediately. If the CDN exposes a vendor purge API instead of `PURGE` (e.g. Azure Front Door management-plane purge), front the CDN origin with a layer that honors `PURGE`, or purge manually.
 - **TikTok rate limits:** TikTok aggressively rate-limits/awards captcha on web scraping. Set conservative `limit` values in the admin import page and expect occasional failures — the import handler falls back cleanly.
 
 ---

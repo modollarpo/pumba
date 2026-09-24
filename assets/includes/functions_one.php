@@ -1583,6 +1583,11 @@ function PT_UploadToS3($filename, $config = array()) {
     } elseif ($pt->config->azure_blob_storage == 'on' && !empty($pt->config->azure_blob_account) && !empty($pt->config->azure_blob_secret) && !empty($pt->config->azure_blob_bucket_name)) {
         $upload = PT_AzureBlobRequest('PUT', $filename, fopen($filename, 'r'), filesize($filename));
         if ($upload) {
+            // Re-uploads replace the blob in place; purge the same key from the
+            // CDN so edges don't keep serving the stale copy until TTL expiry.
+            if (!empty($pt->config->azure_blob_cdn)) {
+                PT_AzureCDNPurge($filename);
+            }
             if (empty($config['delete'])) {
                 @unlink($filename);
             }
