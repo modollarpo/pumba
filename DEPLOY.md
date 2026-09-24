@@ -233,18 +233,25 @@ Run the provided scripts after all services are up:
 **Windows (PowerShell):**
 
 ```powershell
-.\deploy\smoke-test.ps1 -YouTubeApi "http://127.0.0.1:3000" -TikTokApi "http://127.0.0.1:3001" -MediaMTX "http://127.0.0.1:8888"
+.\deploy\smoke-test.ps1 -YouTubeApi "http://127.0.0.1:3000" -TikTokApi "http://127.0.0.1:3001" -MediaMTX "http://127.0.0.1:8888" -ApiToken "your-token"
 ```
 
 **Linux:**
 
 ```bash
-bash deploy/smoke-test.sh --youtube http://127.0.0.1:3000 --tiktok http://127.0.0.1:3001 --mediamtx http://127.0.0.1:8888
+bash deploy/smoke-test.sh --youtube http://127.0.0.1:3000 --tiktok http://127.0.0.1:3001 --mediamtx http://127.0.0.1:8888 --api-token "your-token"
 ```
 
-The script checks: YouTube search/info/download headers, TikTok info/user/search, MediaMTX
-HLS health (`/stream_health_check/index.m3u8` → returns 404/redirect but proves reachability),
-and PlayTube `/` returns 200.
+Pass the same `API_TOKEN` you set in the Node `.env` (and in PlayTube admin) — without it
+the downloader API checks are skipped (they require auth) but `/health`, MediaMTX and
+PlayTube checks still run. With a token, the script verifies HMAC-signed success plus a
+negative check that an unauthenticated request is rejected.
+
+The script checks: YouTube search/info/download (HMAC-signed), TikTok info/user/search
+(HMAC-signed), the public `/health` probes on both Node APIs, MediaMTX HLS health
+(`/stream_health_check/index.m3u8` → returns 404/redirect but proves reachability),
+PlayTube `/` returns 200, and (with a token) a negative check that an unauthenticated
+request is rejected.
 
 ---
 
