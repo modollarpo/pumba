@@ -59,9 +59,11 @@ function authRequired(req, res, next) {
     next();
 }
 
-// Static /files (downloaded media served to the site for playback) stays public.
+// Static /files (downloaded media served to the site for playback) and the
+// /health probe stay public; everything else is rate-limited + token gated.
 app.use((req, res, next) => {
-    if (String(req.path).startsWith('/files')) return next();
+    const p = String(req.path);
+    if (p.startsWith('/files') || p.startsWith('/health')) return next();
     rateLimiter(req, res, () => authRequired(req, res, next));
 });
 
@@ -69,6 +71,26 @@ const API_KEY = process.env.YOUTUBE_API_KEY;
 const YTDLP_BIN = process.env.YTDLP_BIN || 'yt-dlp';
 const DOWNLOAD_DIR = process.env.DOWNLOAD_DIR || path.join(__dirname, 'downloads');
 const GOOGLE = 'https://www.googleapis.com/youtube/v3';
+
+// --- Ops: public health probe (no auth, no rate cap) -----------------------
+// Reports process uptime plus whether the yt-dlp binary is reachable, so
+// load balancers / uptime monitors have a real signal instead of 401s.
+app.get('/health', (req, res) => {
+    let binary = 'unknown';
+    try {
+        const r = execFile.sync(YTDLP_BIN, ['--version'], { timeout: 5000, encoding: 'utf8' });
+        binary = String(r).trim().split(/\r?\n/)[0] || 'unknown';
+    } catch (e) {
+        binary = 'unreachable';
+    }
+    res.json({
+        status: 'ok',
+        service: 'youtube-media-downloader',
+        uptimeSeconds: Math.floor(process.uptime()),
+        binary,
+        tokenSet: !!API_TOKEN
+    });
+});
 
 fs.mkdirSync(DOWNLOAD_DIR, { recursive: true });
 app.use('/files', express.static(DOWNLOAD_DIR));

@@ -199,6 +199,10 @@ PT_CleanLiveRecordings('./recordings', 7);
 3000 and the TikTok API on 3001, or set distinct `PORT` env values on each. Then point
 `yt_api_url` / `tiktok_api_url` at the correct ports.
 
+> `GET /health` is public on both Node APIs (no token, no rate cap) and reports
+> service/uptime/`tokenSet` — use it with uptime monitors or a load balancer health check.
+> For YouTube, it also reports the `yt-dlp` binary version (or `unreachable`).
+
 > If PlayTube and the Node APIs run on separate machines, use the LAN/server IP instead of
 > `127.0.0.1` and make sure CORS/visibility allows PHP's `connect_to_url()` to reach them.
 

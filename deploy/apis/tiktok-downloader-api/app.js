@@ -55,7 +55,18 @@ function rateLimiter(req, res, next) {
 }
 
 app.use((req, res, next) => {
+    if (String(req.path).startsWith('/health')) return next();
     rateLimiter(req, res, () => authRequired(req, res, next));
+});
+
+// --- Ops: public health probe (no auth, no rate cap) -----------------------
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'ok',
+        service: 'tiktok-downloader',
+        uptimeSeconds: Math.floor(process.uptime()),
+        tokenSet: !!API_TOKEN
+    });
 });
 
 
