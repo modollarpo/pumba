@@ -14,13 +14,30 @@ if (!API_TOKEN) {
 }
 const RATE_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60000;
 const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX, 10) || 60;
+// Optional extra consumer tokens (comma-separated) and per-token quota
+// overrides "token:limit,token:limit" — useful when several consumers share
+// one API (self-hosted media bots, cron importers) and each needs its own cap.
+const EXTRA_TOKENS = String(process.env.API_TOKENS || '').split(',').map(s => s.trim()).filter(Boolean);
+const ALL_TOKENS = [API_TOKEN].concat(EXTRA_TOKENS).filter(Boolean);
+const TOKEN_QUOTAS = {};
+for (const pair of String(process.env.TOKEN_QUOTAS || '').split(',')) {
+    const m = /^(.+):(\d+)$/.exec(pair.trim());
+    if (m) TOKEN_QUOTAS[m[1]] = parseInt(m[2], 10);
+}
+const AUTH_FAIL_WINDOW_MS = parseInt(process.env.AUTH_FAIL_WINDOW_MS, 10) || 60000;
+const AUTH_FAIL_LIMIT = parseInt(process.env.AUTH_FAIL_LIMIT, 10) || 20;
 const hits = new Map();
+const authFails = new Map();
 
 function safeTokenEquals(a, b) {
     const ba = Buffer.from(String(a || ''));
     const bb = Buffer.from(String(b || ''));
     if (ba.length !== bb.length) return false;
     return crypto.timingSafeEqual(ba, bb);
+}
+
+function isValidToken(token) {
+    return ALL_TOKENS.some(t => safeTokenEquals(token, t));
 }
 
 function clientKey(req) {
@@ -61,22 +78,42 @@ function authRequired(req, res, next) {
         const provided = header.slice(5).trim();
         const expected = hmacSig(req);
         if (!API_TOKEN || !expected || !safeTokenEquals(provided, expected)) {
-            return res.status(401).json({ success: false, message: 'Unauthorized' });
+            return failAuth(req, res);
         }
+        req.authToken = API_TOKEN;
         return next();
     }
     // backward-compatible fallback: plain Bearer / query / header token
     let token = header.replace(/^Bearer\s+/i, '').trim();
     if (!token && req.query.token) token = String(req.query.token).trim();
     if (!token && req.get('x-api-token')) token = String(req.get('x-api-token')).trim();
-    if (!API_TOKEN || !safeTokenEquals(token, API_TOKEN)) {
-        return res.status(401).json({ success: false, message: 'Unauthorized' });
+    if (!isValidToken(token)) {
+        return failAuth(req, res);
     }
+    req.authToken = token;
     next();
 }
 
-function rateLimiter(req, res, next) {
+// Throttle authentication failures per client (brute-force protection around
+// the HMAC/Bearer verification itself — it sits before the per-token limiter).
+function failAuth(req, res) {
     const key = clientKey(req);
+    const now = Date.now();
+    let rec = authFails.get(key);
+    if (!rec || now - rec.windowStart > AUTH_FAIL_WINDOW_MS) {
+        rec = { windowStart: now, count: 0 };
+        authFails.set(key, rec);
+    }
+    rec.count += 1;
+    if (rec.count > AUTH_FAIL_LIMIT) {
+        return res.status(429).json({ success: false, message: 'Too many failed attempts. Please try again later.' });
+    }
+    return res.status(401).json({ success: false, message: 'Unauthorized' });
+}
+
+function rateLimiter(req, res, next) {
+    const key = req.authToken ? 't:' + crypto.createHash('sha256').update(req.authToken).digest('hex') : clientKey(req);
+    const limit = req.authToken && TOKEN_QUOTAS[req.authToken] ? TOKEN_QUOTAS[req.authToken] : RATE_LIMIT_MAX;
     const now = Date.now();
     let rec = hits.get(key);
     if (!rec || now - rec.windowStart > RATE_WINDOW_MS) {
@@ -84,7 +121,7 @@ function rateLimiter(req, res, next) {
         hits.set(key, rec);
     }
     rec.count += 1;
-    if (rec.count > RATE_LIMIT_MAX) {
+    if (rec.count > limit) {
         return res.status(429).json({ success: false, message: 'Too many requests' });
     }
     next();

@@ -239,6 +239,32 @@ The downloader APIs accept request signing instead of a static Bearer token:
 > If PlayTube and the Node APIs run on separate machines, use the LAN/server IP instead of
 > `127.0.0.1` and make sure CORS/visibility allows PHP's `connect_to_url()` to reach them.
 
+#### Per-token quotas
+
+Each API rate-limits by the authenticated token identity (not per-IP), so one
+consumer can't starve another. All knobs are env vars:
+
+| Var | Default | Meaning |
+|---|---|---|
+| `RATE_LIMIT_WINDOW_MS` | `60000` | quota window |
+| `RATE_LIMIT_MAX` | `60` | default requests/window per token |
+| `TOKEN_QUOTAS` | (none) | per-token overrides: `tokenA:120,tokenB:10` |
+| `API_TOKENS` | (none) | extra accepted tokens (`tokenC,tokenD`) besides `API_TOKEN` |
+| `AUTH_FAIL_WINDOW_MS` | `60000` | window for counting failed auth attempts |
+| `AUTH_FAIL_LIMIT` | `20` | failed auths per window before 429 (brute-force guard) |
+
+Example `.env`:
+
+```
+API_TOKEN=primary-secret
+API_TOKENS=importer-bot
+TOKEN_QUOTAS=primary-secret:120,importer-bot:30
+```
+
+With this, the primary consumer gets 120 requests/min, the importer bot 30/min,
+and both are isolated from each other. HMAC signing always uses `API_TOKEN`
+(both sides must match); extra `API_TOKENS` authenticate via Bearer fallback.
+
 ---
 
 ## 7. Smoke Test (all-in-one)
