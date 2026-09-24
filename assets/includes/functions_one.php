@@ -1745,7 +1745,7 @@ function PT_DeleteFromToS3($filename, $config = array()) {
             return true;
         }
     }
-    else if ($pt->config->s3_upload = "on") {
+    else if ($pt->config->s3_upload == "on") {
         include_once('assets/libs/s3-lib/vendor/autoload.php');
         $s3Config = (
             empty($pt->config->amazone_s3_key) ||
@@ -1775,7 +1775,7 @@ function PT_DeleteFromToS3($filename, $config = array()) {
             return true;
         }
     }
-    elseif ($pt->config->yandex_storage = "on") {
+    elseif ($pt->config->yandex_storage == "on") {
         if (empty($pt->config->yandex_region) || empty($pt->config->yandex_key) || empty($pt->config->yandex_secret)) {
             return false;
         }
@@ -1817,6 +1817,8 @@ function PT_DeleteFromToS3($filename, $config = array()) {
             return true;
         }
     }
+
+    return false;
 }
 
 function PT_RegisterNewField($registration_data = array()) {
