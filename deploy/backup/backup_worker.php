@@ -45,6 +45,7 @@ $backupDir = sys_get_temp_dir() . '/pt-backup-' . getmypid();
 $errors    = array();
 $uploaded  = array();
 $pruned    = array();
+$files     = array();
 
 if (!is_dir($backupDir) && !@mkdir($backupDir, 0700, true)) {
     fwrite(STDERR, '[backup] cannot create temp workdir' . PHP_EOL);
@@ -71,8 +72,7 @@ if ($gz === false) {
             $errors[] = 'no CREATE for ' . $t;
             continue;
         }
-        $create = reset($created);
-        $create = reset($create);
+        $create = isset($created[0]['Create Table']) ? $created[0]['Create Table'] : '';
         gzwrite($gz, "-- table: {$t}\n{$create};\n\n");
 
         $cols = array();
@@ -102,7 +102,7 @@ if ($gz === false) {
         }
     }
     $dbTables = $tables;
-    gzclose($gzendeavor);
+    gzclose($gz);
 }
 
 if (!empty($dbTables) && file_exists($gzPath)) {
