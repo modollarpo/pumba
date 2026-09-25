@@ -1,11 +1,18 @@
 const express = require('express');
 const axios = require('axios');
-const { execFile } = require('child_process');
+const { execFile, execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
 const app = express();
+
+// The Google API key is restricted to specific HTTP referrers (see GCP
+// Console → API keys). nodemailer/axios itself sends no Referer on
+// server-to-server calls, so forward the configured site URL so those calls
+// satisfy the key's referrer restriction. YT_REFERRER defaults to the
+// deployed App Service URL.
+axios.defaults.headers.common['Referer'] = process.env.YT_REFERRER || 'https://playtube-storegrill-free.azurewebsites.net';
 
 const crypto = require('crypto');
 
@@ -146,6 +153,10 @@ app.use((req, res, next) => {
 
 const API_KEY = process.env.YOUTUBE_API_KEY;
 const YTDLP_BIN = process.env.YTDLP_BIN || 'yt-dlp';
+// Extra yt-dlp args (space-separated) from env, e.g.
+//   YTDLP_ARGS="--extractor-args youtube:player_client=tv --cookies /home/cookies.txt"
+// Needed because YouTube blocks datacenter IPs / varies by player client.
+const YTDLP_ARGS = String(process.env.YTDLP_ARGS || '').trim() ? String(process.env.YTDLP_ARGS).trim().split(/\s+/) : [];
 const DOWNLOAD_DIR = process.env.DOWNLOAD_DIR || path.join(__dirname, 'downloads');
 const GOOGLE = 'https://www.googleapis.com/youtube/v3';
 
@@ -154,17 +165,23 @@ const GOOGLE = 'https://www.googleapis.com/youtube/v3';
 // load balancers / uptime monitors have a real signal instead of 401s.
 app.get('/health', (req, res) => {
     let binary = 'unknown';
+    let binaryError = '';
+    let binaryPath = 'unset';
     try {
-        const r = execFile.sync(YTDLP_BIN, ['--version'], { timeout: 5000, encoding: 'utf8' });
+        binaryPath = YTDLP_BIN;
+        const r = execFileSync(YTDLP_BIN, ['--version'], { timeout: 5000, encoding: 'utf8' });
         binary = String(r).trim().split(/\r?\n/)[0] || 'unknown';
     } catch (e) {
         binary = 'unreachable';
+        binaryError = String((e && e.message) || e);
     }
     res.json({
         status: 'ok',
         service: 'youtube-media-downloader',
         uptimeSeconds: Math.floor(process.uptime()),
         binary,
+        binaryPath,
+        binaryError,
         tokenSet: !!API_TOKEN
     });
 });
@@ -320,6 +337,7 @@ app.get('/api/video/download', async (req, res) => {
                     '-f', 'bv*+ba/b',
                     '--merge-output-format', 'mp4',
                     '--no-playlist',
+                    ...YTDLP_ARGS,
                     '-o', outPath,
                     `https://www.youtube.com/watch?v=${id}`
                 ], { maxBuffer: 128 * 1024 * 1024, timeout: 1800000 }, (err) => {

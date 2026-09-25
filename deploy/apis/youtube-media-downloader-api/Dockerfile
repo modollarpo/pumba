@@ -8,9 +8,10 @@ ENV PORT=3000 \
     DOWNLOAD_DIR=/opt/downloads
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        ca-certificates curl \
-    && curl -L -o /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
+        ca-certificates curl ffmpeg unzip \
+    && curl -L -o /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux \
     && chmod +x /usr/local/bin/yt-dlp \
+    && curl -fsSL https://deno.land/install.sh | DENO_INSTALL=/usr/local sh -s -- v2.9.7 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/app
