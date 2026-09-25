@@ -621,7 +621,20 @@
 						
 					<div class="modal-body" id="pt_language_modal">
 						<ul class="list-unstyled m-0 d-flex align-items-center flex-wrap tag_home_cat_list lang_modal">
-							<?php echo $pt->langs; ?>
+							<?php
+							if (is_array($pt->langs)) {
+								foreach ($pt->langs as $key => $language) {
+									if (!empty($pt->langs_status[$language]) && $pt->langs_status[$language] == 1) {
+										$lang_explode = explode('.', $language);
+										$language     = $lang_explode[0];
+										$language_    = ucfirst($language);
+										echo '<li class="language_select"><a href="?lang=' . $language . '" rel="nofollow" class="' . $language . '">' . $language_ . '</a></li>';
+									}
+								}
+							} else {
+								echo $pt->langs;
+							}
+							?>
 						</ul>
 					</div>
 				</div>
