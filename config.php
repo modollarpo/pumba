@@ -27,4 +27,21 @@ if (empty($sql_db_host) && empty($sql_db_user) && empty($sql_db_name)) {
     header("Location: ./install");
     exit;
 }
+
+// Connect to MySQL using TLS when a CA cert is available (Azure MySQL
+// Flexible has require_secure_transport=ON). Path: env var SQL_CA_CERT or
+// ./az_ca.pem next to this file. Falls back to a plain connection if the
+// CA file does not exist so local/other hosts keep working unchanged.
+function pt_connect_db() {
+    global $sql_db_host, $sql_db_user, $sql_db_pass, $sql_db_name;
+    $ca  = getenv('SQL_CA_CERT') ?: (dirname(__FILE__) . '/az_ca.pem');
+    $mysqli = mysqli_init();
+    if (!empty($ca) && file_exists($ca)) {
+        mysqli_ssl_set($mysqli, NULL, NULL, $ca, NULL, NULL);
+        @mysqli_real_connect($mysqli, $sql_db_host, $sql_db_user, $sql_db_pass, $sql_db_name, 3306, NULL, MYSQLI_CLIENT_SSL);
+    } else {
+        @mysqli_real_connect($mysqli, $sql_db_host, $sql_db_user, $sql_db_pass, $sql_db_name);
+    }
+    return $mysqli;
+}
 ?>

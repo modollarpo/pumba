@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // +------------------------------------------------------------------------+
 // | @author Deen Doughouz (DoughouzForest)
 // | @author_url 1: http://www.playtubescript.com

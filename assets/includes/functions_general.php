@@ -842,7 +842,7 @@ function PT_Decode($text = '') {
     return htmlspecialchars_decode($text);
 }
 function PT_Backup($sql_db_host, $sql_db_user, $sql_db_pass, $sql_db_name, $tables = false, $backup_name = false) {
-    $mysqli = new mysqli($sql_db_host, $sql_db_user, $sql_db_pass, $sql_db_name);
+    $mysqli = pt_connect_db();
     $mysqli->select_db($sql_db_name);
     $mysqli->query("SET NAMES 'utf8'");
     $queryTables = $mysqli->query('SHOW TABLES');

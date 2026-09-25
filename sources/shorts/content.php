@@ -254,7 +254,7 @@ if (empty($html)) {
 	$html = '<div class="text-center no-comments-found empty_state"><svg class="feather" width="24" height="24" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 98.94 122.88" xml:space="preserve"><g><path fill="currentColor" class="st0" d="M63.49,2.71c11.59-6.04,25.94-1.64,32.04,9.83c6.1,11.47,1.65,25.66-9.94,31.7l-9.53,5.01 c8.21,0.3,16.04,4.81,20.14,12.52c6.1,11.47,1.66,25.66-9.94,31.7l-50.82,26.7c-11.59,6.04-25.94,1.64-32.04-9.83 c-6.1-11.47-1.65-25.66,9.94-31.7l9.53-5.01c-8.21-0.3-16.04-4.81-20.14-12.52c-6.1-11.47-1.65-25.66,9.94-31.7L63.49,2.71 L63.49,2.71z M36.06,42.53l30.76,18.99l-30.76,18.9V42.53L36.06,42.53z"></path></g></svg>'.$pt->all_lang->no_videos_found_for_now.'</div>';
 	$pt->page_url_ = PT_Link('shorts');
 }
-if ($get_video->converted != 1) {
+if (!empty($get_video) && $get_video->converted != 1) {
     $pt->in_queue = true;
     $pt->converted = false;
 }

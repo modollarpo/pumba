@@ -4,7 +4,7 @@
 
 param registryName string
 
-resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01' existing = {
+resource acr 'Microsoft.ContainerRegistry/registries@2025-06-01-preview' existing = {
   name: registryName
 }
 

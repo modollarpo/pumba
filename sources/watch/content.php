@@ -13,13 +13,12 @@ if (strpos($id, '_') !== false) {
 
 $_GET['id'] = strip_tags($_GET['id']);
 $get_video = PT_GetVideoByID($id, 1, 1);
-if ($get_video->is_short == 1) {
-    header("Location: " . $get_video->url);
+if (empty($get_video) || !is_object($get_video)) {
+    header("Location: " . PT_Link('404'));
     exit();
 }
-
-if (empty($get_video)) {
-    header("Location: " . PT_Link('404'));
+if ($get_video->is_short == 1) {
+    header("Location: " . $get_video->url);
     exit();
 }
 if ($get_video->is_movie && $pt->config->movies_videos != 'on') {

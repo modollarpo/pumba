@@ -16,7 +16,7 @@ require 'assets/libs/php-rss/vendor/autoload.php';
 $pt     = ToObject(array());
 
 // Connect to MySQL Server
-$mysqli     = new mysqli($sql_db_host, $sql_db_user, $sql_db_pass, $sql_db_name);
+$mysqli     = pt_connect_db();
 $sqlConnect = $mysqli;
 
 
