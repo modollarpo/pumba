@@ -7,7 +7,7 @@
 				<div class="swiper-slide">
 					<div class="position-relative tag_feat_video_img">
 						<a href="<?php echo($video_slide->url) ?>" data-load="?link1=watch&id=<?php echo(PT_Slug($video_slide->title, $video_slide->video_id)) ?>">
-							<img class="w-100 h-100" src="<?php echo $video_slide->thumbnail; ?>" />
+							<img class="w-100 h-100" src="<?php echo $video_slide->thumbnail; ?>" alt="<?php echo htmlspecialchars(FilterStripTags($video_slide->title)); ?>" />
 						</a>
 					</div>
 					<div class="position-absolute d-flex align-items-end pt-5 tag_feat_video_info">
@@ -35,7 +35,7 @@
 					foreach ($pt->videos_array as $key => $video_slide) {
 				?>
 					<div class="swiper-slide">
-						<img src="<?php echo $video_slide->thumbnail; ?>" />
+						<img src="<?php echo $video_slide->thumbnail; ?>" alt="<?php echo htmlspecialchars(FilterStripTags($video_slide->title)); ?>" loading="lazy" />
 					</div>
 				<?php }} ?>
 			</div>

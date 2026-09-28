@@ -13,13 +13,12 @@ if (strpos($id, '_') !== false) {
 
 $_GET['id'] = strip_tags($_GET['id']);
 $get_video = PT_GetVideoByID($id, 1, 1);
-if ($get_video->is_short == 1) {
-    header("Location: " . $get_video->url);
+if (empty($get_video) || !is_object($get_video)) {
+    header("Location: " . PT_Link('404'));
     exit();
 }
-
-if (empty($get_video)) {
-    header("Location: " . PT_Link('404'));
+if ($get_video->is_short == 1) {
+    header("Location: " . $get_video->url);
     exit();
 }
 if ($get_video->is_movie && $pt->config->movies_videos != 'on') {
@@ -119,7 +118,7 @@ $desc = mb_substr($desc, 0, 220, "UTF-8");
 $pt->get_video   = $get_video;
 $pt->page        = 'watch';
 $pt->title       = $get_video->title;
-$pt->description = htmlspecialchars($desc);
+$pt->description = $desc;
 $pt->keyword     = $get_video->tags;
 $pt->is_list     = false;
 $pt->is_wl       = false;
@@ -753,25 +752,25 @@ if ($pt->config->ffmpeg_system == 'on') {
     $explode_video = explode('_video', $get_video->video_location);
     if ($pt->get_video->sell_video == 0 || PT_IsAdmin() || $pt->get_video->is_owner || ($pt->get_video->sell_video > 0 && $pt->is_paid > 0 && $pt->config->sell_videos_system == 'on')) {
         if ($get_video->{"240p"} == 1) {
-            $pt->video_240 = $explode_video[0] . '_video_240p_converted.mp4';
+            $pt->video_240 = PT_QualityVideoUrl($explode_video[0], '240');
         }
         if ($get_video->{"360p"} == 1) {
-            $pt->video_360 = $explode_video[0] . '_video_360p_converted.mp4';
+            $pt->video_360 = PT_QualityVideoUrl($explode_video[0], '360');
         }
         if ($get_video->{"480p"} == 1) {
-            $pt->video_480 = $explode_video[0] . '_video_480p_converted.mp4';
+            $pt->video_480 = PT_QualityVideoUrl($explode_video[0], '480');
         }
         if ($get_video->{"720p"} == 1) {
-            $pt->video_720 = $explode_video[0] . '_video_720p_converted.mp4';
+            $pt->video_720 = PT_QualityVideoUrl($explode_video[0], '720');
         }
         if ($get_video->{"1080p"} == 1) {
-            $pt->video_1080 = $explode_video[0] . '_video_1080p_converted.mp4';
+            $pt->video_1080 = PT_QualityVideoUrl($explode_video[0], '1080');
         }
         if ($get_video->{"4096p"} == 1) {
-            $pt->video_4096 = $explode_video[0] . '_video_4096p_converted.mp4';
+            $pt->video_4096 = PT_QualityVideoUrl($explode_video[0], '4096');
         }
         if ($get_video->{"2048p"} == 1) {
-            $pt->video_2048 = $explode_video[0] . '_video_2048p_converted.mp4';
+            $pt->video_2048 = PT_QualityVideoUrl($explode_video[0], '2048');
         }
     }
     else if ($pt->get_video->sell_video > 0 && !$pt->is_paid && $pt->config->sell_videos_system == 'on' && !empty($get_video->demo)) {
@@ -815,25 +814,25 @@ if ($pt->config->ffmpeg_system == 'on') {
     }
     elseif ($pt->get_video->rent_price == 0 || PT_IsAdmin() || $pt->get_video->is_owner || ($pt->get_video->rent_price > 0 && $pt->is_paid > 0 && $pt->config->rent_videos_system == 'on')) {
         if ($get_video->{"240p"} == 1) {
-            $pt->video_240 = $explode_video[0] . '_video_240p_converted.mp4';
+            $pt->video_240 = PT_QualityVideoUrl($explode_video[0], '240');
         }
         if ($get_video->{"360p"} == 1) {
-            $pt->video_360 = $explode_video[0] . '_video_360p_converted.mp4';
+            $pt->video_360 = PT_QualityVideoUrl($explode_video[0], '360');
         }
         if ($get_video->{"480p"} == 1) {
-            $pt->video_480 = $explode_video[0] . '_video_480p_converted.mp4';
+            $pt->video_480 = PT_QualityVideoUrl($explode_video[0], '480');
         }
         if ($get_video->{"720p"} == 1) {
-            $pt->video_720 = $explode_video[0] . '_video_720p_converted.mp4';
+            $pt->video_720 = PT_QualityVideoUrl($explode_video[0], '720');
         }
         if ($get_video->{"1080p"} == 1) {
-            $pt->video_1080 = $explode_video[0] . '_video_1080p_converted.mp4';
+            $pt->video_1080 = PT_QualityVideoUrl($explode_video[0], '1080');
         }
         if ($get_video->{"4096p"} == 1) {
-            $pt->video_4096 = $explode_video[0] . '_video_4096p_converted.mp4';
+            $pt->video_4096 = PT_QualityVideoUrl($explode_video[0], '4096');
         }
         if ($get_video->{"2048p"} == 1) {
-            $pt->video_2048 = $explode_video[0] . '_video_2048p_converted.mp4';
+            $pt->video_2048 = PT_QualityVideoUrl($explode_video[0], '2048');
         }
     }
     else if ($pt->get_video->rent_price > 0 && !$pt->is_paid && $pt->config->rent_videos_system == 'on' && !empty($get_video->demo)) {

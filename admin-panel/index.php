@@ -1,4 +1,4 @@
-﻿<?php 
+<?php 
 $http_header           = 'http://';
 if (!empty($_SERVER['HTTPS'])) {
     $http_header = 'https://';

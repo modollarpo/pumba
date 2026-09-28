@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // +------------------------------------------------------------------------+
 // | @author Deen Doughouz (DoughouzForest)
 // | @author_url 1: http://www.playtubescript.com
@@ -3183,10 +3183,17 @@ function GetIso()
 {
     global $pt,$db;
     $iso = array();
-    foreach ($pt->langs as $key => $value) {
-        $info = $db->where('lang_name',$value)->getOne(T_LANG_ISO);
-        if (!empty($info) && !empty($info->iso)) {
-            $iso[$value] = $info->iso;
+    if (!empty($pt->langs)) {
+        $esc = array();
+        foreach ($pt->langs as $value) {
+            $esc[] = "'".$db->escape($value)."'";
+        }
+        $in   = implode(',',$esc);
+        $rows = $db->rawQuery("SELECT lang_name, iso FROM ".T_LANG_ISO." WHERE lang_name IN (".$in.")");
+        foreach ($rows as $info) {
+            if (!empty($info->lang_name) && !empty($info->iso)) {
+                $iso[$info->lang_name] = $info->iso;
+            }
         }
     }
     return $iso;
@@ -3195,10 +3202,17 @@ function LangsStatus()
 {
     global $pt,$db;
     $iso = array();
-    foreach ($pt->langs as $key => $value) {
-        $info = $db->where('lang_name',$value)->getOne(T_LANG_ISO);
-        if (!empty($info) && isset($info->status)) {
-            $iso[$value] = $info->status;
+    if (!empty($pt->langs)) {
+        $esc = array();
+        foreach ($pt->langs as $value) {
+            $esc[] = "'".$db->escape($value)."'";
+        }
+        $in   = implode(',',$esc);
+        $rows = $db->rawQuery("SELECT lang_name, status FROM ".T_LANG_ISO." WHERE lang_name IN (".$in.")");
+        foreach ($rows as $info) {
+            if (!empty($info->lang_name) && isset($info->status)) {
+                $iso[$info->lang_name] = $info->status;
+            }
         }
     }
     return $iso;

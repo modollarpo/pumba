@@ -180,25 +180,78 @@ $footer            = '';
 
 
 $og_meta = '';
-if ($pt->page == 'watch') {
+$og_is_specific = false;
+$pt->is_video_page = false;
+$pt->seo_thumb = '';
+$pt->seo_url = '';
+$og_image_default = $pt->config->theme_url . '/img/logo.png';
+if (file_exists('./themes/' . $pt->config->theme . '/img/logo.png')) {
+    $og_image_default = $pt->config->site_url . '/themes/' . $pt->config->theme . '/img/logo.png';
+}
+if (in_array($pt->page, array('watch', 'shorts')) && !empty($get_video)) {
+    $pt->is_video_page = true;
+    $og_is_specific = true;
+    $pt->seo_url = $get_video->url;
+    $pt->seo_thumb = PT_GetMedia(str_replace('mqdefault', 'maxresdefault', $get_video->thumbnail));
+    $og_type = (!empty($get_video->is_movie) && $get_video->is_movie == 1) ? 'video.movie' : 'video.other';
+    $og_tw = 'summary_large_image';
     $og_meta = PT_LoadPage('watch/og-meta', array(
-        'TITLE' => FilterStripTags($pt->title),
-        'DESC' => mb_substr(FilterStripTags($pt->description), 0, 400, "UTF-8"),
-        'THUMB' => str_replace('mqdefault', 'maxresdefault', $get_video->thumbnail),
-        'URL' => PT_Link('watch/' . PT_Slug($get_video->title, $get_video->video_id))
+        'OG_TITLE' => htmlspecialchars(FilterStripTags($pt->title)),
+        'OG_TYPE' => $og_type,
+        'OG_URL' => htmlspecialchars($pt->seo_url),
+        'OG_IMAGE' => htmlspecialchars($pt->seo_thumb),
+        'OG_DESC' => htmlspecialchars(PT_CleanSeoText($pt->description, 300)),
+        'TW_CARD' => $og_tw
     ));
 }
 if ($pt->page == 'read') {
+    $pt->article = $article;
+    $og_is_specific = true;
+    $pt->seo_url = PT_Link('articles/read/' . PT_URLSlug($article->title, $article->id));
+    $pt->seo_thumb = PT_GetMedia($article->image);
     $og_meta = PT_LoadPage('watch/og-meta', array(
-        'TITLE' => FilterStripTags($pt->title),
-        'DESC' => mb_substr(FilterStripTags($pt->description), 0, 400, "UTF-8"),
-        'THUMB' => PT_GetMedia($article->image),
-        'URL' => PT_Link('articles/read/' . PT_URLSlug($article->title,$article->id))
+        'OG_TITLE' => htmlspecialchars(FilterStripTags($pt->title)),
+        'OG_TYPE' => 'article',
+        'OG_URL' => htmlspecialchars($pt->seo_url),
+        'OG_IMAGE' => htmlspecialchars($pt->seo_thumb),
+        'OG_DESC' => htmlspecialchars(PT_CleanSeoText($pt->description, 300)),
+        'TW_CARD' => 'summary_large_image'
     ));
+}
+if ($pt->page == 'home') {
+    $og_meta .= '<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "' . addslashes($pt->config->name) . '",
+    "url": "' . $pt->config->site_url . '",
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "' . $pt->config->site_url . '/search?keyword={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+    }
+}
+</script>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "' . addslashes($pt->config->name) . '",
+    "url": "' . $pt->config->site_url . '",
+    "logo": "' . $og_image_default . '"
+}
+</script>';
 }
 $pt->lang_attr = 'en';
 if (!empty($pt->language) && !empty($pt->iso) && in_array($pt->language, array_keys($pt->iso)) && !empty($pt->iso[$pt->language])) {
     $pt->lang_attr = $pt->iso[$pt->language];
+}
+$og_url_base = $pt->config->site_url;
+if (!empty($pt->page_url_)) {
+    $og_url_base = $pt->page_url_;
 }
 foreach ($pt->langs as $key => $value) {
     if ($pt->langs_status[$value] == 1) {
@@ -206,7 +259,11 @@ foreach ($pt->langs as $key => $value) {
         if (!empty($pt->iso[$value])) {
             $iso = $pt->iso[$value];
         }
-        $og_meta .= '<link rel="alternate" href="'.$pt->config->site_url.'?lang='.$value.'" hreflang="'.$iso.'" />';
+        $lang_url = $og_url_base . '?lang=' . $value;
+        if ($iso == $pt->lang_attr) {
+            $lang_url = $og_url_base;
+        }
+        $og_meta .= '<link rel="alternate" href="' . $lang_url . '" hreflang="' . $iso . '" />';
     }
 }
 if ($pt->page != 'login') {
@@ -261,6 +318,26 @@ if (!empty($pt->config->seo)) {
     }
 }
 
+/* Generic OG/Twitter tags are emitted here rather than alongside the video and
+   article tags above, because the custom SEO block above is what produces the
+   final page title/description. Emitting them earlier made og:title disagree with
+   <title> (e.g. "Articles | SITE" vs "Articles - SITE"). The guard tests
+   $og_is_specific rather than empty($og_meta), because the JSON-LD and hreflang
+   blocks below already append to $og_meta on every page. */
+if (!$og_is_specific) {
+    $og_meta = '<meta property="og:site_name" content="' . htmlspecialchars($pt->config->name) . '" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="' . (!empty($pt->page_url_) ? htmlspecialchars($pt->page_url_) : htmlspecialchars($pt->config->site_url)) . '" />
+<meta property="og:title" content="' . htmlspecialchars($pt->title) . '" />
+<meta property="og:image" content="' . htmlspecialchars($og_image_default) . '" />
+<meta property="og:description" content="' . htmlspecialchars(PT_CleanSeoText($pt->description, 160)) . '" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="' . htmlspecialchars($pt->title) . '" />
+<meta name="twitter:description" content="' . htmlspecialchars(PT_CleanSeoText($pt->description, 200)) . '" />
+<meta name="twitter:image" content="' . htmlspecialchars($og_image_default) . '" />';
+}
+
 $getHeaderAds = PT_GetAd('header');
 $getFooterAds = PT_GetAd('footer');
 if (in_array($pt->page, ['register', 'login', 'shorts', 'latest', 'top', 'trending', 'stock', 'upload-video', 'import-video'])) {
@@ -276,7 +353,7 @@ if (IS_LOGGED === true && $user->is_pro == 1 && $pt->config->go_pro == 'on') {
 $final_content = PT_LoadPage('container', array(
     'CONTAINER_TITLE' => $pt->title,
     'CONTAINER_TITLE_DE' => htmlspecialchars($pt->title),
-    'CONTAINER_DESC_DE' => htmlspecialchars($pt->description),
+    'CONTAINER_DESC_DE' => htmlspecialchars(PT_CleanSeoText($pt->description, 160)),
     'CONTAINER_DESC' => $pt->description,
     'CONTAINER_KEYWORDS' => $pt->keyword,
     'CONTAINER_CONTENT' => $pt->content,

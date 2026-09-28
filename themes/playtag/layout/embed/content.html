@@ -46,7 +46,7 @@
             <iframe src="http://player.vimeo.com/video/{{VIDEO_ID}}?api=1;title=0&amp;byline=0&amp;portrait=0&amp;autoplay=1" width="100%" height="<?php echo $pt->height;?>" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
          <?php } else if (!empty($pt->get_video->daily)) { ?>
             <iframe frameborder="0" width="100%" height="<?php echo $pt->height;?>" src="//www.dailymotion.com/embed/video/{{VIDEO_ID}}?PARAMS" allowfullscreen></iframe>
-        <?php }  else if (!empty($pt->get_video->youtube) && $pt->config->youtube_player == 'on') { ?>
+        <?php }  else if (!empty($pt->get_video->youtube) && ($pt->config->youtube_player == 'on' || empty($pt->get_video->video_location))) { ?>
             <iframe width="100%" height="<?php echo $pt->height;?>" src="https://www.youtube.com/embed/<?php echo($pt->get_video->youtube); ?>" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
          <?php }  else if (!empty($pt->get_video->twitch)) {
                   if ($pt->get_video->twitch_type != 'streams') {

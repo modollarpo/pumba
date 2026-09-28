@@ -761,7 +761,7 @@ body.search_menu_open .tag_search_menu, body.noti_menu_open .tag_noti_menu {tran
 .tag_header_ddown .btn-close {margin-top: 15px;}
 .main-content {margin: 60px 0 !important;}
 .main-content, .empty_state_center {min-height: calc(100vh - 120px);min-height: calc(var(--vh, 1vh) * 100 - 120px);}
-.display-4 {font-size: 2.8rem;}
+.display-4 {font-size: 1.8rem;}
 .content.p-4 {padding: 1.5rem!important;}
 .user-comments img.rounded-circle {width: 40px;height: 40px;}
 .h1, h1 {font-size: 2rem;}

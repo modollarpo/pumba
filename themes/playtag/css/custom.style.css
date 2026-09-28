@@ -59,3 +59,103 @@ Add here your custom css styles Example: p { text-align: center; color: red; }
 		right: 0;
 	}
 }
+
+/* ============ KEEKI PLAY - YouTube-Style Overlay (pure CSS, hero glow preserved) ============ */
+
+:root {
+	--main: #FF6600 !important;
+	--main-hover: #E66D00 !important;
+	--font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+}
+body, .btn, input, textarea, select, .form-control, .modal-body, .dropdown-menu {
+	font-family: var(--font-family);
+}
+
+.tag_header {
+	height: 56px;
+	background: var(--body-bg);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+.tag_header:before { opacity: 0 !important; }
+.tag_header .navbar-brand { display: inline-flex; align-items: center; }
+.tag_header .navbar-brand img { max-height: 44px; }
+.tag_header .dropdown .btn { border-radius: 18px; font-size: 13px; font-weight: 600; }
+@media (max-width: 767px) {
+	.tag_header { height: 60px; }
+}
+
+.head_sidebar { border-right: 1px solid rgba(0, 0, 0, 0.06); }
+.head_sidebar_menu a { font-size: 13px; }
+.head_sidebar_menu a svg, .head_sidebar_menu a img { width: 24px; height: 24px; }
+
+/* The account drawer's nav tiles (Articles, Movies, Popular Channels, ...) never
+   got a font-size of their own and inherited 16px from body, which left them
+   visibly larger than every other title in this scale. Match the card titles. */
+.tag_user_menu_links a { font-size: 14px; line-height: 20px; }
+
+/* The icon rail is 100px wide (style.css), so every offset that was sized for
+   the old 70px header / 124px rail has to be pulled back into line with the
+   56px header above. Desktop only - below 768px the rail becomes a 60px
+   bottom bar and style.css sets its own offsets. */
+@media (min-width: 768px) {
+	.main-content {
+		margin-top: 56px;
+		min-height: calc(100vh - 56px);
+		min-height: calc(var(--vh, 1vh) * 100 - 56px);
+	}
+	.tag_header_ddown { left: 100px; }
+	.tag_header_ddown .btn-close { margin-top: 56px; }
+}
+
+.tag_home_vid_list > .title { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.tag_home_vid_list .title a svg { display: none; }
+
+.tag_home_cat_list a {
+	background: rgba(0, 0, 0, 0.07);
+	border-radius: 8px;
+	padding: 7px 14px;
+	margin: 2px 4px 2px 0;
+	color: inherit;
+	font-weight: 500;
+}
+.tag_home_cat_list a:hover { background: rgba(0, 0, 0, 0.14); }
+
+.tag_video_grid_list:before { display: none !important; }
+.tag_video_grid_list .thumb { border-radius: 10px; background: #000; }
+.tag_video_grid_list .thumb img { border-radius: 10px; transition: transform 0.15s ease; }
+.tag_video_grid_list:hover .thumb img { transform: scale(1.04); }
+.tag_video_grid_list .duration {
+	right: 6px; bottom: 6px; left: auto;
+	background: rgba(0, 0, 0, 0.8);
+	border-radius: 4px;
+	font-size: 12px; line-height: 16px; padding: 0 4px;
+	font-weight: 500;
+}
+.tag_video_grid_list:hover .duration { right: 6px; bottom: 6px; opacity: 1; }
+.tag_video_grid_list .play_btn {
+	opacity: 0;
+	visibility: hidden;
+	background: transparent;
+	align-items: center;
+	justify-content: center;
+	pointer-events: none;
+	transition: opacity 0.15s ease;
+}
+.tag_video_grid_list .thumb:hover .play_btn { opacity: 1; visibility: visible; }
+.tag_video_grid_list .play_btn svg { width: 46px; height: 46px; }
+.tag_video_grid_list .info h4 { font-weight: 500; font-size: 14px; line-height: 1.35; margin-top: 2px; }
+.tag_video_grid_list .info p, .tag_video_grid_list .info .foot { font-size: 12px; }
+
+.author-list > .col-md-3 { flex: 0 0 100%; max-width: 100%; }
+.author-list .tag_video_grid_list { display: flex; gap: 16px; align-items: flex-start; }
+.author-list .tag_video_grid_list .thumb { flex: 0 0 320px; width: 320px; padding-bottom: 0; aspect-ratio: 16 / 9; }
+.author-list .tag_video_grid_list .info { flex: 1; margin-top: 0; }
+.author-list .tag_video_grid_list .info h4 { font-size: 18px; line-height: 1.3; max-height: 52px; }
+@media (max-width: 967px) {
+	.author-list .tag_video_grid_list .thumb { flex-basis: 160px; width: 160px; }
+}
+
+.tag_main_player .embed-responsive { border-radius: 10px; overflow: hidden; }
+.tag_video_title { font-size: 1.25rem; }
+
+.py-4.container > h2.display-4:first-child { font-size: 1.5rem; font-weight: 600; }

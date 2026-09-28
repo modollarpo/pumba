@@ -27,7 +27,7 @@
 
 require_once('config.php');
 
-$mysqli = @new mysqli($sql_db_host, $sql_db_user, $sql_db_pass, $sql_db_name);
+$mysqli = @pt_connect_db();
 if ($mysqli->connect_error) {
     // DB down: fail open so an existing stream is not killed by a DB outage.
     http_response_code(200);

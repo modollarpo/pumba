@@ -103,6 +103,7 @@ function PT_Slug($string, $video_id) {
         'delimiter' => '-',
         'limit' => 100,
         'lowercase' => true,
+        'transliterate' => true,
         'replacements' => array(
             '/\b(an)\b/i' => 'a',
             '/\b(example)\b/i' => 'Test'
@@ -116,6 +117,7 @@ function PT_URLSlug($string, $id) {
         'delimiter' => '-',
         'limit' => 100,
         'lowercase' => true,
+        'transliterate' => true,
         'replacements' => array(
             '/\b(an)\b/i' => 'a',
             '/\b(example)\b/i' => 'Test'
@@ -133,7 +135,10 @@ function PT_LoadAdminLink($link = '') {
 }
 function url_slug($str, $options = array()) {
     // Make sure string is in UTF-8 and strip invalid UTF-8 characters
-    $str      = mb_convert_encoding((string) $str, 'UTF-8', mb_list_encodings());
+    $str = (string) $str;
+    if (!mb_check_encoding($str, 'UTF-8')) {
+        $str = mb_convert_encoding($str, 'UTF-8', 'ISO-8859-1');
+    }
     $defaults = array(
         'delimiter' => '-',
         'limit' => null,
@@ -842,7 +847,7 @@ function PT_Decode($text = '') {
     return htmlspecialchars_decode($text);
 }
 function PT_Backup($sql_db_host, $sql_db_user, $sql_db_pass, $sql_db_name, $tables = false, $backup_name = false) {
-    $mysqli = new mysqli($sql_db_host, $sql_db_user, $sql_db_pass, $sql_db_name);
+    $mysqli = pt_connect_db();
     $mysqli->select_db($sql_db_name);
     $mysqli->query("SET NAMES 'utf8'");
     $queryTables = $mysqli->query('SHOW TABLES');
@@ -1164,7 +1169,25 @@ function connect_to_url($url = '', $config = array()) {
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $config['POST']);
     }
-    if (!empty($config['bearer'])) {
+    if (!empty($config['hmac'])) {
+        // HMAC-signed request: secret never travels on the wire. The caller
+        // provides the shared secret via $config['hmac']; a short-lived
+        // signature (timestamp + nonce) is derived per-request instead of a
+        // static Bearer token, so a captured request cannot be replayed or
+        // reused to mint new ones. See the downloader APIs' authRequired().
+        $ts     = time();
+        $nonce  = bin2hex(random_bytes(8));
+        $p      = parse_url($url);
+        $path   = isset($p['path']) ? $p['path'] : '/';
+        $query  = isset($p['query']) ? $p['query'] : '';
+        $raw    = 'GET ' . $path . ($query !== '' ? '?' . $query : '') . "\n" . $ts . "\n" . $nonce;
+        $sig    = hash_hmac('sha256', $raw, (string) $config['hmac']);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+            'Authorization: HMAC ' . $sig,
+            'X-Auth-Timestamp: ' . $ts,
+            'X-Auth-Nonce: ' . $nonce
+        ));
+    } elseif (!empty($config['bearer'])) {
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(
             'Authorization: Bearer ' . $config['bearer']
         ));
@@ -1644,6 +1667,34 @@ function getBrowser() {
 function FilterStripTags($string='')
 {
     return filter_var(strip_tags($string), FILTER_UNSAFE_RAW);
+}
+function PT_ISO8601_Duration($duration = '') {
+    $duration = trim((string) $duration);
+    if (empty($duration)) {
+        return 'PT0S';
+    }
+    if (preg_match('/^P/i', $duration)) {
+        return strtoupper($duration);
+    }
+    $h = 0; $m = 0; $s = 0;
+    if (preg_match('/^(\d+):(\d{1,2}):(\d{1,2})$/', $duration, $matches)) {
+        $h = (int) $matches[1]; $m = (int) $matches[2]; $s = (int) $matches[3];
+    } elseif (preg_match('/^(\d+):(\d{1,2})$/', $duration, $matches)) {
+        $m = (int) $matches[1]; $s = (int) $matches[2];
+    } elseif (is_numeric($duration)) {
+        $s = (int) $duration;
+    }
+    return time_to_iso8601_duration(($h * 3600) + ($m * 60) + $s);
+}
+function PT_CleanSeoText($text = '', $len = 160) {
+    $text = html_entity_decode((string) $text, ENT_QUOTES, 'UTF-8');
+    $text = strip_tags($text);
+    $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/u', ' ', $text);
+    $text = trim(preg_replace('/\s+/u', ' ', $text));
+    if (mb_strlen($text, 'UTF-8') > $len) {
+        $text = rtrim(mb_substr($text, 0, $len - 1, 'UTF-8')) . '…';
+    }
+    return $text;
 }
 function time_to_iso8601_duration($time) {
     $units = array(

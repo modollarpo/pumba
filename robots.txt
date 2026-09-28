@@ -10,3 +10,6 @@ Disallow: /admincp
 Disallow: /admin-panel
 Disallow: /embed
 Disallow: /nodejs
+Disallow: /*?lang=
+
+Sitemap: https://playtube-storegrill-free.azurewebsites.net/sitemap-main.xml
