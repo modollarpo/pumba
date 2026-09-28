@@ -57,10 +57,10 @@
 		<link rel="stylesheet" href="{{CONFIG theme_url}}/css/style.css?version=<?php echo Tag_version(); ?>" id="style-css">
 		
 		<?php if ($pt->mode == 'night' || $pt->config->night_mode == 'night'): ?>
-			<link rel="stylesheet" href="{{CONFIG theme_url}}/css/night-mode.css?version={{CONFIG version}}" class="night-mode-css">
+			<link rel="stylesheet" href="{{CONFIG theme_url}}/css/night-mode.css?version={{CONFIG assets_version}}" class="night-mode-css">
 		<?php endif; ?>
 		
-		<link rel="stylesheet" href="{{CONFIG theme_url}}/css/custom.style.css?version={{CONFIG version}}">
+		<link rel="stylesheet" href="{{CONFIG theme_url}}/css/custom.style.css?version={{CONFIG assets_version}}">
 
 		<script src="{{CONFIG theme_url}}/js/jquery-3.min.js"></script>
 		<script src="{{CONFIG theme_url}}/js/jquery-ui.min.js"></script>
@@ -90,7 +90,7 @@
       
 		<?php if ($pt->language_type == 'rtl') { ?>
 			<link rel="stylesheet" href="{{CONFIG theme_url}}/css/bootsrap-rtl.min.css">
-			<link rel="stylesheet" href="{{CONFIG theme_url}}/css/rtl.style.css?version={{CONFIG version}}">
+			<link rel="stylesheet" href="{{CONFIG theme_url}}/css/rtl.style.css?version={{CONFIG assets_version}}">
 		<?php } ?>
 	  
 		<script src="{{CONFIG theme_url}}/player/plugins/speed/speed.min.js"></script>
@@ -214,7 +214,7 @@
            }
 		</script>
 		
-		<script src="{{CONFIG theme_url}}/js/header.js?version={{CONFIG version}}"></script>
+		<script src="{{CONFIG theme_url}}/js/header.js?version={{CONFIG assets_version}}"></script>
 	  
 		<?php if($pt->config->player_type == 'cloudinary'){ ?>
 			<link href="{{CONFIG theme_url}}/css/cld-video-player.min.css" rel="stylesheet">
@@ -418,10 +418,10 @@
 	  
 		{{EXTRA_JS}}
 	  
-		<script type="text/javascript" src="{{CONFIG theme_url}}/js/script.js?version={{CONFIG version}}"></script>
+		<script type="text/javascript" src="{{CONFIG theme_url}}/js/script.js?version={{CONFIG assets_version}}"></script>
 		<script type="text/javascript" src="{{CONFIG theme_url}}/js/bootstrap.min.js"></script>
 		<script src="{{CONFIG theme_url}}/js/bootstrap-toggle.min.js"></script>
-		<script src="{{CONFIG theme_url}}/js/footer.js?version={{CONFIG version}}"></script>
+		<script src="{{CONFIG theme_url}}/js/footer.js?version={{CONFIG assets_version}}"></script>
 		
 		<script>
 			$(window).on("popstate", function (e) {

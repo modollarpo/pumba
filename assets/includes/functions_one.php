@@ -95,6 +95,15 @@ function PT_GetConfig() {
     foreach ($configs as $key => $config) {
         $data[$config->name] = $config->value;
     }
+    // Asset cache-busting is deliberately kept separate from the schema version.
+    // `version` is compared against $pt->config->filesVersion to detect upgrade
+    // drift (see getStatus()), so bumping it just to bust a CSS cache makes the
+    // site look like the database is running newer code than the files on disk.
+    // Templates use {{CONFIG assets_version}}; fall back to `version` so this
+    // stays safe on installs that have not inserted the row yet.
+    if (empty($data['assets_version'])) {
+        $data['assets_version'] = isset($data['version']) ? $data['version'] : '';
+    }
     return $data;
 }
 

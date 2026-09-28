@@ -22,10 +22,10 @@
   <meta name="robots" content="noindex">
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs" crossorigin="anonymous"></script>
     <script src="{{CONFIG theme_url}}/js/Fingerprintjs2/fingerprint2.js"></script>
-    <link rel="stylesheet" href="{{CONFIG theme_url}}/player/css/mediaelementplayer.min.css?version={{CONFIG version}}" />
-    <script src="{{CONFIG theme_url}}/player/js/mediaelement-and-player.min.js?version={{CONFIG version}}"></script>
-    <script src="{{CONFIG theme_url}}/player/plugins/quality/quality.min.js?version={{CONFIG version}}"></script>
-    <link rel="stylesheet" href="{{CONFIG theme_url}}/player/plugins/quality/quality.min.css?version={{CONFIG version}}" />
+    <link rel="stylesheet" href="{{CONFIG theme_url}}/player/css/mediaelementplayer.min.css?version={{CONFIG assets_version}}" />
+    <script src="{{CONFIG theme_url}}/player/js/mediaelement-and-player.min.js?version={{CONFIG assets_version}}"></script>
+    <script src="{{CONFIG theme_url}}/player/plugins/quality/quality.min.js?version={{CONFIG assets_version}}"></script>
+    <link rel="stylesheet" href="{{CONFIG theme_url}}/player/plugins/quality/quality.min.css?version={{CONFIG assets_version}}" />
     <?php if (!empty($pt->get_video->twitch)) {  ?>
     <script src= "https://player.twitch.tv/js/embed/v1.js"></script>
   <?php }  ?>
