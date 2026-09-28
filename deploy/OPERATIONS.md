@@ -40,6 +40,22 @@ them and to de-duplicate the `version` row (the shipped dump contains three, and
 `PT_GetConfig()` is last-write-wins, so the effective version was whichever row
 the query happened to return last).
 
+The migration reads `version` **before** resetting it, and carries the old value
+into `assets_version` — not into `3.1.2`. That matters: `version` was at
+`3.1.4` precisely because someone bumped it to force a CSS refresh, so clients
+are holding assets keyed on `?version=3.1.4`. Seeding `3.1.2` would issue a key
+the browser has already cached from *before* the restyle, which is exactly the
+stale-stylesheet problem this change exists to fix. Check the confirm query at
+the end reports `3.1.4`.
+
+Note that `config` has **no unique index on `name`**, which is why duplicates
+exist in the first place and why the insert has to be guarded with `NOT EXISTS`
+rather than `INSERT IGNORE`. The shipped dump duplicates 78 distinct names, not
+just `version` — `version`, `all_ages`, `age_restriction`, `google`, `paypal`,
+`ftp_password`, `title`, `description`, and so on. For those other names the
+effective value is whichever duplicate the query returns last, so config for
+them is genuinely ambiguous and worth auditing separately.
+
 ## 3. Sitemaps not writable
 
 `getStatus()` wants `/sitemaps` set to `777`. Don't. That grants world-write to

@@ -26,17 +26,49 @@
 -- time, in either order.
 --
 -- Safe to run more than once.
+--
+-- Order matters: the cache-buster value must be read BEFORE `version` is
+-- overwritten below.
 
--- 1. Restore `version` to the version of the files actually on disk.
+-- 1. Add the asset cache-buster row, if it is not already there, seeded from
+--    the value `version` currently holds.
+--
+--    `version` is at 3.1.4 on the affected install precisely because someone
+--    bumped it to force a CSS refresh, so browsers and any CDN in front of the
+--    site are holding CSS keyed on ?version=3.1.4. Seeding the schema version
+--    (3.1.2) here would hand out a key the client has *already* cached from
+--    before the restyle, silently serving the stale stylesheet this change
+--    exists to invalidate.
+--
+--    `ORDER BY id DESC LIMIT 1` deliberately mirrors PT_GetConfig(), which
+--    resolves duplicates last-write-wins in row order, so this picks the same
+--    value the site is actually serving assets with today.
+--
+--    Read into assets_version before the UPDATE in step 2 rather than using a
+--    `SET @var` session variable: some migration runners execute statements
+--    outside a single persistent session, where @cache_buster would come back
+--    NULL.
+INSERT INTO `config` (`name`, `value`)
+SELECT 'assets_version', (
+         SELECT `value` FROM (
+           SELECT `value` FROM `config` WHERE `name` = 'version'
+             ORDER BY `id` DESC LIMIT 1
+         ) AS `v`
+       )
+  FROM DUAL
+  WHERE NOT EXISTS (SELECT 1 FROM (SELECT `name` FROM `config`) AS `c`
+                    WHERE `c`.`name` = 'assets_version');
+
+-- 2. Restore `version` to the version of the files actually on disk.
 --    Only touch this if it has drifted; if you are mid-upgrade to a real
 --    release, set it to that release's version instead.
 UPDATE `config` SET `value` = '3.1.2' WHERE `name` = 'version';
 
--- 2. De-duplicate `version`.
---    The shipped dump contains three `version` rows (ids 138, 167 and 171).
---    PT_GetConfig() builds its array as `$data[$config->name] = $config->value`
---    in row order, so with duplicates present the value that wins is whichever
---    row the query returns last. That makes the upgrade check ambiguous.
+-- 3. De-duplicate `version`.
+--    The shipped dump contains three `version` rows (ids 138, 167 and 171),
+--    all with value '3.1.2'. PT_GetConfig() builds its array as
+--    `$data[$config->name] = $config->value` in row order, so duplicates make
+--    the effective value dependent on the order rows happen to be returned in.
 --    Keep the lowest id and drop the rest.
 DELETE `version_1` FROM `config` AS `version_1`
   INNER JOIN `config` AS `version_2`
@@ -44,15 +76,9 @@ DELETE `version_1` FROM `config` AS `version_1`
    AND `version_2`.`name` = 'version'
    AND `version_2`.`id` < `version_1`.`id`;
 
--- 3. Add the asset cache-buster row, if it is not already there.
-INSERT INTO `config` (`name`, `value`)
-SELECT 'assets_version', '3.1.2'
-  FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM (SELECT `name` FROM `config`) AS `c`
-                    WHERE `c`.`name` = 'assets_version');
-
--- 4. Confirm. Expect exactly one `version` row and one `assets_version` row,
---    both '3.1.2'.
+-- 4. Confirm. Expect exactly one `version` row ('3.1.2') and one
+--    `assets_version` row (the pre-migration cache-buster, '3.1.4' on the
+--    affected install).
 SELECT `name`, `value`, COUNT(*) AS rows_found
   FROM `config`
  WHERE `name` IN ('version', 'assets_version')
