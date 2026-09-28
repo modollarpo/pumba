@@ -68,13 +68,17 @@ UPDATE `config` SET `value` = '3.1.2' WHERE `name` = 'version';
 --    The shipped dump contains three `version` rows (ids 138, 167 and 171),
 --    all with value '3.1.2'. PT_GetConfig() builds its array as
 --    `$data[$config->name] = $config->value` in row order, so duplicates make
---    the effective value dependent on the order rows happen to be returned in.
---    Keep the lowest id and drop the rest.
-DELETE `version_1` FROM `config` AS `version_1`
-  INNER JOIN `config` AS `version_2`
-    ON `version_1`.`name` = 'version'
-   AND `version_2`.`name` = 'version'
-   AND `version_2`.`id` < `version_1`.`id`;
+--    the effective value depend on the order rows happen to be returned in.
+--    Keep the highest id and drop the rest, which is the row PT_GetConfig()'s
+--    last-write-wins resolution picks today, so this changes nothing in effect.
+--    2026-09-28-dedupe-config-names.sql extends this to every other
+--    duplicated name; this step is kept here so the split is self-contained
+--    and safe to run on its own.
+DELETE `stale` FROM `config` AS `stale`
+  INNER JOIN `config` AS `winner`
+    ON `stale`.`name` = 'version'
+   AND `winner`.`name` = 'version'
+   AND `winner`.`id` > `stale`.`id`;
 
 -- 4. Confirm. Expect exactly one `version` row ('3.1.2') and one
 --    `assets_version` row (the pre-migration cache-buster, '3.1.4' on the

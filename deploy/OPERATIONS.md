@@ -50,11 +50,24 @@ the end reports `3.1.4`.
 
 Note that `config` has **no unique index on `name`**, which is why duplicates
 exist in the first place and why the insert has to be guarded with `NOT EXISTS`
-rather than `INSERT IGNORE`. The shipped dump duplicates 78 distinct names, not
-just `version` — `version`, `all_ages`, `age_restriction`, `google`, `paypal`,
-`ftp_password`, `title`, `description`, and so on. For those other names the
-effective value is whichever duplicate the query returns last, so config for
-them is genuinely ambiguous and worth auditing separately.
+rather than `INSERT IGNORE`.
+
+The shipped dump duplicates **10** of its 437 config names. Seven are
+identical copies and harmless, but three disagree — and in all three the lower
+id is empty while the higher id holds the real value:
+
+| name | lower id | higher id |
+|---|---|---|
+| `ftp_host` | id 90 `''` | id 98 `'localhost'` |
+| `ftp_port` | id 91 `''` | id 99 `'21'` |
+| `ftp_endpoint` | id 95 `''` | id 103 `'storage.wowonder.com'` |
+
+Because `PT_GetConfig()` resolves duplicates last-write-wins in row order, the
+higher id is the value the site is actually using — but that is not guaranteed,
+since the query has no `ORDER BY`. The effective value of any duplicated setting
+is therefore arbitrary and can differ between hosts. Run
+`deploy/sql/2026-09-28-dedupe-config-names.sql`, which keeps the highest id and
+so preserves current behaviour while removing the ambiguity.
 
 ## 3. Sitemaps not writable
 
