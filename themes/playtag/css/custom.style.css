@@ -88,6 +88,11 @@ body, .btn, input, textarea, select, .form-control, .modal-body, .dropdown-menu 
 .head_sidebar_menu a { font-size: 13px; }
 .head_sidebar_menu a svg, .head_sidebar_menu a img { width: 24px; height: 24px; }
 
+/* The account drawer's nav tiles (Articles, Movies, Popular Channels, ...) never
+   got a font-size of their own and inherited 16px from body, which left them
+   visibly larger than every other title in this scale. Match the card titles. */
+.tag_user_menu_links a { font-size: 14px; line-height: 20px; }
+
 /* The icon rail is 100px wide (style.css), so every offset that was sized for
    the old 70px header / 124px rail has to be pulled back into line with the
    56px header above. Desktop only - below 768px the rail becomes a 60px
