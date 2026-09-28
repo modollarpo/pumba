@@ -397,3 +397,4 @@ Logs go to `deploy/logs/`. Ctrl+C stops the foreground processes.
 | Live broadcast fails | Check `mediamtx_whip_url`; MediaMTX must allow WHIP (`whip: yes` in `paths.stream_`). |
 | `rapid_api` referenced | The reference was removed in this codebase — update any cached copy. |
 | Config rows missing on an existing install | Run the `INSERT IGNORE` statements from Step 2. |
+| `system-status.php` reports a problem | See `deploy/OPERATIONS.md` for what each check means and which ones to actually act on. |
