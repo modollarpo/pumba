@@ -1,0 +1,1321 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "languageVersion": "2.0",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.45.15.27210",
+      "templateHash": "17346277641904613944"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "allowedValues": [
+        "eastus",
+        "eastus2",
+        "centralus",
+        "westus",
+        "westus2",
+        "westus3",
+        "northeurope",
+        "westeurope",
+        "southeastasia",
+        "eastasia",
+        "australiaeast",
+        "centralindia",
+        "canadacentral",
+        "uksouth"
+      ],
+      "metadata": {
+        "description": "Azure region. Free tiers are available in all mainstream regions."
+      }
+    },
+    "environment": {
+      "type": "string",
+      "defaultValue": "free",
+      "metadata": {
+        "description": "Short environment suffix used in resource names."
+      }
+    },
+    "customer": {
+      "type": "string",
+      "defaultValue": "storegrill",
+      "metadata": {
+        "description": "Owner/customer tag used in resource names and tags."
+      }
+    },
+    "registryName": {
+      "type": "string",
+      "defaultValue": "playtubeacrfree",
+      "metadata": {
+        "description": "Existing ACR holding the container images (playtubeacrfree)."
+      }
+    },
+    "playtubeImage": {
+      "type": "string",
+      "defaultValue": "playtube/playtube:latest",
+      "metadata": {
+        "description": "Full image ref for the PlayTube PHP app in ACR (unused unless usePlaytubeContainer is set)."
+      }
+    },
+    "usePlaytubeContainer": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "When true, run the PHP app as a container; default false = built-in PHP 8.2 runtime (avoids uploading the 266MB PHP context to ACR)."
+      }
+    },
+    "ytApiImage": {
+      "type": "string",
+      "defaultValue": "playtube/yt-api:latest",
+      "metadata": {
+        "description": "YouTube downloader API image (repository:tag) in ACR."
+      }
+    },
+    "ttApiImage": {
+      "type": "string",
+      "defaultValue": "playtube/tt-api:latest",
+      "metadata": {
+        "description": "TikTok downloader API image (repository:tag) in ACR."
+      }
+    },
+    "sqlAdminUser": {
+      "type": "string",
+      "defaultValue": "playtube_admin",
+      "metadata": {
+        "description": "MySQL administrator login (also used by the app via config.php env)."
+      }
+    },
+    "sqlAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "MySQL administrator password."
+      }
+    },
+    "sqlDbName": {
+      "type": "string",
+      "defaultValue": "playtube",
+      "metadata": {
+        "description": "MySQL database name created by the app installer/tables script."
+      }
+    },
+    "mysqlAllowedIps": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional client IPs/CIDRs allowed to reach MySQL directly (in addition to Azure services)."
+      }
+    },
+    "ytApiKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "YouTube Data API v3 key (starts with AIza)."
+      }
+    },
+    "ytApiToken": {
+      "type": "string",
+      "metadata": {
+        "description": "Bearer token that PlayTube uses when calling the YouTube API."
+      }
+    },
+    "ttApiToken": {
+      "type": "string",
+      "metadata": {
+        "description": "Bearer token that PlayTube uses when calling the TikTok API."
+      }
+    },
+    "siteUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "Public site URL without trailing slash, e.g. https://playtube-...azurewebsites.net."
+      }
+    },
+    "purchaseCode": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Envato purchase code."
+      }
+    },
+    "deployVm": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Deploy the B1s VM running MediaMTX plus PHP cron workers. Off by default: free-tier VM SKUs (B1s/B2pts_v2) were capacity-restricted on this subscription during validation -- flip to true once compute capacity opens up, or use an existing host."
+      }
+    },
+    "vmAdminSshPublicKey": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "SSH public key for the VM (required when deployVm is true)."
+      }
+    },
+    "vmAdminUser": {
+      "type": "string",
+      "defaultValue": "playtube",
+      "metadata": {
+        "description": "Admin user on the VM."
+      }
+    },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_B1s",
+      "metadata": {
+        "description": "VM size; switch to Standard_B2pts_v2 if the chosen region lacks B1s capacity."
+      }
+    },
+    "mediaContainerName": {
+      "type": "string",
+      "defaultValue": "media",
+      "metadata": {
+        "description": "Blob container holding site media (azure_blob_storage target)."
+      }
+    },
+    "deployCron": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Enable the free-consumption Function timer that calls cronjob.php (needed for imports/encode on F1)."
+      }
+    },
+    "dataNameSuffix": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional unique suffix appended to data resource names (avoids stale ARM name conflicts after a failed regional deploy)."
+      }
+    }
+  },
+  "resources": {
+    "data": {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "data",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          },
+          "customer": {
+            "value": "[parameters('customer')]"
+          },
+          "sqlAdminUser": {
+            "value": "[parameters('sqlAdminUser')]"
+          },
+          "sqlAdminPassword": {
+            "value": "[parameters('sqlAdminPassword')]"
+          },
+          "mysqlAllowedIps": {
+            "value": "[parameters('mysqlAllowedIps')]"
+          },
+          "mediaContainerName": {
+            "value": "[parameters('mediaContainerName')]"
+          },
+          "nameSuffix": {
+            "value": "[parameters('dataNameSuffix')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.45.15.27210",
+              "templateHash": "5083518648428354702"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "environment": {
+              "type": "string",
+              "minLength": 3
+            },
+            "customer": {
+              "type": "string",
+              "minLength": 3
+            },
+            "sqlAdminUser": {
+              "type": "string"
+            },
+            "sqlAdminPassword": {
+              "type": "securestring"
+            },
+            "mysqlAllowedIps": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "Optional client IPs/CIDRs allowed direct MySQL access alongside Azure services."
+              }
+            },
+            "mediaContainerName": {
+              "type": "string"
+            },
+            "nameSuffix": {
+              "type": "string",
+              "defaultValue": "",
+              "metadata": {
+                "description": "Optional unique suffix appended to resource names (use when a stale ARM record blocks the default name in another region)."
+              }
+            }
+          },
+          "variables": {
+            "sqlServerName": "[format('mysql-{0}-{1}{2}', parameters('customer'), parameters('environment'), parameters('nameSuffix'))]",
+            "storageName": "[format('st{0}{1}{2}', parameters('customer'), parameters('environment'), parameters('nameSuffix'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DBforMySQL/flexibleServers",
+              "apiVersion": "2022-01-01",
+              "name": "[variables('sqlServerName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard_B1ms",
+                "tier": "Burstable"
+              },
+              "properties": {
+                "administratorLogin": "[parameters('sqlAdminUser')]",
+                "administratorLoginPassword": "[parameters('sqlAdminPassword')]",
+                "version": "8.0",
+                "storage": {
+                  "storageSizeGB": 32
+                },
+                "backup": {
+                  "backupRetentionDays": 7
+                },
+                "highAvailability": {
+                  "mode": "Disabled"
+                }
+              },
+              "tags": {
+                "environment": "[parameters('environment')]",
+                "customer": "[parameters('customer')]"
+              }
+            },
+            {
+              "type": "Microsoft.DBforMySQL/flexibleServers/firewallRules",
+              "apiVersion": "2022-01-01",
+              "name": "[format('{0}/{1}', variables('sqlServerName'), 'allow-azure-services')]",
+              "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "0.0.0.0"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/flexibleServers', variables('sqlServerName'))]"
+              ]
+            },
+            {
+              "copy": {
+                "name": "mysqlFirewallClient",
+                "count": "[length(parameters('mysqlAllowedIps'))]"
+              },
+              "type": "Microsoft.DBforMySQL/flexibleServers/firewallRules",
+              "apiVersion": "2022-01-01",
+              "name": "[format('{0}/{1}', variables('sqlServerName'), format('client-{0}', add(copyIndex(), 1)))]",
+              "properties": {
+                "startIpAddress": "[parameters('mysqlAllowedIps')[copyIndex()]]",
+                "endIpAddress": "[parameters('mysqlAllowedIps')[copyIndex()]]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/flexibleServers', variables('sqlServerName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2022-09-01",
+              "name": "[variables('storageName')]",
+              "location": "[parameters('location')]",
+              "kind": "StorageV2",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "properties": {
+                "allowBlobPublicAccess": true,
+                "minimumTlsVersion": "TLS1_2",
+                "supportsHttpsTrafficOnly": true
+              },
+              "tags": {
+                "environment": "[parameters('environment')]",
+                "customer": "[parameters('customer')]"
+              }
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}/{1}', variables('storageName'), 'default')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}/{1}/{2}', variables('storageName'), 'default', parameters('mediaContainerName'))]",
+              "properties": {
+                "publicAccess": "Blob"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageName'), 'default')]"
+              ]
+            }
+          ],
+          "outputs": {
+            "sqlHost": {
+              "type": "string",
+              "value": "[format('{0}.mysql.database.azure.com', variables('sqlServerName'))]"
+            },
+            "storageAccount": {
+              "type": "string",
+              "value": "[variables('storageName')]"
+            },
+            "storageAccountKey": {
+              "type": "string",
+              "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2022-09-01').keys[0].value]"
+            },
+            "storageConnectionString": {
+              "type": "string",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net', variables('storageName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2022-09-01').keys[0].value)]"
+            },
+            "mediaEndpoint": {
+              "type": "string",
+              "value": "[format('{0}{1}', reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2022-09-01').primaryEndpoints.blob, parameters('mediaContainerName'))]"
+            }
+          }
+        }
+      }
+    },
+    "appsvc": {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "appservice",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          },
+          "customer": {
+            "value": "[parameters('customer')]"
+          },
+          "playtubeImage": {
+            "value": "[parameters('playtubeImage')]"
+          },
+          "usePlaytubeContainer": {
+            "value": "[parameters('usePlaytubeContainer')]"
+          },
+          "ytApiImage": {
+            "value": "[parameters('ytApiImage')]"
+          },
+          "ttApiImage": {
+            "value": "[parameters('ttApiImage')]"
+          },
+          "registryServer": {
+            "value": "[reference('acr').outputs.loginServer.value]"
+          },
+          "registryUsername": {
+            "value": "[reference('acr').outputs.username.value]"
+          },
+          "registryPassword": {
+            "value": "[listOutputsWithSecureValues('acr', '2025-04-01').password]"
+          },
+          "sqlHost": {
+            "value": "[reference('data').outputs.sqlHost.value]"
+          },
+          "sqlAdminUser": {
+            "value": "[parameters('sqlAdminUser')]"
+          },
+          "sqlAdminPassword": {
+            "value": "[parameters('sqlAdminPassword')]"
+          },
+          "sqlDbName": {
+            "value": "[parameters('sqlDbName')]"
+          },
+          "siteUrl": {
+            "value": "[parameters('siteUrl')]"
+          },
+          "purchaseCode": {
+            "value": "[parameters('purchaseCode')]"
+          },
+          "ytApiKey": {
+            "value": "[parameters('ytApiKey')]"
+          },
+          "ytApiToken": {
+            "value": "[parameters('ytApiToken')]"
+          },
+          "ttApiToken": {
+            "value": "[parameters('ttApiToken')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.45.15.27210",
+              "templateHash": "15088895352109716580"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "environment": {
+              "type": "string"
+            },
+            "customer": {
+              "type": "string"
+            },
+            "playtubeImage": {
+              "type": "string",
+              "defaultValue": "",
+              "metadata": {
+                "description": "Full ACR image ref for the PHP app, e.g. acr.azurecr.io/playtube/playtube:latest. Unused when usePlaytubeContainer is false."
+              }
+            },
+            "usePlaytubeContainer": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "When true, run the PHP app from this image; otherwise use the built-in PHP 8.2 runtime (code deploy). Defaults to built-in so no container upload is required."
+              }
+            },
+            "ytApiImage": {
+              "type": "string",
+              "metadata": {
+                "description": "Container image ref for the YouTube API (repository:tag, pulled from ACR)."
+              }
+            },
+            "ttApiImage": {
+              "type": "string",
+              "metadata": {
+                "description": "Container image ref for the TikTok API (repository:tag, pulled from ACR)."
+              }
+            },
+            "registryServer": {
+              "type": "string",
+              "defaultValue": "",
+              "metadata": {
+                "description": "ACR registry server (e.g. myacr.azurecr.io) for private image pulls."
+              }
+            },
+            "registryUsername": {
+              "type": "string",
+              "defaultValue": "",
+              "metadata": {
+                "description": "ACR admin username."
+              }
+            },
+            "registryPassword": {
+              "type": "securestring",
+              "defaultValue": ""
+            },
+            "sqlHost": {
+              "type": "string"
+            },
+            "sqlAdminUser": {
+              "type": "string"
+            },
+            "sqlAdminPassword": {
+              "type": "securestring"
+            },
+            "sqlDbName": {
+              "type": "string"
+            },
+            "siteUrl": {
+              "type": "string"
+            },
+            "purchaseCode": {
+              "type": "string"
+            },
+            "ytApiKey": {
+              "type": "securestring"
+            },
+            "ytApiToken": {
+              "type": "string"
+            },
+            "ttApiToken": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "planName": "[format('plan-{0}-{1}', parameters('customer'), parameters('environment'))]",
+            "playtubeName": "[format('playtube-{0}-{1}', parameters('customer'), parameters('environment'))]",
+            "ytApiName": "[format('yt-api-{0}-{1}', parameters('customer'), parameters('environment'))]",
+            "ttApiName": "[format('tt-api-{0}-{1}', parameters('customer'), parameters('environment'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2022-03-01",
+              "name": "[variables('planName')]",
+              "location": "[parameters('location')]",
+              "kind": "linux",
+              "sku": {
+                "name": "F1",
+                "tier": "Free",
+                "size": "F1",
+                "family": "F",
+                "capacity": 1
+              },
+              "properties": {
+                "reserved": true
+              },
+              "tags": {
+                "environment": "[parameters('environment')]",
+                "customer": "[parameters('customer')]"
+              }
+            },
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2023-01-01",
+              "name": "[variables('playtubeName')]",
+              "location": "[parameters('location')]",
+              "kind": "[if(parameters('usePlaytubeContainer'), 'app,linux,container', 'app,linux')]",
+              "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
+                "httpsOnly": true,
+                "siteConfig": {
+                  "linuxFxVersion": "[if(parameters('usePlaytubeContainer'), format('DOCKER|{0}/{1}', parameters('registryServer'), parameters('playtubeImage')), 'PHP|8.2')]",
+                  "ftpsState": "FtpsOnly",
+                  "appSettings": [
+                    {
+                      "name": "SITE_URL",
+                      "value": "[parameters('siteUrl')]"
+                    },
+                    {
+                      "name": "SQL_DB_HOST",
+                      "value": "[parameters('sqlHost')]"
+                    },
+                    {
+                      "name": "SQL_DB_USER",
+                      "value": "[parameters('sqlAdminUser')]"
+                    },
+                    {
+                      "name": "SQL_DB_PASS",
+                      "value": "[parameters('sqlAdminPassword')]"
+                    },
+                    {
+                      "name": "SQL_DB_NAME",
+                      "value": "[parameters('sqlDbName')]"
+                    },
+                    {
+                      "name": "PURCHASE_CODE",
+                      "value": "[parameters('purchaseCode')]"
+                    }
+                  ]
+                }
+              },
+              "tags": {
+                "environment": "[parameters('environment')]",
+                "customer": "[parameters('customer')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2023-01-01",
+              "name": "[variables('ytApiName')]",
+              "location": "[parameters('location')]",
+              "kind": "app,linux,container",
+              "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
+                "httpsOnly": true,
+                "siteConfig": {
+                  "linuxFxVersion": "[format('DOCKER|{0}/{1}', parameters('registryServer'), parameters('ytApiImage'))]",
+                  "ftpsState": "FtpsOnly",
+                  "appSettings": [
+                    {
+                      "name": "WEBSITES_PORT",
+                      "value": "3000"
+                    },
+                    {
+                      "name": "PORT",
+                      "value": "3000"
+                    },
+                    {
+                      "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+                      "value": "1"
+                    },
+                    {
+                      "name": "API_TOKEN",
+                      "value": "[parameters('ytApiToken')]"
+                    },
+                    {
+                      "name": "YOUTUBE_API_KEY",
+                      "value": "[parameters('ytApiKey')]"
+                    },
+                    {
+                      "name": "DOWNLOAD_DIR",
+                      "value": "/home/downloads"
+                    },
+                    {
+                      "name": "DOCKER_REGISTRY_SERVER_URL",
+                      "value": "[format('https://{0}', parameters('registryServer'))]"
+                    },
+                    {
+                      "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+                      "value": "[parameters('registryUsername')]"
+                    },
+                    {
+                      "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+                      "value": "[parameters('registryPassword')]"
+                    }
+                  ]
+                }
+              },
+              "tags": {
+                "environment": "[parameters('environment')]",
+                "customer": "[parameters('customer')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2023-01-01",
+              "name": "[variables('ttApiName')]",
+              "location": "[parameters('location')]",
+              "kind": "app,linux,container",
+              "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
+                "httpsOnly": true,
+                "siteConfig": {
+                  "linuxFxVersion": "[format('DOCKER|{0}/{1}', parameters('registryServer'), parameters('ttApiImage'))]",
+                  "ftpsState": "FtpsOnly",
+                  "appSettings": [
+                    {
+                      "name": "WEBSITES_PORT",
+                      "value": "3000"
+                    },
+                    {
+                      "name": "PORT",
+                      "value": "3000"
+                    },
+                    {
+                      "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+                      "value": "1"
+                    },
+                    {
+                      "name": "API_TOKEN",
+                      "value": "[parameters('ttApiToken')]"
+                    },
+                    {
+                      "name": "DOCKER_REGISTRY_SERVER_URL",
+                      "value": "[format('https://{0}', parameters('registryServer'))]"
+                    },
+                    {
+                      "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+                      "value": "[parameters('registryUsername')]"
+                    },
+                    {
+                      "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+                      "value": "[parameters('registryPassword')]"
+                    }
+                  ]
+                }
+              },
+              "tags": {
+                "environment": "[parameters('environment')]",
+                "customer": "[parameters('customer')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "playtubeUrl": {
+              "type": "string",
+              "value": "[format('https://{0}', reference(resourceId('Microsoft.Web/sites', variables('playtubeName')), '2023-01-01').defaultHostName)]"
+            },
+            "ytApiUrl": {
+              "type": "string",
+              "value": "[format('https://{0}', reference(resourceId('Microsoft.Web/sites', variables('ytApiName')), '2023-01-01').defaultHostName)]"
+            },
+            "ttApiUrl": {
+              "type": "string",
+              "value": "[format('https://{0}', reference(resourceId('Microsoft.Web/sites', variables('ttApiName')), '2023-01-01').defaultHostName)]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "acr",
+        "data"
+      ]
+    },
+    "acr": {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "acr",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "registryName": {
+            "value": "[parameters('registryName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.45.15.27210",
+              "templateHash": "5818577494200899151"
+            }
+          },
+          "parameters": {
+            "registryName": {
+              "type": "string"
+            }
+          },
+          "resources": {
+            "acr": {
+              "existing": true,
+              "type": "Microsoft.ContainerRegistry/registries",
+              "apiVersion": "2023-01-01",
+              "name": "[parameters('registryName')]"
+            }
+          },
+          "outputs": {
+            "loginServer": {
+              "type": "string",
+              "value": "[reference('acr').loginServer]"
+            },
+            "username": {
+              "type": "string",
+              "value": "[listCredentials('acr', '2023-01-01').username]"
+            },
+            "password": {
+              "type": "securestring",
+              "value": "[listCredentials('acr', '2023-01-01').passwords[0].value]"
+            }
+          }
+        }
+      }
+    },
+    "vm": {
+      "condition": "[parameters('deployVm')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "mediamtx-vm",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          },
+          "customer": {
+            "value": "[parameters('customer')]"
+          },
+          "adminUser": {
+            "value": "[parameters('vmAdminUser')]"
+          },
+          "sshPublicKey": {
+            "value": "[parameters('vmAdminSshPublicKey')]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.45.15.27210",
+              "templateHash": "2367186692340924317"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "environment": {
+              "type": "string"
+            },
+            "customer": {
+              "type": "string"
+            },
+            "adminUser": {
+              "type": "string"
+            },
+            "sshPublicKey": {
+              "type": "string"
+            },
+            "vmSize": {
+              "type": "string",
+              "defaultValue": "Standard_B1s",
+              "allowedValues": [
+                "Standard_B1s",
+                "Standard_B1ls",
+                "Standard_B2pts_v2"
+              ],
+              "metadata": {
+                "description": "VM size (all three are in the 12-month free 750h offer; pick the one the region has capacity for)."
+              }
+            }
+          },
+          "variables": {
+            "vmName": "[format('vm-{0}-{1}', parameters('customer'), parameters('environment'))]",
+            "nicName": "[format('{0}-nic', variables('vmName'))]",
+            "pipName": "[format('{0}-pip', variables('vmName'))]",
+            "nsgName": "[format('{0}-nsg', variables('vmName'))]",
+            "vnetName": "[format('vnet-{0}', variables('vmName'))]",
+            "cloudInitScript": "#cloud-config\npackage_update: true\npackages:\n  - docker.io\n  - docker-compose-v2\n  - php-cli\n  - php-mysql\n  - php-mbstring\n  - php-curl\n  - php-zip\n  - php-gd\n  - php-xml\nruncmd:\n  - [ systemctl, enable, --now, docker ]\n  - docker run -d --name mediamtx --restart unless-stopped -p 1935:1935 -p 8554:8554 -p 8888:8888 -p 8889:8889 -p 8080:8080 bluenviron/mediamtx:latest-ffmpeg\n  - systemctl disable --now ufw || true\n"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2022-11-01",
+              "name": "[variables('vnetName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": [
+                    "10.20.0.0/16"
+                  ]
+                },
+                "subnets": [
+                  {
+                    "name": "default",
+                    "properties": {
+                      "addressPrefix": "10.20.0.0/24"
+                    }
+                  }
+                ]
+              },
+              "tags": {
+                "environment": "[parameters('environment')]",
+                "customer": "[parameters('customer')]"
+              }
+            },
+            {
+              "type": "Microsoft.Network/networkSecurityGroups",
+              "apiVersion": "2022-11-01",
+              "name": "[variables('nsgName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "securityRules": [
+                  {
+                    "name": "ssh",
+                    "properties": {
+                      "priority": 100,
+                      "direction": "Inbound",
+                      "access": "Allow",
+                      "protocol": "Tcp",
+                      "sourceAddressPrefix": "*",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRange": "22"
+                    }
+                  },
+                  {
+                    "name": "mediamtx-rtsp",
+                    "properties": {
+                      "priority": 200,
+                      "direction": "Inbound",
+                      "access": "Allow",
+                      "protocol": "Tcp",
+                      "sourceAddressPrefix": "*",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRange": "8554"
+                    }
+                  },
+                  {
+                    "name": "mediamtx-rtmp",
+                    "properties": {
+                      "priority": 210,
+                      "direction": "Inbound",
+                      "access": "Allow",
+                      "protocol": "Tcp",
+                      "sourceAddressPrefix": "*",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRange": "1935"
+                    }
+                  },
+                  {
+                    "name": "mediamtx-hls",
+                    "properties": {
+                      "priority": 220,
+                      "direction": "Inbound",
+                      "access": "Allow",
+                      "protocol": "Tcp",
+                      "sourceAddressPrefix": "*",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRange": "8888"
+                    }
+                  },
+                  {
+                    "name": "mediamtx-webrtc",
+                    "properties": {
+                      "priority": 230,
+                      "direction": "Inbound",
+                      "access": "Allow",
+                      "protocol": "Tcp",
+                      "sourceAddressPrefix": "*",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRange": "8889"
+                    }
+                  },
+                  {
+                    "name": "mediamtx-api",
+                    "properties": {
+                      "priority": 240,
+                      "direction": "Inbound",
+                      "access": "Allow",
+                      "protocol": "Tcp",
+                      "sourceAddressPrefix": "*",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRange": "8080"
+                    }
+                  }
+                ]
+              },
+              "tags": {
+                "environment": "[parameters('environment')]",
+                "customer": "[parameters('customer')]"
+              }
+            },
+            {
+              "type": "Microsoft.Network/publicIPAddresses",
+              "apiVersion": "2022-11-01",
+              "name": "[variables('pipName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Basic"
+              },
+              "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+              },
+              "tags": {
+                "environment": "[parameters('environment')]",
+                "customer": "[parameters('customer')]"
+              }
+            },
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2022-11-01",
+              "name": "[variables('nicName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "networkSecurityGroup": {
+                  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
+                },
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "privateIPAllocationMethod": "Dynamic",
+                      "publicIPAddress": {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('pipName'))]"
+                      },
+                      "subnet": {
+                        "id": "[reference(resourceId('Microsoft.Network/virtualNetworks', variables('vnetName')), '2022-11-01').subnets[0].id]"
+                      }
+                    }
+                  }
+                ]
+              },
+              "tags": {
+                "environment": "[parameters('environment')]",
+                "customer": "[parameters('customer')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('pipName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2023-03-01",
+              "name": "[variables('vmName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                  "computerName": "[variables('vmName')]",
+                  "adminUsername": "[parameters('adminUser')]",
+                  "linuxConfiguration": {
+                    "disablePasswordAuthentication": true,
+                    "ssh": {
+                      "publicKeys": [
+                        {
+                          "path": "[format('/home/{0}/.ssh/authorized_keys', parameters('adminUser'))]",
+                          "keyData": "[parameters('sshPublicKey')]"
+                        }
+                      ]
+                    }
+                  },
+                  "customData": "[base64(variables('cloudInitScript'))]"
+                },
+                "storageProfile": {
+                  "imageReference": {
+                    "publisher": "Canonical",
+                    "offer": "0001-com-ubuntu-server-jammy",
+                    "sku": "22_04-lts-gen2",
+                    "version": "latest"
+                  },
+                  "osDisk": {
+                    "createOption": "FromImage",
+                    "managedDisk": {
+                      "storageAccountType": "Standard_LRS"
+                    }
+                  }
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+                    }
+                  ]
+                },
+                "diagnosticsProfile": {
+                  "bootDiagnostics": {
+                    "enabled": false
+                  }
+                }
+              },
+              "tags": {
+                "environment": "[parameters('environment')]",
+                "customer": "[parameters('customer')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "publicIp": {
+              "type": "string",
+              "value": "[if(not(equals(reference(resourceId('Microsoft.Network/publicIPAddresses', variables('pipName')), '2022-11-01').ipAddress, null())), reference(resourceId('Microsoft.Network/publicIPAddresses', variables('pipName')), '2022-11-01').ipAddress, '')]"
+            }
+          }
+        }
+      }
+    },
+    "cron": {
+      "condition": "[parameters('deployCron')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "cron",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          },
+          "customer": {
+            "value": "[parameters('customer')]"
+          },
+          "functionAppName": {
+            "value": "[format('func-cron-{0}-{1}', parameters('customer'), parameters('environment'))]"
+          },
+          "planName": {
+            "value": "[format('plan-cron-{0}-{1}', parameters('customer'), parameters('environment'))]"
+          },
+          "storageAccountName": {
+            "value": "[reference('data').outputs.storageAccount.value]"
+          },
+          "storageAccountKey": {
+            "value": "[reference('data').outputs.storageAccountKey.value]"
+          },
+          "siteUrl": {
+            "value": "[reference('appsvc').outputs.playtubeUrl.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.45.15.27210",
+              "templateHash": "14676869407821098513"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "environment": {
+              "type": "string"
+            },
+            "customer": {
+              "type": "string"
+            },
+            "functionAppName": {
+              "type": "string"
+            },
+            "planName": {
+              "type": "string"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "storageAccountKey": {
+              "type": "securestring"
+            },
+            "siteUrl": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2022-03-01",
+              "name": "[parameters('planName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
+              },
+              "tags": {
+                "environment": "[parameters('environment')]",
+                "customer": "[parameters('customer')]"
+              }
+            },
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2023-01-01",
+              "name": "[parameters('functionAppName')]",
+              "location": "[parameters('location')]",
+              "kind": "functionapp",
+              "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('planName'))]",
+                "httpsOnly": true,
+                "siteConfig": {
+                  "appSettings": [
+                    {
+                      "name": "AzureWebJobsStorage",
+                      "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net', parameters('storageAccountName'), parameters('storageAccountKey'))]"
+                    },
+                    {
+                      "name": "FUNCTIONS_WORKER_RUNTIME",
+                      "value": "node"
+                    },
+                    {
+                      "name": "FUNCTIONS_EXTENSION_VERSION",
+                      "value": "~4"
+                    },
+                    {
+                      "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                      "value": "~20"
+                    },
+                    {
+                      "name": "CRON_URL",
+                      "value": "[format('{0}/cronjob.php', parameters('siteUrl'))]"
+                    }
+                  ]
+                }
+              },
+              "tags": {
+                "environment": "[parameters('environment')]",
+                "customer": "[parameters('customer')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('planName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "funcName": {
+              "type": "string",
+              "value": "[parameters('functionAppName')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "appsvc",
+        "data"
+      ]
+    }
+  },
+  "outputs": {
+    "playtubeUrl": {
+      "type": "string",
+      "value": "[reference('appsvc').outputs.playtubeUrl.value]"
+    },
+    "ytApiUrl": {
+      "type": "string",
+      "value": "[reference('appsvc').outputs.ytApiUrl.value]"
+    },
+    "ttApiUrl": {
+      "type": "string",
+      "value": "[reference('appsvc').outputs.ttApiUrl.value]"
+    },
+    "sqlHost": {
+      "type": "string",
+      "value": "[reference('data').outputs.sqlHost.value]"
+    },
+    "storageAccount": {
+      "type": "string",
+      "value": "[reference('data').outputs.storageAccount.value]"
+    },
+    "mediaEndpoint": {
+      "type": "string",
+      "value": "[reference('data').outputs.mediaEndpoint.value]"
+    },
+    "vmPublicIp": {
+      "type": "string",
+      "value": "[if(parameters('deployVm'), reference('vm').outputs.publicIp.value, '')]"
+    },
+    "cronFuncName": {
+      "type": "string",
+      "value": "[if(parameters('deployCron'), reference('cron').outputs.funcName.value, '')]"
+    }
+  }
+}

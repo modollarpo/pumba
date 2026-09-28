@@ -323,28 +323,36 @@ $sub_categories = array();
 try {
     $all_categories = $db->where('type','category')->get(T_LANGS);
     $sub_categories = array();
+    $category_keys  = array();
     foreach ($all_categories as $key => $value) {
-        $array_keys = array_keys($all_categories);
         if ($value->lang_key != 'other') {
             if (!empty($value->lang_key) && !empty($lang->{$value->lang_key})) {
                 $categories[$value->lang_key] = $lang->{$value->lang_key};
             }
-            $all_sub_categories = $db->where('type',$value->lang_key)->get(T_LANGS);
-
-            if (!empty($all_sub_categories)) {
-                foreach ($all_sub_categories as $key => $sub) {
+            $category_keys[] = $value->lang_key;
+        }
+    }
+    if (!empty($category_keys)) {
+        $esc = array();
+        foreach ($category_keys as $ck) {
+            $esc[] = "'".$db->escape($ck)."'";
+        }
+        $in   = implode(',',$esc);
+        $all_sub_categories = $db->rawQuery("SELECT lang_key, type FROM ".T_LANGS." WHERE type IN (".$in.") ORDER BY id");
+        if (!empty($all_sub_categories)) {
+            foreach ($all_sub_categories as $sub) {
+                if (!empty($sub->type) && in_array($sub->type, $category_keys)) {
                     $array = array();
                     if (!empty($sub->lang_key) && !empty($lang->{$sub->lang_key})) {
                         $array[$sub->lang_key] = $lang->{$sub->lang_key};
-                        $sub_categories[$value->lang_key][] = $array;
+                        $sub_categories[$sub->type][] = $array;
                     }
                 }
             }
         }
-        if (end($array_keys) == $key) {
-            $categories['other'] = $lang->other;
-        }
-
+    }
+    if (!empty($all_categories)) {
+        $categories['other'] = $lang->other;
     }
 } catch (Exception $e) {
 

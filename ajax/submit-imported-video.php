@@ -268,6 +268,7 @@ if (empty($error)) {
                 'time'        => time(),
                 'registered'  => date('Y') . '/' . intval(date('m')),
                 'is_short'        => (!empty($_POST['video_type']) && $_POST['video_type'] == 'short') ? 1 : 0,
+                'converted'       => 1,
                 'privacy' => $video_privacy,
             );
             $video_ok = true;

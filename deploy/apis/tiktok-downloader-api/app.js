@@ -1,13 +1,19 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
 const crypto = require('crypto');
+const { execFile } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
 const app = express();
+
 const PORT = process.env.PORT || 3000;
+const YTDLP = process.env.YTDLP_BIN || '/usr/local/bin/yt-dlp';
+const MEDIA_DIR = process.env.MEDIA_DIR || os.tmpdir();
+const MEDIA_TTL_MS = parseInt(process.env.MEDIA_TTL_MS, 10) || 10 * 60 * 1000;
+const YTDLP_TIMEOUT = parseInt(process.env.YTDLP_TIMEOUT, 10) || 15 * 60 * 1000;
+const TIKTOK_URL_RE = /^https?:\/\/(?:www\.|vm\.|vt\.|m\.)?tiktok\.com\//i;
 
 // --- API hardening: token auth + rate limiting ---
-// Token is read from env (API_TOKEN). The PlayTube site sends it via the
-// Authorization: Bearer header (connect_to_url 'bearer' option) — never in the
-// URL or access logs. Compare with timingSafeEqual to avoid timing leaks.
 const API_TOKEN = process.env.API_TOKEN || '';
 if (!API_TOKEN) {
     console.warn('[SECURITY] API_TOKEN is not set. Requests will be rejected until you set it in .env and in the PlayTube admin (see playtube.sql config keys tiktok_api_token).');
@@ -127,8 +133,10 @@ function rateLimiter(req, res, next) {
     next();
 }
 
+// Public paths: health probe and the media proxy (media has its own limiter).
 app.use((req, res, next) => {
-    if (String(req.path).startsWith('/health')) return next();
+    const p = String(req.path);
+    if (p.startsWith('/health') || p.startsWith('/api/tiktok/media')) return next();
     authRequired(req, res, () => rateLimiter(req, res, next));
 });
 
@@ -138,27 +146,25 @@ app.get('/health', (req, res) => {
         status: 'ok',
         service: 'tiktok-downloader',
         uptimeSeconds: Math.floor(process.uptime()),
+        binary: path.basename(YTDLP),
         tokenSet: !!API_TOKEN
     });
 });
 
-
-function deepFindItemStructs(obj, results) {
-    if (obj === null || typeof obj !== 'object') {
-        return;
-    }
-    if (Array.isArray(obj)) {
-        for (const item of obj) {
-            deepFindItemStructs(item, results);
-        }
-        return;
-    }
-    if (obj.itemStruct && obj.itemStruct.video && obj.itemStruct.video.id) {
-        results.push(obj.itemStruct);
-    }
-    for (const key of Object.keys(obj)) {
-        deepFindItemStructs(obj[key], results);
-    }
+// --- yt-dlp helpers ----------------------------------------------------------
+function runYtdlp(args, timeoutMs) {
+    return new Promise((resolve, reject) => {
+        execFile(YTDLP, args, { maxBuffer: 128 * 1024 * 1024, timeout: timeoutMs || YTDLP_TIMEOUT }, (err, stdout, stderr) => {
+            if (err) {
+                let msg = String(stderr || err.message || '').trim();
+                if (!msg) msg = err.message;
+                const lines = msg.split('\n').filter(Boolean);
+                reject(new Error(lines[lines.length - 1] || msg));
+                return;
+            }
+            resolve(stdout);
+        });
+    });
 }
 
 function secondsToIso(seconds) {
@@ -169,167 +175,191 @@ function secondsToIso(seconds) {
     return 'PT' + (h > 0 ? h + 'H' : '') + (m > 0 || h > 0 ? m + 'M' : '') + sec + 'S';
 }
 
-function mapItemStruct(itemStruct) {
-    const v = itemStruct.video || {};
-    const author = itemStruct.author || {};
-    return {
-        id: v.id || itemStruct.id || '',
-        title: author.nickname || itemStruct.desc || '',
-        desc: itemStruct.desc || '',
-        thumbnail: (v.cover && typeof v.cover === 'object' ? v.cover.urlList[0] : v.cover) || '',
-        duration: secondsToIso(v.duration),
-        author: author.uniqueId || author.nickname || '',
-        video_url: (v.downloadAddr && v.downloadAddr.urlList[0]) || v.downloadAddr || ''
-    };
+function pickThumb(info) {
+    if (info && info.thumbnail) return info.thumbnail;
+    const ts = (info && Array.isArray(info.thumbnails)) ? info.thumbnails : [];
+    return ts.length ? ts[ts.length - 1].url : '';
 }
 
-async function extractFromUniversalData(videoUrl) {
-    let browser;
-    try {
-        browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+function videoIdFromUrl(url) {
+    const m = /\/video\/(\d+)/.exec(String(url || ''));
+    return m ? m[1] : '';
+}
+
+function mediaEndpoint(req, videoUrl) {
+    // TLS terminates at the platform (App Service/ingress), so req.protocol is
+    // "http" on the inside — always advertise https for the public URL.
+    return 'https://' + req.get('host') + '/api/tiktok/media?video_url=' + encodeURIComponent(videoUrl);
+}
+
+async function mapUserItems(username, limit) {
+    const url = 'https://www.tiktok.com/@' + encodeURIComponent(username);
+    const raw = await runYtdlp(['--flat-playlist', '-I', '1:' + limit, '-J', '--no-warnings', '--no-check-certificates', '--no-playlist', url]);
+    const data = JSON.parse(raw);
+    const entries = (data && Array.isArray(data.entries)) ? data.entries : [];
+    const results = [];
+    for (const e of entries) {
+        if (!e || !e.id) continue;
+        const id = String(e.id);
+        const dur = parseInt(e.duration || 0, 10) || 0;
+        const title = String(e.title || '').replace(new RegExp('^' + username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\d*\\s*', 'i'), '');
+        results.push({
+            id,
+            title: title.slice(0, 200) || (e.description || '').slice(0, 200) || '',
+            desc: '',
+            thumbnail: pickThumb(e),
+            author: username,
+            duration: secondsToIso(dur),
+            duration_seconds: dur,
+            video_url: 'https://www.tiktok.com/@' + username + '/video/' + id
         });
-        const page = await browser.newPage();
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-        await page.goto(videoUrl, { waitUntil: 'networkidle2', timeout: 60000 });
-
-        const universal = await page.evaluate(() => {
-            const script = document.querySelector('script[data-e2e="parser-data"]');
-            if (script && script.innerText) {
-                try {
-                    const data = JSON.parse(script.innerText);
-                    return data.__UNIVERSAL_DATA_FOR_REHYDRATION__ || null;
-                } catch (e) {
-                    return null;
-                }
-            }
-            return null;
-        });
-
-        await browser.close();
-
-        if (!universal) {
-            return [];
-        }
-
-        const structs = [];
-        deepFindItemStructs(universal, structs);
-        const seen = new Set();
-        const items = [];
-        for (const struct of structs) {
-            const id = (struct.video && struct.video.id) || struct.id;
-            if (!id || seen.has(id)) {
-                continue;
-            }
-            seen.add(id);
-            items.push(mapItemStruct(struct));
-        }
-        return items;
-    } catch (err) {
-        if (browser) await browser.close();
-        throw err;
     }
+    return results;
 }
 
+// --- API: resolve a single TikTok video -------------------------------------
 app.get('/api/tiktok/info', async (req, res) => {
     try {
-        const videoUrl = req.query.video_url;
-        if (!videoUrl) {
-            return res.status(400).json({ success: false, message: 'video_url is required' });
+        const videoUrl = String(req.query.video_url || '').trim();
+        if (!videoUrl || !TIKTOK_URL_RE.test(videoUrl)) {
+            return res.status(400).json({ success: false, message: 'A valid tiktok.com URL is required' });
         }
-
-        let browser;
-        try {
-            browser = await puppeteer.launch({
-                headless: true,
-                args: ['--no-sandbox', '--disable-setuid-sandbox']
-            });
-            const page = await browser.newPage();
-            await page.goto(videoUrl, { waitUntil: 'networkidle2', timeout: 60000 });
-
-            // Try to extract __UNIVERSAL_DATA_FOR_REHYDRATION__ from parser-data script
-            const videoInfo = await page.evaluate(() => {
-                const script = document.querySelector('script[data-e2e="parser-data"]');
-                if (script && script.innerText) {
-                    try {
-                        const data = JSON.parse(script.innerText);
-                        return data.__UNIVERSAL_DATA_FOR_REHYDRATION__ || null;
-                    } catch (e) {
-                        return null;
-                    }
-                }
-                return null;
-            });
-
-            await browser.close();
-
-            if (videoInfo && videoInfo.videoData && videoInfo.videoData.itemStruct && videoInfo.videoData.itemStruct.video) {
-                const mapped = mapItemStruct(videoInfo.videoData.itemStruct);
-                res.json({
-                    success: true,
-                    video_url: mapped.video_url,
-                    cover: mapped.thumbnail,
-                    id: mapped.id,
-                    title: mapped.title,
-                    desc: mapped.desc
-                });
-            } else if (videoInfo) {
-                const structs = [];
-                deepFindItemStructs(videoInfo, structs);
-                if (structs.length > 0) {
-                    const mapped = mapItemStruct(structs[0]);
-                    res.json({
-                        success: true,
-                        video_url: mapped.video_url,
-                        cover: mapped.thumbnail,
-                        id: mapped.id,
-                        title: mapped.title,
-                        desc: mapped.desc
-                    });
-                } else {
-                    res.status(404).json({ success: false, message: 'Could not extract video info' });
-                }
-            } else {
-                res.status(404).json({ success: false, message: 'Could not extract video info' });
-            }
-        } catch (err) {
-            if (browser) await browser.close();
-            res.status(500).json({ success: false, message: 'Error: ' + err.message });
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        const raw = await runYtdlp(['-J', '--no-warnings', '--no-check-certificates', '--no-playlist', videoUrl]);
+        const info = JSON.parse(raw);
+        const dur = parseInt(info.duration || 0, 10) || 0;
+        res.json({
+            success: true,
+            video_url: mediaEndpoint(req, videoUrl),
+            cover: pickThumb(info),
+            id: String(info.id || videoIdFromUrl(videoUrl)),
+            title: String(info.title || info.description || '').slice(0, 300),
+            desc: String(info.description || '').slice(0, 2000),
+            author: String(info.uploader || info.channel || '').replace(/^@/, ''),
+            duration: secondsToIso(dur),
+            duration_seconds: dur
+        });
+    } catch (e) {
+        res.status(500).json({ success: false, message: e.message });
     }
 });
 
-app.get('/api/tiktok/search', async (req, res) => {
-    try {
-        const query = req.query.query;
-        const limit = Math.min(parseInt(req.query.limit, 10) || 30, 60);
-        if (!query) {
-            return res.status(400).json({ success: false, message: 'query is required' });
-        }
-        const items = await extractFromUniversalData('https://www.tiktok.com/search?q=' + encodeURIComponent(query));
-        res.json({ success: true, limit: limit, results: items.slice(0, limit) });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-});
-
+// --- API: latest videos for a TikTok username --------------------------------
 app.get('/api/tiktok/user', async (req, res) => {
     try {
-        let username = (req.query.username || '').trim().replace(/^@/, '');
+        let username = String(req.query.username || '').trim().replace(/^@/, '');
         const limit = Math.min(parseInt(req.query.limit, 10) || 30, 60);
         if (!username) {
             return res.status(400).json({ success: false, message: 'username is required' });
         }
-        const items = await extractFromUniversalData('https://www.tiktok.com/@' + encodeURIComponent(username));
-        res.json({ success: true, username: username, limit: limit, results: items.slice(0, limit) });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        const results = await mapUserItems(username, limit);
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'No videos found for this username (private or blocked?).' });
+        }
+        res.json({ success: true, username, limit, results });
+    } catch (e) {
+        res.status(500).json({ success: false, message: e.message });
     }
 });
 
+// --- API: keyword search ------------------------------------------------------
+// TikTok hides keyword search behind a signed-in session (login wall), so it
+// cannot be scraped anonymously. When the query looks like a username we route
+// straight to the user profile listing; otherwise we return a helpful error.
+app.get('/api/tiktok/search', async (req, res) => {
+    try {
+        const query = String(req.query.query || '').trim();
+        const limit = Math.min(parseInt(req.query.limit, 10) || 30, 60);
+        if (!query) {
+            return res.status(400).json({ success: false, message: 'query is required' });
+        }
+        if (/^@?[\w.]{2,24}$/.test(query)) {
+            const username = query.replace(/^@/, '');
+            const results = await mapUserItems(username, limit);
+            return res.json({ success: true, limit, results });
+        }
+        res.json({
+            success: false,
+            message: 'TikTok does not allow anonymous keyword search. Use "Import From User" with a TikTok username (e.g. @user) or paste a TikTok video URL from the Import Video page instead.'
+        });
+    } catch (e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+async function downloadTikTokMedia(videoUrl, base) {
+    // TikTok CDN links are transient and occasionally answer Range/resume
+    // requests with 416. Retry with fresh attempts (cleaning any partial
+    // output between tries) and fall back to a single-format download if the
+    // merge keeps failing.
+    const mergeFlags = ['-f', 'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/b', '--merge-output-format', 'mp4'];
+    const singleFlags = ['-f', 'b', '--merge-output-format', 'mp4'];
+    let lastErr = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+        if (attempt > 0) {
+            await new Promise((r) => setTimeout(r, 1500 * attempt));
+        }
+        for (const flags of [mergeFlags, ...(attempt >= 2 ? [singleFlags] : [])]) {
+            try {
+                await runYtdlp([
+                    ...flags,
+                    '--no-playlist', '--no-part', '--no-mtime',
+                    '--no-warnings', '--no-check-certificates',
+                    '-o', base, videoUrl
+                ]);
+                return;
+            } catch (e) {
+                lastErr = e;
+                try {
+                    const stem = path.basename(base).replace('.%(ext)s', '');
+                    for (const f of fs.readdirSync(MEDIA_DIR)) {
+                        if (f === stem || f.startsWith(stem + '.')) {
+                            fs.rmSync(path.join(MEDIA_DIR, f), { force: true });
+                        }
+                    }
+                } catch (_) {}
+            }
+        }
+    }
+    throw lastErr || new Error('media download failed');
+}
+
+// --- API: muxed MP4 proxy (public, rate-limited) ------------------------------
+// The site streams the no-watermark video+audio here; the merged file is cached
+// briefly so repeated downloads (multiple queue attempts) are cheap.
+app.get('/api/tiktok/media', (req, res) => {
+    rateLimiter(req, res, async () => {
+        try {
+            const videoUrl = String(req.query.video_url || '').trim();
+            if (!videoUrl || !TIKTOK_URL_RE.test(videoUrl)) {
+                return res.status(400).json({ success: false, message: 'video_url is required' });
+            }
+            if (!fs.existsSync(MEDIA_DIR)) {
+                fs.mkdirSync(MEDIA_DIR, { recursive: true });
+            }
+            const key = crypto.createHash('sha256').update(videoUrl).digest('hex');
+            const finalPath = path.join(MEDIA_DIR, key + '.mp4');
+            if (!fs.existsSync(finalPath) || Date.now() - fs.statSync(finalPath).mtimeMs > MEDIA_TTL_MS) {
+                const base = path.join(MEDIA_DIR, key + '.%(ext)s');
+                await downloadTikTokMedia(videoUrl, base);
+                const match = fs.readdirSync(MEDIA_DIR).find(f => f.startsWith(key + '.') && f.toLowerCase().endsWith('.mp4'));
+                if (!match) {
+                    return res.status(502).json({ success: false, message: 'Could not render media' });
+                }
+                const tmpMerged = path.join(MEDIA_DIR, match);
+                if (tmpMerged !== finalPath) {
+                    fs.renameSync(tmpMerged, finalPath);
+                }
+            }
+            res.setHeader('Content-Type', 'video/mp4');
+            res.setHeader('Content-Disposition', 'inline; filename="video.mp4"');
+            res.setHeader('Cache-Control', 'private, max-age=' + Math.floor(MEDIA_TTL_MS / 1000));
+            fs.createReadStream(finalPath).pipe(res);
+        } catch (e) {
+            res.status(500).json({ success: false, message: e.message });
+        }
+    });
+});
+
 app.listen(PORT, () => {
-    console.log(`TikTok downloader API running on port ${PORT}`);
+    console.log(`TikTok downloader API running on port ${PORT} (yt-dlp: ${YTDLP})`);
 });

@@ -1,36 +1,72 @@
-<!-- Twitter Card data -->
-<meta name="twitter:card" content="summary">
-<meta name="twitter:site" content="@publisher_handle">
-<meta name="twitter:title" content="{{TITLE}}">
-<meta name="twitter:description" content="{{DESC}}">
-<meta name="twitter:creator" content="@author_handle">
-<meta name="twitter:image" content="{{THUMB}}">
-
 <!-- Open Graph data -->
-<meta property="og:title" content="{{TITLE}}" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="{{URL}}" />
-<meta property="og:image" content="{{THUMB}}" />
-<meta property="og:description" content="{{DESC}}" /> 
-<meta name="thumbnail" content="{{THUMB}}" />
+<meta property="og:title" content="{{OG_TITLE}}" />
+<meta property="og:type" content="{{OG_TYPE}}" />
+<meta property="og:url" content="{{OG_URL}}" />
+<meta property="og:image" content="{{OG_IMAGE}}" />
+<meta property="og:description" content="{{OG_DESC}}" />
+<meta property="og:site_name" content="{{CONFIG name}}" />
+<meta property="og:locale" content="en_US" />
+<meta property="fb:app_id" content="1643990952546825" />
+<meta name="thumbnail" content="{{OG_IMAGE}}" />
 
-<?php if (!empty($pt->get_video)) { ?>
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "MusicGroup",
-    "image": [
-        "<?php echo $pt->get_video->thumbnail; ?>"
-    ],
-    "name": "<?php echo FilterStripTags($pt->get_video->title); ?>",
-    "subjectOf": {
-        "@type": "VideoObject",
-        "description": "<?php echo FilterStripTags($pt->get_video->markup_description); ?>",
-        "duration": "<?php echo time_to_iso8601_duration(strtotime($pt->get_video->duration)); ?>",
-        "name": "<?php echo FilterStripTags($pt->get_video->title); ?>",
-        "thumbnailUrl": "<?php echo $pt->get_video->thumbnail; ?>",
-        "uploadDate": "<?php echo date('c',$pt->get_video->time); ?>"
+<!-- Twitter Card data -->
+<meta name="twitter:card" content="{{TW_CARD}}" />
+<meta name="twitter:title" content="{{OG_TITLE}}" />
+<meta name="twitter:description" content="{{OG_DESC}}" />
+<meta name="twitter:image" content="{{OG_IMAGE}}" />
+
+<?php
+if (!empty($pt->get_video) && !empty($pt->is_video_page)) {
+    $video_json = array(
+        '@context' => 'https://schema.org',
+        '@type' => 'VideoObject',
+        'name' => (string) $pt->get_video->title,
+        'description' => (string) FilterStripTags($pt->get_video->edit_description),
+        'thumbnailUrl' => (string) $pt->seo_thumb,
+        'uploadDate' => date('c', $pt->get_video->time),
+        'duration' => PT_ISO8601_Duration($pt->get_video->duration),
+        'contentUrl' => (string) $pt->seo_url,
+        'embedUrl' => (string) $pt->config->site_url . '/embed/' . PT_Slug($pt->get_video->title, $pt->get_video->video_id),
+        'interactionCount' => (string) $pt->get_video->views,
+        'interactionStatistic' => array(
+            '@type' => 'InteractionCounter',
+            'interactionType' => array('@type' => 'WatchAction'),
+            'userInteractionCount' => (int) $pt->get_video->views
+        ),
+        'publisher' => array(
+            '@type' => 'Organization',
+            'name' => (string) $pt->config->name
+        ),
+        'author' => array(
+            '@type' => 'Person',
+            'name' => (string) $pt->get_video->owner->name
+        )
+    );
+    if (!empty($pt->config->language)) {
+        $video_json['inLanguage'] = (string) $pt->config->language;
     }
+    echo '<script type="application/ld+json">' . json_encode($video_json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . '</script>';
 }
-</script>
-<?php } ?>
+else if (!empty($pt->article)) {
+    $article_json = array(
+        '@context' => 'https://schema.org',
+        '@type' => 'Article',
+        'name' => (string) FilterStripTags($pt->article->title),
+        'headline' => (string) FilterStripTags($pt->article->title),
+        'description' => (string) FilterStripTags($pt->article->description),
+        'image' => (string) $pt->seo_thumb,
+        'url' => (string) $pt->seo_url,
+        'datePublished' => date('c', $pt->article->time),
+        'dateModified' => date('c', $pt->article->time),
+        'author' => array(
+            '@type' => 'Organization',
+            'name' => (string) $pt->config->name
+        ),
+        'publisher' => array(
+            '@type' => 'Organization',
+            'name' => (string) $pt->config->name
+        )
+    );
+    echo '<script type="application/ld+json">' . json_encode($article_json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . '</script>';
+}
+?>

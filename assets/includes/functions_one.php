@@ -348,7 +348,7 @@ function PT_GetVideoByID($video_id = '', $add_views = 0, $likes_dislikes = 0, $r
 
         }
         $get_video->type         = 'video';
-        if (!empty($get_video->youtube) && $get_video->converted == 1) {
+        if (!empty($get_video->youtube) && $get_video->converted == 1 && !empty($get_video->video_location)) {
             $get_video->youtube        = '';
             $get_video->video_type     = 'video/mp4';
             $get_video->source         = 'Uploaded';
@@ -1249,6 +1249,9 @@ function PT_AzureBlobRequest($method = 'GET', $blobPath = '', $body = null, $bod
         'x-ms-date'    => $date,
         'x-ms-version' => '2021-02-12'
     );
+    if ($method == 'PUT') {
+        $headers['x-ms-blob-type'] = 'BlockBlob';
+    }
 
     $canonicalHeaders = '';
     $msHeaders        = array();
@@ -1293,6 +1296,7 @@ function PT_AzureBlobRequest($method = 'GET', $blobPath = '', $body = null, $bod
     );
     if ($method == 'PUT') {
         $curlHeaders[] = 'Content-Type: application/octet-stream';
+        $curlHeaders[] = 'x-ms-blob-type: BlockBlob';
     }
 
     $ch = curl_init($url);
@@ -3302,10 +3306,17 @@ function GetIso()
 {
     global $pt,$db;
     $iso = array();
-    foreach ($pt->langs as $key => $value) {
-        $info = $db->where('lang_name',$value)->getOne(T_LANG_ISO);
-        if (!empty($info) && !empty($info->iso)) {
-            $iso[$value] = $info->iso;
+    if (!empty($pt->langs)) {
+        $esc = array();
+        foreach ($pt->langs as $value) {
+            $esc[] = "'".$db->escape($value)."'";
+        }
+        $in   = implode(',',$esc);
+        $rows = $db->rawQuery("SELECT lang_name, iso FROM ".T_LANG_ISO." WHERE lang_name IN (".$in.")");
+        foreach ($rows as $info) {
+            if (!empty($info->lang_name) && !empty($info->iso)) {
+                $iso[$info->lang_name] = $info->iso;
+            }
         }
     }
     return $iso;
@@ -3314,10 +3325,17 @@ function LangsStatus()
 {
     global $pt,$db;
     $iso = array();
-    foreach ($pt->langs as $key => $value) {
-        $info = $db->where('lang_name',$value)->getOne(T_LANG_ISO);
-        if (!empty($info) && isset($info->status)) {
-            $iso[$value] = $info->status;
+    if (!empty($pt->langs)) {
+        $esc = array();
+        foreach ($pt->langs as $value) {
+            $esc[] = "'".$db->escape($value)."'";
+        }
+        $in   = implode(',',$esc);
+        $rows = $db->rawQuery("SELECT lang_name, status FROM ".T_LANG_ISO." WHERE lang_name IN (".$in.")");
+        foreach ($rows as $info) {
+            if (!empty($info->lang_name) && isset($info->status)) {
+                $iso[$info->lang_name] = $info->status;
+            }
         }
     }
     return $iso;
@@ -3484,6 +3502,17 @@ function SaveTiktokVideo($url='')
     $d = fopen($filename, "w");
     fwrite($d, $data);
     fclose($d);
+
+    // Validate before persisting: the muxed mp4 must look like an MP4, not an
+    // error/JSON payload from the mux API or a truncated response. Otherwise
+    // a bogus "video" would be uploaded and linked into the library.
+    $size = @filesize($filename);
+    $head = @file_get_contents($filename, false, null, 0, 64);
+    $is_mp4 = !empty($head) && strpos($head, 'ftyp') !== false && strncmp($head, '{"', 2) !== 0 && strncmp($head, '<', 1) !== 0;
+    if ($httpcode < 200 || $httpcode >= 400 || empty($data) || !$is_mp4 || $size < 1024) {
+        @unlink($filename);
+        return '';
+    }
 
     PT_UploadToS3($filename);
 

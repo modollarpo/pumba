@@ -521,14 +521,14 @@
 				<h5><div class="badge badge-info bold p-2">{{LANG <?php echo $pt->get_video->license; ?>}}</div></h5>
 			<?php } ?>
 				
-			<h2 class="font-weight-bold m-0 tag_video_title" itemprop="title">
+			<h1 class="font-weight-bold m-0 tag_video_title" itemprop="title">
 				{{TITLE}}
 				<?php if ($pt->get_video->sell_video > 0) { ?>
 					<?php if ($pt->video_approved == true) { ?>
 						<span title="{{LANG video_verified}}"><svg xmlns="http://www.w3.org/2000/svg" class="main" width="28" height="28" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M7 12l5 5l10 -10"></path><path d="M2 12l5 5m5 -5l5 -5"></path></svg></span>
 					<?php } ?>
 				<?php } ?>
-			</h2>
+			</h1>
 			
 			<div class="d-flex align-items-center justify-content-between gap-15 flex-wrap py-2 my-3 position-relative">
 				<?php if (($pt->config->sell_videos_system == 'on') || $pt->get_video->sell_video == 0 ) { ?>

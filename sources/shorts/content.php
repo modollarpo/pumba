@@ -189,8 +189,6 @@ foreach ($videos as $key => $value) {
 			$desc = str_replace("\n", "", $desc);
 			$desc = str_replace("\r", "", $desc);
 			$desc = mb_substr($desc, 0, 220, "UTF-8");
-			$desc = htmlspecialchars($desc);
-			$desc = filter_var ( $desc, FILTER_UNSAFE_RAW);
 			$pt->description = $desc;
 		}
 		if ($pt->config->history_system == 'on' && IS_LOGGED == true && $user->pause_history == 0) {

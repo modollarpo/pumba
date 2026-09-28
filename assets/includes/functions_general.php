@@ -1663,6 +1663,34 @@ function FilterStripTags($string='')
 {
     return filter_var(strip_tags($string), FILTER_UNSAFE_RAW);
 }
+function PT_ISO8601_Duration($duration = '') {
+    $duration = trim((string) $duration);
+    if (empty($duration)) {
+        return 'PT0S';
+    }
+    if (preg_match('/^P/i', $duration)) {
+        return strtoupper($duration);
+    }
+    $h = 0; $m = 0; $s = 0;
+    if (preg_match('/^(\d+):(\d{1,2}):(\d{1,2})$/', $duration, $matches)) {
+        $h = (int) $matches[1]; $m = (int) $matches[2]; $s = (int) $matches[3];
+    } elseif (preg_match('/^(\d+):(\d{1,2})$/', $duration, $matches)) {
+        $m = (int) $matches[1]; $s = (int) $matches[2];
+    } elseif (is_numeric($duration)) {
+        $s = (int) $duration;
+    }
+    return time_to_iso8601_duration(($h * 3600) + ($m * 60) + $s);
+}
+function PT_CleanSeoText($text = '', $len = 160) {
+    $text = html_entity_decode((string) $text, ENT_QUOTES, 'UTF-8');
+    $text = strip_tags($text);
+    $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/u', ' ', $text);
+    $text = trim(preg_replace('/\s+/u', ' ', $text));
+    if (mb_strlen($text, 'UTF-8') > $len) {
+        $text = rtrim(mb_substr($text, 0, $len - 1, 'UTF-8')) . '…';
+    }
+    return $text;
+}
 function time_to_iso8601_duration($time) {
     $units = array(
         "Y" => 365*24*3600,

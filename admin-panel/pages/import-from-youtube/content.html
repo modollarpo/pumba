@@ -55,7 +55,7 @@ if (!empty($_GET['query']) || !empty($_GET['multi-query'])) {
             if ($i > 0 && !empty($next_token)) {
                 $loop_url .= '&pageToken=' . rawurlencode($next_token);
             }
-            $api_response = connect_to_url($loop_url);
+            $api_response = connect_to_url($loop_url, array('hmac' => (isset($pt->config->yt_api_token) ? $pt->config->yt_api_token : '')));
             if (empty($api_response)) {
                 $respond_error = 1;
                 $error_text = 'Something went wrong, please try again later';
@@ -71,6 +71,9 @@ if (!empty($_GET['query']) || !empty($_GET['multi-query'])) {
             $new_count  = 0;
             if (!empty($search_data->results)) {
                 foreach ($search_data->results as $key => $video) {
+                    if (empty($video->id)) {
+                        continue;
+                    }
                     $check_if_exists = $db->where('youtube', $video->id)->getValue(T_VIDEOS, 'count(*)');
                     if ($check_if_exists == 0) {
                         $new_count++;
@@ -294,11 +297,15 @@ if (!empty($_GET['auto_import'])) {
 					                    $tags = implode(',', $tags_array);
 					                }
 					            }
-					            $duration = '00:00';
-					            if (!empty(covtime($video->contentDetails->duration))) {
-					                $duration = covtime($video->contentDetails->duration);
-					            }
-	                        	$array_data = array(
+$duration = '00:00';
+	                        try {
+	                            if (!empty($video->contentDetails->duration)) {
+	                                $duration = covtime($video->contentDetails->duration);
+	                            }
+	                        } catch (\Exception $e) {
+	                            $duration = '00:00';
+	                        }
+	                        $array_data = array(
 	                        		'ID' => $video->id,
 	                        		'TITLE' => $video->snippet->title,
 	                        		'DESC' => $video->snippet->description,

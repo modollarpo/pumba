@@ -15,8 +15,18 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 		<meta name="version" content="<?php echo Tag_version(); ?>">
 		
-		<?php if (!empty($pt->video_privacy)) { ?>
-			<meta name="robots" content="noindex">
+		<?php
+			$pt_noindex_pages = array('login','register','messages','settings','dashboard','upload-video','import-video','manage-videos','edit-video','wallet','transactions','subscriptions','liked-videos','saved-videos','history','watch_later','notifications','confirm','forgot_password','reset-password','two_factor_login','two_factor_submit','oauth','age_block','maintenance','members','search');
+			if (!empty($pt->video_privacy) || in_array($pt->page, $pt_noindex_pages)) {
+				$pt_robots = 'noindex, nofollow';
+			}
+			else{
+				$pt_robots = 'index, follow';
+			}
+		?>
+		<meta name="robots" content="<?php echo $pt_robots; ?>">
+		<?php if (!empty($pt->page_url_)) { ?>
+			<link rel="canonical" href="<?php echo($pt->page_url_); ?>"/>
 		<?php } ?>
 		
 		<meta property="fb:app_id" content="1643990952546825" />
@@ -27,9 +37,7 @@
 			<meta name="dailymotion-domain-verification" content="{{CONFIG dailymotion_id}}" />
 		<?php } ?>
 		
-		<?php if (!empty($pt->page_url_)) { ?>
-			<link rel="canonical" href="<?php echo($pt->page_url_); ?>"/>
-		<?php } ?>
+		<meta name="theme-color" content="#0F1014">
 		
 		{{OG_METATAGS}}
 	  
@@ -38,6 +46,7 @@
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 	  
 		<link rel="shortcut icon" type="image/png" href="{{CONFIG theme_url}}/img/icon.png"/>
+		<link rel="apple-touch-icon" href="{{CONFIG theme_url}}/img/icon.png"/>
 		<link rel="stylesheet" href="{{CONFIG theme_url}}/css/jquery-ui.min.css">
 		<link rel="stylesheet" href="{{CONFIG theme_url}}/css/jquery.tagit.css">
 		<link rel="stylesheet" href="{{CONFIG theme_url}}/css/font-awesome-4.7.0/css/font-awesome.min.css">

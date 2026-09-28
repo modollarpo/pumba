@@ -34,7 +34,7 @@ if (!empty($_GET['query'])) {
         } else {
             $api_url = $tiktok_api_url . '/api/tiktok/search?query=' . rawurlencode($query) . '&limit=' . intval($limit);
         }
-        $api_response = connect_to_url($api_url);
+        $api_response = connect_to_url($api_url, array('hmac' => $pt->config->tiktok_api_token));
         if (empty($api_response)) {
             $respond_error = 1;
             $error_text = 'Something went wrong, please try again later';
@@ -57,8 +57,8 @@ if (!empty($_GET['query'])) {
                             $thumb = $video->thumbnail;
                         }
                         $duration = '00:00';
-                        if (!empty($video->duration) && !empty(covtime($video->duration))) {
-                            $duration = covtime($video->duration);
+                        if (!empty($video->duration)) {
+                            $duration = $video->duration;
                         }
                         $items[] = (object) array(
                             'ID' => $feedback_video_id,

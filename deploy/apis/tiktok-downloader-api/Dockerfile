@@ -1,19 +1,17 @@
 # TikTok Downloader API (Azure App Service F1 / generic Linux host).
 #   docker build -t playtube/tt-api:<tag> .
-# Runs Puppeteer against the Chromium downloaded during `npm install`
-# (PUPPETEER_CACHE_DIR keeps it in the image). Entrypoint: `node app.js`.
+# yt-dlp resolves TikTok content and ffmpeg muxes the separated
+# video/audio streams into a single playable MP4. Entrypoint: `node app.js`.
 FROM node:20-bookworm-slim
 
 ENV PORT=3000 \
-    PUPPETEER_CACHE_DIR=/opt/puppeteer
+    YTDLP_BIN=/usr/local/bin/yt-dlp \
+    MEDIA_DIR=/tmp/tt-media
 
-# Chromium headless runtime deps for Puppeteer 23+ on Debian bookworm.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        ca-certificates fonts-liberation xdg-utils \
-        libasound2 libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 \
-        libcups2 libdbus-1-3 libdrm2 libgbm1 libgtk-3-0 \
-        libnspr4 libnss3 libx11-6 libxcb1 libxcomposite1 libxdamage1 \
-        libxext6 libxfixes3 libxkbcommon0 libxrandr2 \
+        ca-certificates curl ffmpeg \
+    && curl -L -o /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux \
+    && chmod +x /usr/local/bin/yt-dlp \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/app
