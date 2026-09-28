@@ -88,6 +88,20 @@ body, .btn, input, textarea, select, .form-control, .modal-body, .dropdown-menu 
 .head_sidebar_menu a { font-size: 13px; }
 .head_sidebar_menu a svg, .head_sidebar_menu a img { width: 24px; height: 24px; }
 
+/* The icon rail is 100px wide (style.css), so every offset that was sized for
+   the old 70px header / 124px rail has to be pulled back into line with the
+   56px header above. Desktop only - below 768px the rail becomes a 60px
+   bottom bar and style.css sets its own offsets. */
+@media (min-width: 768px) {
+	.main-content {
+		margin-top: 56px;
+		min-height: calc(100vh - 56px);
+		min-height: calc(var(--vh, 1vh) * 100 - 56px);
+	}
+	.tag_header_ddown { left: 100px; }
+	.tag_header_ddown .btn-close { margin-top: 56px; }
+}
+
 .tag_home_vid_list > .title { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
 .tag_home_vid_list .title a svg { display: none; }
 
@@ -103,7 +117,8 @@ body, .btn, input, textarea, select, .form-control, .modal-body, .dropdown-menu 
 
 .tag_video_grid_list:before { display: none !important; }
 .tag_video_grid_list .thumb { border-radius: 10px; background: #000; }
-.tag_video_grid_list .thumb img { border-radius: 10px; }
+.tag_video_grid_list .thumb img { border-radius: 10px; transition: transform 0.15s ease; }
+.tag_video_grid_list:hover .thumb img { transform: scale(1.04); }
 .tag_video_grid_list .duration {
 	right: 6px; bottom: 6px; left: auto;
 	background: rgba(0, 0, 0, 0.8);

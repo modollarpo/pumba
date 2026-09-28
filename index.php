@@ -180,6 +180,7 @@ $footer            = '';
 
 
 $og_meta = '';
+$og_is_specific = false;
 $pt->is_video_page = false;
 $pt->seo_thumb = '';
 $pt->seo_url = '';
@@ -189,6 +190,7 @@ if (file_exists('./themes/' . $pt->config->theme . '/img/logo.png')) {
 }
 if (in_array($pt->page, array('watch', 'shorts')) && !empty($get_video)) {
     $pt->is_video_page = true;
+    $og_is_specific = true;
     $pt->seo_url = $get_video->url;
     $pt->seo_thumb = PT_GetMedia(str_replace('mqdefault', 'maxresdefault', $get_video->thumbnail));
     $og_type = (!empty($get_video->is_movie) && $get_video->is_movie == 1) ? 'video.movie' : 'video.other';
@@ -204,6 +206,7 @@ if (in_array($pt->page, array('watch', 'shorts')) && !empty($get_video)) {
 }
 if ($pt->page == 'read') {
     $pt->article = $article;
+    $og_is_specific = true;
     $pt->seo_url = PT_Link('articles/read/' . PT_URLSlug($article->title, $article->id));
     $pt->seo_thumb = PT_GetMedia($article->image);
     $og_meta = PT_LoadPage('watch/og-meta', array(
@@ -214,19 +217,6 @@ if ($pt->page == 'read') {
         'OG_DESC' => htmlspecialchars(PT_CleanSeoText($pt->description, 300)),
         'TW_CARD' => 'summary_large_image'
     ));
-}
-if (empty($og_meta)) {
-    $og_meta = '<meta property="og:site_name" content="' . htmlspecialchars($pt->config->name) . '" />
-<meta property="og:locale" content="en_US" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="' . (!empty($pt->page_url_) ? htmlspecialchars($pt->page_url_) : htmlspecialchars($pt->config->site_url)) . '" />
-<meta property="og:title" content="' . htmlspecialchars($pt->title) . '" />
-<meta property="og:image" content="' . htmlspecialchars($og_image_default) . '" />
-<meta property="og:description" content="' . htmlspecialchars(PT_CleanSeoText($pt->description, 160)) . '" />
-<meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="' . htmlspecialchars($pt->title) . '" />
-<meta name="twitter:description" content="' . htmlspecialchars(PT_CleanSeoText($pt->description, 200)) . '" />
-<meta name="twitter:image" content="' . htmlspecialchars($og_image_default) . '" />';
 }
 if ($pt->page == 'home') {
     $og_meta .= '<script type="application/ld+json">
@@ -326,6 +316,26 @@ if (!empty($pt->config->seo)) {
         $pt->description = str_replace('{SITE_DESC}', $pt->config->description, $seo[$page]['meta_description']);
         $pt->keyword     = str_replace('{SITE_KEYWORDS}', $pt->config->keyword, $seo[$page]['meta_keywords']);
     }
+}
+
+/* Generic OG/Twitter tags are emitted here rather than alongside the video and
+   article tags above, because the custom SEO block above is what produces the
+   final page title/description. Emitting them earlier made og:title disagree with
+   <title> (e.g. "Articles | SITE" vs "Articles - SITE"). The guard tests
+   $og_is_specific rather than empty($og_meta), because the JSON-LD and hreflang
+   blocks below already append to $og_meta on every page. */
+if (!$og_is_specific) {
+    $og_meta = '<meta property="og:site_name" content="' . htmlspecialchars($pt->config->name) . '" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="' . (!empty($pt->page_url_) ? htmlspecialchars($pt->page_url_) : htmlspecialchars($pt->config->site_url)) . '" />
+<meta property="og:title" content="' . htmlspecialchars($pt->title) . '" />
+<meta property="og:image" content="' . htmlspecialchars($og_image_default) . '" />
+<meta property="og:description" content="' . htmlspecialchars(PT_CleanSeoText($pt->description, 160)) . '" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="' . htmlspecialchars($pt->title) . '" />
+<meta name="twitter:description" content="' . htmlspecialchars(PT_CleanSeoText($pt->description, 200)) . '" />
+<meta name="twitter:image" content="' . htmlspecialchars($og_image_default) . '" />';
 }
 
 $getHeaderAds = PT_GetAd('header');
