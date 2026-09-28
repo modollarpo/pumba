@@ -103,6 +103,7 @@ function PT_Slug($string, $video_id) {
         'delimiter' => '-',
         'limit' => 100,
         'lowercase' => true,
+        'transliterate' => true,
         'replacements' => array(
             '/\b(an)\b/i' => 'a',
             '/\b(example)\b/i' => 'Test'
@@ -116,6 +117,7 @@ function PT_URLSlug($string, $id) {
         'delimiter' => '-',
         'limit' => 100,
         'lowercase' => true,
+        'transliterate' => true,
         'replacements' => array(
             '/\b(an)\b/i' => 'a',
             '/\b(example)\b/i' => 'Test'
@@ -133,7 +135,10 @@ function PT_LoadAdminLink($link = '') {
 }
 function url_slug($str, $options = array()) {
     // Make sure string is in UTF-8 and strip invalid UTF-8 characters
-    $str      = mb_convert_encoding((string) $str, 'UTF-8', mb_list_encodings());
+    $str = (string) $str;
+    if (!mb_check_encoding($str, 'UTF-8')) {
+        $str = mb_convert_encoding($str, 'UTF-8', 'ISO-8859-1');
+    }
     $defaults = array(
         'delimiter' => '-',
         'limit' => null,
