@@ -7,15 +7,73 @@ Items surfaced by `system-status.php`, and the order to clear them.
 unless noted — the page has no "warning" severity in practice, so read the
 severity with judgement rather than treating all of them as equal.
 
-## 1. Delete `./install` — do this first
+## 0. CRITICAL: the installer is publicly reachable
+
+**Do this before anything else in this document.**
+
+Verified on `https://play.keekii.net` (checked 2026-09-28):
+
+```
+GET /install/                  -> 200, 8988 bytes, <title>PlayTube | Installation</title>
+GET /install/index.php?step=1  -> 200, 8988 bytes
+```
+
+The page is the live four-step setup wizard with a terms-acceptance form. It is
+not a stub. `install/index.php` then:
+
+- **line 117** — `file_put_contents($config_file_name, $file_content)` overwrites
+  `../config.php` with submitted database credentials.
+- **lines 179-181** — `INSERT INTO users (username, password, email, admin,
+  active, registered) VALUES ('<submitted>', sha1('<submitted>'), ...)` creates an
+  admin account with credentials supplied by whoever submits the form.
+- **line 272** — checks `is_writable('../config.php')`; the wizard proceeds when
+  the webserver can write it.
+
+So anyone who can reach the site can accept the terms, run the wizard, and end
+up with a database config they control plus an admin login. That is full site
+takeover, not a cosmetic exposure.
+
+Do it now:
 
 ```bash
 rm -rf /path/to/webroot/install
 ```
 
-`getStatus()` flags it at `functions_one.php:3789`. The stock PlayTube installer
-is still reachable on a live site, which usually means the setup wizard can be
-re-run against your database. It is not needed after installation.
+Then confirm it is gone from outside:
+
+```bash
+curl -sS -o /dev/null -w '%{http_code}\n' https://your-host/install/
+```
+
+Expect `404`.
+
+Do not simply rename the directory to something guessable, and do not rely on
+the wizard refusing to run — `getStatus()` merely *reports* this directory, it
+does not block it. If you want a second layer, deny it at the webserver as well:
+
+```apache
+RedirectMatch 404 ^/install
+```
+
+**Also public on that host:** `system-status.php` returns 200 and prints the
+full server inventory (PHP version, paths, writability of every directory, DB
+version, cron age, SMTP state). That is useful to an attacker doing exactly the
+reconnaissance this document describes. Remove it, or restrict it:
+
+```apache
+<Files "system-status.php">
+    Require local
+</Files>
+```
+
+`.git/config` already returns 403, so the vhost has *some* deny rules — check
+that `install/` and `system-status.php` were simply missed.
+
+## 1. Delete `./install` — covered above
+
+This is the same finding as section 0, kept here because `getStatus()` reports
+it at `functions_one.php:3807`. The stock PlayTube installer should not be
+reachable on a live site at all.
 
 ## 2. Version drift — see the migration
 
@@ -68,6 +126,34 @@ since the query has no `ORDER BY`. The effective value of any duplicated setting
 is therefore arbitrary and can differ between hosts. Run
 `deploy/sql/2026-09-28-dedupe-config-names.sql`, which keeps the highest id and
 so preserves current behaviour while removing the ambiguity.
+
+### Verified against production
+
+Fetched `https://play.keekii.net` on 2026-09-28 (read-only, no writes):
+
+- Theme in use: **playtag**.
+- Assets are served with `?version=3.1.4` (5 references) — this confirms
+  `config.version` really is `3.1.4` in production, which is what the split
+  migration's seed value depends on.
+- **But `style.css` was served as `?version=1.0.7`.** `playtag` and `youplay`
+  build their cache-buster from a `Tag_version()` helper defined *inside the
+  template* (`themes/playtag/layout/container.html:2-4`) that hardcodes
+  `echo '1.0.7'`. So the main theme stylesheet was pinned to `1.0.7` and
+  bumping `config.version` never busted it — a restyle of `style.css` would
+  silently not appear for returning visitors. Both themes now use
+  `{{CONFIG assets_version}}` for it. `Tag_version()` is left in place for the
+  `<meta name="version">` tag, which nothing in the repo reads.
+- `night-mode.css` had no cache-buster at all in several templates, including
+  the JS that injects it on dark-mode toggle, and `style.css` in the
+  `hybird_view` layouts had none either. All now carry
+  `?version={{CONFIG assets_version}}`.
+- Third-party libraries (bootstrap, jquery, font-awesome, DataTables, swiper,
+  trumbowyg…) are deliberately left **unversioned**. They do not change between
+  releases, and versioning them would force a re-download of every vendor asset
+  on each restyle.
+
+Run the confirm query at the end of each migration and check the output before
+moving on.
 
 ## 3. Sitemaps not writable
 

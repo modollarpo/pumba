@@ -54,7 +54,7 @@
 		<link rel="stylesheet" href="{{CONFIG theme_url}}/css/bootstrap.min.css">
 		<link rel="stylesheet" href="{{CONFIG theme_url}}/js/lib/sweetalert2/dist/sweetalert2.min.css">
 		<link rel="stylesheet" href="{{CONFIG theme_url}}/js/lib/notifIt/notifIt/css/notifIt.min.css">
-		<link rel="stylesheet" href="{{CONFIG theme_url}}/css/style.css?version=<?php echo Tag_version(); ?>" id="style-css">
+		<link rel="stylesheet" href="{{CONFIG theme_url}}/css/style.css?version={{CONFIG assets_version}}" id="style-css">
 		
 		<?php if ($pt->mode == 'night' || $pt->config->night_mode == 'night'): ?>
 			<link rel="stylesheet" href="{{CONFIG theme_url}}/css/night-mode.css?version={{CONFIG assets_version}}" class="night-mode-css">
@@ -89,7 +89,7 @@
 		<script src="{{CONFIG theme_url}}/js/bootstrap-select.min.js"></script>
       
 		<?php if ($pt->language_type == 'rtl') { ?>
-			<link rel="stylesheet" href="{{CONFIG theme_url}}/css/bootsrap-rtl.min.css">
+			<link rel="stylesheet" href="{{CONFIG theme_url}}/css/bootsrap-rtl.min.css?version={{CONFIG assets_version}}">
 			<link rel="stylesheet" href="{{CONFIG theme_url}}/css/rtl.style.css?version={{CONFIG assets_version}}">
 		<?php } ?>
 	  
@@ -437,7 +437,7 @@
 						mode = 'night';
 						$('<link>',{
 							rel:'stylesheet',
-							href:'{{CONFIG theme_url}}/css/night-mode.css',
+							href:'{{CONFIG theme_url}}/css/night-mode.css?version={{CONFIG assets_version}}',
 							class:'night-mode-css'
 						}).insertAfter('link#style-css');
 						$('.navbar-brand img').attr('src', '{{CONFIG theme_url}}/img/logo-light.png?cache=<?php echo($pt->config->logo_cache) ?>');

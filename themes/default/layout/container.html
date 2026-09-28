@@ -933,7 +933,7 @@
                  mode = 'night';
                  $('<link>',{
                    rel:'stylesheet',
-                   href:'{{CONFIG theme_url}}/css/night-mode.css',
+                   href:'{{CONFIG theme_url}}/css/night-mode.css?version={{CONFIG assets_version}}',
                    class:'night-mode-css'
                  }).insertAfter('link#style-css');
                  $('.logo-img img').attr('src', '{{CONFIG theme_url}}/img/logo-light.png?cache=<?php echo($pt->config->logo_cache) ?>');
