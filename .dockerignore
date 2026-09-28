@@ -12,6 +12,13 @@ deploy/start.sh
 nodejs
 node_modules
 **/node_modules
+# Type-contract tooling. Dev-only: tsc emits nothing, so none of this is needed
+# at runtime and it should not bloat the image.
+package.json
+package-lock.json
+tsconfig.json
+types
+tools
 logs
 *.log
 .htaccess.user

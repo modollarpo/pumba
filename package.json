@@ -1,0 +1,14 @@
+{
+  "name": "playtype-contracts",
+  "private": true,
+  "description": "Type contracts for the PlayTube ajax surface. Dev-only; nothing here is deployed.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json && node tools/check-ajax-routes.mjs",
+    "typecheck:types": "tsc -p tsconfig.json",
+    "typecheck:routes": "node tools/check-ajax-routes.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

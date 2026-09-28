@@ -1,2 +1,7 @@
 nodejs/node_modules/
 nodejs/config.json
+
+# Type-contract tooling (dev-only, emits nothing).
+node_modules/
+package-lock.json
+tsconfig.tsbuildinfo
