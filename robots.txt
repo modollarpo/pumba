@@ -12,4 +12,4 @@ Disallow: /embed
 Disallow: /nodejs
 Disallow: /*?lang=
 
-Sitemap: https://playtube-storegrill-free.azurewebsites.net/sitemap-main.xml
+Sitemap: https://play.keekii.net/sitemap-main.xml
