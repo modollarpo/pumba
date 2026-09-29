@@ -3723,10 +3723,20 @@ function PT_VerifySmtpLogin($timeout = 12) {
         if ($reason === '') {
             $reason = 'connection or authentication failed';
         }
-        // never echo anything credential-shaped back into the page
-        $reason = preg_replace('/[A-Za-z0-9_\-]{12,}/', 'redacted', $reason);
+        // Keep it to one readable line: drop the "SMTP Error:" wrapper, prefer
+        // the text after the last "failed:", then remove anything that looks
+        // like a credential (base64-ish blobs) before it reaches the page.
+        if (($pos = strripos($reason, 'failed:')) !== false) {
+            $reason = substr($reason, $pos + 7);
+        }
+        $reason = preg_replace('/^\s*SMTP\s+Error\s*:\s*/i', '', $reason);
+        $reason = preg_replace('/[A-Za-z0-9+\/=]{16,}/', '', $reason);
+        $reason = trim(preg_replace('/\s+/', ' ', $reason), " \t:.-");
+        if ($reason === '') {
+            $reason = 'connection or authentication failed';
+        }
         $reason = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
-        return substr($reason, 0, 200);
+        return substr($reason, 0, 120);
     }
 
     return true;
