@@ -21,80 +21,80 @@
       <?php } ?>
       {{OG_METATAGS}}
       <link rel="shortcut icon" type="image/png" href="{{CONFIG theme_url}}/img/icon.png"/>
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/jquery-ui.min.css?version={{CONFIG version}}">
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/jquery.tagit.css?version={{CONFIG version}}">
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/font-awesome-4.7.0/css/font-awesome.min.css?version={{CONFIG version}}">
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/twemoji-awesome.css?version={{CONFIG version}}">
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/bootstrap-glyphicons.css?version={{CONFIG version}}">
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/bootstrap.min.css?version={{CONFIG version}}">
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/js/lib/sweetalert2/dist/sweetalert2.min.css?version={{CONFIG version}}">
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/js/lib/notifIt/notifIt/css/notifIt.min.css?version={{CONFIG version}}">
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/style.css?version={{CONFIG version}}" id="style-css">
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/jquery-ui.min.css?version={{CONFIG assets_version}}">
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/jquery.tagit.css?version={{CONFIG assets_version}}">
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/font-awesome-4.7.0/css/font-awesome.min.css?version={{CONFIG assets_version}}">
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/twemoji-awesome.css?version={{CONFIG assets_version}}">
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/bootstrap-glyphicons.css?version={{CONFIG assets_version}}">
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/bootstrap.min.css?version={{CONFIG assets_version}}">
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/js/lib/sweetalert2/dist/sweetalert2.min.css?version={{CONFIG assets_version}}">
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/js/lib/notifIt/notifIt/css/notifIt.min.css?version={{CONFIG assets_version}}">
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/style.css?version={{CONFIG assets_version}}" id="style-css">
       <?php if ($pt->mode == 'night' || $pt->config->night_mode == 'night'): ?>
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/night-mode.css?version={{CONFIG version}}" class="night-mode-css">
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/night-mode.css?version={{CONFIG assets_version}}" class="night-mode-css">
       <?php endif; ?>
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/custom.style.css?version={{CONFIG version}}">
-      <link href="{{CONFIG theme_url}}/css/material.css?version={{CONFIG version}}" rel="stylesheet" type="text/css">
-      <link href="{{CONFIG theme_url}}/css/roboto.css?version={{CONFIG version}}" rel="stylesheet">
-      <script src="{{CONFIG theme_url}}/js/jquery-3.min.js?version={{CONFIG version}}"></script>
-      <script src="{{CONFIG theme_url}}/js/jquery-ui.min.js?version={{CONFIG version}}"></script>
-      <script type="text/javascript" src="{{CONFIG theme_url}}/js/jquery.form.min.js?version={{CONFIG version}}"></script>
-      <script type="text/javascript" src="{{CONFIG theme_url}}/js/tag-it.min.js?version={{CONFIG version}}"></script>
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/custom.style.css?version={{CONFIG assets_version}}">
+      <link href="{{CONFIG theme_url}}/css/material.css?version={{CONFIG assets_version}}" rel="stylesheet" type="text/css">
+      <link href="{{CONFIG theme_url}}/css/roboto.css?version={{CONFIG assets_version}}" rel="stylesheet">
+      <script src="{{CONFIG theme_url}}/js/jquery-3.min.js?version={{CONFIG assets_version}}"></script>
+      <script src="{{CONFIG theme_url}}/js/jquery-ui.min.js?version={{CONFIG assets_version}}"></script>
+      <script type="text/javascript" src="{{CONFIG theme_url}}/js/jquery.form.min.js?version={{CONFIG assets_version}}"></script>
+      <script type="text/javascript" src="{{CONFIG theme_url}}/js/tag-it.min.js?version={{CONFIG assets_version}}"></script>
       <?php if ($pt->config->player_type == 'fluidPlayer') { ?>
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/player/css/fluidplayer/fluidplayer.min.css?version={{CONFIG version}}" type="text/css"/>
-      <script src="{{CONFIG theme_url}}/player/js/fluidplayer/fluidplayer.min.js?version={{CONFIG version}}"></script>
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/player/css/fluidplayer/fluidplayer.min.css?version={{CONFIG assets_version}}" type="text/css"/>
+      <script src="{{CONFIG theme_url}}/player/js/fluidplayer/fluidplayer.min.js?version={{CONFIG assets_version}}"></script>
       <?php }elseif ($pt->config->player_type == 'videojs') { ?>
-      <link href="{{CONFIG theme_url}}/player/css/video_js/video-js.css?version={{CONFIG version}}" rel="stylesheet">
-      <link href="{{CONFIG theme_url}}/player/css/video_js/videojs-contrib-ads.min.css?version={{CONFIG version}}" rel="stylesheet">
-      <link href="{{CONFIG theme_url}}/player/css/video_js/videojs-resolution-switcher.css?version={{CONFIG version}}" rel="stylesheet">
-      <link href="{{CONFIG theme_url}}/player/css/video_js/videojs.ima.css?version={{CONFIG version}}" rel="stylesheet">
+      <link href="{{CONFIG theme_url}}/player/css/video_js/video-js.css?version={{CONFIG assets_version}}" rel="stylesheet">
+      <link href="{{CONFIG theme_url}}/player/css/video_js/videojs-contrib-ads.min.css?version={{CONFIG assets_version}}" rel="stylesheet">
+      <link href="{{CONFIG theme_url}}/player/css/video_js/videojs-resolution-switcher.css?version={{CONFIG assets_version}}" rel="stylesheet">
+      <link href="{{CONFIG theme_url}}/player/css/video_js/videojs.ima.css?version={{CONFIG assets_version}}" rel="stylesheet">
       <?php }elseif ($pt->config->player_type == 'plyr') { ?>
-      <script src="{{CONFIG theme_url}}/js/plyr.polyfilled.js?version={{CONFIG version}}"></script>
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/player/css/plyr.css?version={{CONFIG version}}" />
+      <script src="{{CONFIG theme_url}}/js/plyr.polyfilled.js?version={{CONFIG assets_version}}"></script>
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/player/css/plyr.css?version={{CONFIG assets_version}}" />
       <?php } ?>
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/player/css/mediaelementplayer.min.css?version={{CONFIG version}}" />
-      <script src="{{CONFIG theme_url}}/player/js/mediaelement-and-player.min.js?version={{CONFIG version}}"></script>
-      <script src="{{CONFIG theme_url}}/js/lib/sweetalert2/dist/sweetalert2.js?version={{CONFIG version}}"></script>
-      <script src="{{CONFIG theme_url}}/js/lib/notifIt/notifIt/js/notifIt.min.js?version={{CONFIG version}}"></script>
-      <link href="{{CONFIG theme_url}}/css/bootstrap-toggle.min.css?version={{CONFIG version}}" rel="stylesheet">
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/bootstrap-select.min.css?version={{CONFIG version}}">
-      <script src="{{CONFIG theme_url}}/js/bootstrap-select.min.js?version={{CONFIG version}}"></script>
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/owl.carousel.min.css?version={{CONFIG version}}">
-      <script src="{{CONFIG theme_url}}/js/owl.carousel.min.js?version={{CONFIG version}}"></script>
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/player/css/mediaelementplayer.min.css?version={{CONFIG assets_version}}" />
+      <script src="{{CONFIG theme_url}}/player/js/mediaelement-and-player.min.js?version={{CONFIG assets_version}}"></script>
+      <script src="{{CONFIG theme_url}}/js/lib/sweetalert2/dist/sweetalert2.js?version={{CONFIG assets_version}}"></script>
+      <script src="{{CONFIG theme_url}}/js/lib/notifIt/notifIt/js/notifIt.min.js?version={{CONFIG assets_version}}"></script>
+      <link href="{{CONFIG theme_url}}/css/bootstrap-toggle.min.css?version={{CONFIG assets_version}}" rel="stylesheet">
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/bootstrap-select.min.css?version={{CONFIG assets_version}}">
+      <script src="{{CONFIG theme_url}}/js/bootstrap-select.min.js?version={{CONFIG assets_version}}"></script>
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/owl.carousel.min.css?version={{CONFIG assets_version}}">
+      <script src="{{CONFIG theme_url}}/js/owl.carousel.min.js?version={{CONFIG assets_version}}"></script>
       <?php if ($pt->language_type == 'rtl') { ?>
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/bootsrap-rtl.min.css?version={{CONFIG version}}">
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/rtl.style.css?version={{CONFIG version}}">
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/bootsrap-rtl.min.css?version={{CONFIG assets_version}}">
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/rtl.style.css?version={{CONFIG assets_version}}">
       <?php } ?>
-      <script src="{{CONFIG theme_url}}/player/plugins/speed/speed.min.js?version={{CONFIG version}}"></script>
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/player/plugins/speed/speed.min.css?version={{CONFIG version}}" />
-      <script src="{{CONFIG theme_url}}/player/plugins/speed/speed-i18n.js?version={{CONFIG version}}"></script>
-      <script src="{{CONFIG theme_url}}/player/plugins/jump/jump-forward.min.js?version={{CONFIG version}}"></script>
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/player/plugins/jump/jump-forward.min.css?version={{CONFIG version}}" />
-      <script src="{{CONFIG theme_url}}/player/plugins/ads/ads.min.js?version={{CONFIG version}}"></script>
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/player/plugins/ads/ads.min.css?version={{CONFIG version}}" />
-      <script src="{{CONFIG theme_url}}/player/plugins/ads/ads-i18n.js?version={{CONFIG version}}"></script>
-      <script src="{{CONFIG theme_url}}/player/plugins/vast/ads-vast-vpaid.js?version={{CONFIG version}}"></script>
-      <script src="{{CONFIG theme_url}}/player/plugins/quality/quality.min.js?version={{CONFIG version}}"></script>
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/player/plugins/quality/quality.min.css?version={{CONFIG version}}" />
-      <script src="{{CONFIG theme_url}}/js/facebook.min.js?version={{CONFIG version}}"></script>
-      <script src="{{CONFIG theme_url}}/js/Fingerprintjs2/fingerprint2.js?version={{CONFIG version}}"></script>
-      <script src="{{CONFIG theme_url}}/js/emoji/emojionearea/dist/emojionearea.js?version={{CONFIG version}}"></script>
-      <link rel="stylesheet" type="text/css" href="{{CONFIG theme_url}}/js/emoji/emojionearea/dist/emojionearea.min.css?version={{CONFIG version}}"/>
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/bootstrap-colorpicker.min.css?version={{CONFIG version}}" />
-      <script src="{{CONFIG theme_url}}/js/bootstrap-colorpicker.min.js?version={{CONFIG version}}"></script>
-      <script src="{{CONFIG theme_url}}/js/v1.js?version={{CONFIG version}}"></script>
+      <script src="{{CONFIG theme_url}}/player/plugins/speed/speed.min.js?version={{CONFIG assets_version}}"></script>
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/player/plugins/speed/speed.min.css?version={{CONFIG assets_version}}" />
+      <script src="{{CONFIG theme_url}}/player/plugins/speed/speed-i18n.js?version={{CONFIG assets_version}}"></script>
+      <script src="{{CONFIG theme_url}}/player/plugins/jump/jump-forward.min.js?version={{CONFIG assets_version}}"></script>
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/player/plugins/jump/jump-forward.min.css?version={{CONFIG assets_version}}" />
+      <script src="{{CONFIG theme_url}}/player/plugins/ads/ads.min.js?version={{CONFIG assets_version}}"></script>
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/player/plugins/ads/ads.min.css?version={{CONFIG assets_version}}" />
+      <script src="{{CONFIG theme_url}}/player/plugins/ads/ads-i18n.js?version={{CONFIG assets_version}}"></script>
+      <script src="{{CONFIG theme_url}}/player/plugins/vast/ads-vast-vpaid.js?version={{CONFIG assets_version}}"></script>
+      <script src="{{CONFIG theme_url}}/player/plugins/quality/quality.min.js?version={{CONFIG assets_version}}"></script>
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/player/plugins/quality/quality.min.css?version={{CONFIG assets_version}}" />
+      <script src="{{CONFIG theme_url}}/js/facebook.min.js?version={{CONFIG assets_version}}"></script>
+      <script src="{{CONFIG theme_url}}/js/Fingerprintjs2/fingerprint2.js?version={{CONFIG assets_version}}"></script>
+      <script src="{{CONFIG theme_url}}/js/emoji/emojionearea/dist/emojionearea.js?version={{CONFIG assets_version}}"></script>
+      <link rel="stylesheet" type="text/css" href="{{CONFIG theme_url}}/js/emoji/emojionearea/dist/emojionearea.min.css?version={{CONFIG assets_version}}"/>
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/bootstrap-colorpicker.min.css?version={{CONFIG assets_version}}" />
+      <script src="{{CONFIG theme_url}}/js/bootstrap-colorpicker.min.js?version={{CONFIG assets_version}}"></script>
+      <script src="{{CONFIG theme_url}}/js/v1.js?version={{CONFIG assets_version}}"></script>
       <?php if ($pt->config->checkout_payment == 'yes') { ?>
-      <script type="text/javascript" src="https://www.2checkout.com/checkout/api/2co.min.js?version={{CONFIG version}}"></script>
+      <script type="text/javascript" src="https://www.2checkout.com/checkout/api/2co.min.js?version={{CONFIG assets_version}}"></script>
       <?php } ?>
       <?php if ($pt->page == 'login' && $pt->config->recaptcha == 'on') { ?>
-      <script src="https://www.google.com/recaptcha/api.js?version={{CONFIG version}}" async defer></script>
+      <script src="https://www.google.com/recaptcha/api.js?version={{CONFIG assets_version}}" async defer></script>
       <?php } ?>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js?version={{CONFIG version}}"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js?version={{CONFIG assets_version}}"></script>
       <?php if (!empty($pt->config->google)) { echo htmlspecialchars_decode($pt->config->google); } ?>
       <?php if (!empty($pt->config->google_vignette)) { echo htmlspecialchars_decode($pt->config->google_vignette); } ?>
-      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/swiper-bundle.min.css?version={{CONFIG version}}" />
-      <script src="{{CONFIG theme_url}}/js/swiper-bundle.min.js?version={{CONFIG version}}"></script>
-      <script src="{{CONFIG theme_url}}/js/plupload.full.min.js?version={{CONFIG version}}"></script>
+      <link rel="stylesheet" href="{{CONFIG theme_url}}/css/swiper-bundle.min.css?version={{CONFIG assets_version}}" />
+      <script src="{{CONFIG theme_url}}/js/swiper-bundle.min.js?version={{CONFIG assets_version}}"></script>
+      <script src="{{CONFIG theme_url}}/js/plupload.full.min.js?version={{CONFIG assets_version}}"></script>
         <?php if ($pt->config->braintree_payment == 'yes') { ?>
         <script src="https://js.braintreegateway.com/web/dropin/1.36.0/js/dropin.js"></script>
         <?php } ?>
@@ -182,13 +182,13 @@
              if (parts.length == 2) return parts.pop().split(";").shift();
            }
       </script>
-      <script src="{{CONFIG theme_url}}/js/header.js?version={{CONFIG version}}"></script>
+      <script src="{{CONFIG theme_url}}/js/header.js?version={{CONFIG assets_version}}"></script>
       <?php if($pt->config->player_type == 'cloudinary'){ ?>
-      <link href="{{CONFIG theme_url}}/css/cld-video-player.min.css?version={{CONFIG version}}" rel="stylesheet">
-      <script src="{{CONFIG theme_url}}/js/cloudinary/cloudinary-core-shrinkwrap.min.js?version={{CONFIG version}}" type="text/javascript"></script>
-      <script src="{{CONFIG theme_url}}/js/cloudinary/cld-video-player.min.js?version={{CONFIG version}}" type="text/javascript"></script>
+      <link href="{{CONFIG theme_url}}/css/cld-video-player.min.css?version={{CONFIG assets_version}}" rel="stylesheet">
+      <script src="{{CONFIG theme_url}}/js/cloudinary/cloudinary-core-shrinkwrap.min.js?version={{CONFIG assets_version}}" type="text/javascript"></script>
+      <script src="{{CONFIG theme_url}}/js/cloudinary/cld-video-player.min.js?version={{CONFIG assets_version}}" type="text/javascript"></script>
       <?php } ?>
-      <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js?version={{CONFIG version}}" type="text/javascript"></script>
+      <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js?version={{CONFIG assets_version}}" type="text/javascript"></script>
       <?php if($pt->config->plus_login == 'on'): ?>
       <script src="https://accounts.google.com/gsi/client" async defer></script>
       <?php endif; ?>
@@ -911,10 +911,10 @@
       </script>
       <?php } ?>
       {{EXTRA_JS}}
-      <script type="text/javascript" src="{{CONFIG theme_url}}/js/script.js?version={{CONFIG version}}"></script>
-      <script type="text/javascript" src="{{CONFIG theme_url}}/js/bootstrap.min.js?version={{CONFIG version}}"></script>
-      <script src="{{CONFIG theme_url}}/js/bootstrap-toggle.min.js?version={{CONFIG version}}"></script>
-      <script src="{{CONFIG theme_url}}/js/footer.js?version={{CONFIG version}}"></script>
+      <script type="text/javascript" src="{{CONFIG theme_url}}/js/script.js?version={{CONFIG assets_version}}"></script>
+      <script type="text/javascript" src="{{CONFIG theme_url}}/js/bootstrap.min.js?version={{CONFIG assets_version}}"></script>
+      <script src="{{CONFIG theme_url}}/js/bootstrap-toggle.min.js?version={{CONFIG assets_version}}"></script>
+      <script src="{{CONFIG theme_url}}/js/footer.js?version={{CONFIG assets_version}}"></script>
       <link rel="" ="">
       <script>
          $(window).on("popstate", function (e) {
@@ -933,7 +933,7 @@
                  mode = 'night';
                  $('<link>',{
                    rel:'stylesheet',
-                   href:'{{CONFIG theme_url}}/css/night-mode.css',
+                   href:'{{CONFIG theme_url}}/css/night-mode.css?version={{CONFIG assets_version}}',
                    class:'night-mode-css'
                  }).insertAfter('link#style-css');
                  $('.logo-img img').attr('src', '{{CONFIG theme_url}}/img/logo-light.png?cache=<?php echo($pt->config->logo_cache) ?>');
@@ -1064,7 +1064,7 @@
       <?php } ?>
       <?php if ($pt->phone_api != 'yes'): ?>
 
-      <script src="{{CONFIG theme_url}}/js/cookieconsent.min.js?version={{CONFIG version}}"></script>
+      <script src="{{CONFIG theme_url}}/js/cookieconsent.min.js?version={{CONFIG assets_version}}"></script>
       <script>
          window.addEventListener("load", function(){
          window.cookieconsent.initialise({
@@ -1437,7 +1437,7 @@
             </div>
          </div>
       </div>
-      <script src="https://checkout.razorpay.com/v1/checkout.js?version={{CONFIG version}}"></script>
+      <script src="https://checkout.razorpay.com/v1/checkout.js?version={{CONFIG assets_version}}"></script>
       <?php } ?>
       <?php if ($pt->config->iyzipay_payment == 'yes') { ?>
       <div id="iyzipay_content"></div>
