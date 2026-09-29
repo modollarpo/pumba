@@ -5,3 +5,6 @@ nodejs/config.json
 node_modules/
 package-lock.json
 tsconfig.tsbuildinfo
+
+# live credentials - never commit
+/config.php
