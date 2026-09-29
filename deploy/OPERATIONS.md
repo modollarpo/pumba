@@ -141,8 +141,9 @@ Fetched `https://play.keekii.net` on 2026-09-28 (read-only, no writes):
   `echo '1.0.7'`. So the main theme stylesheet was pinned to `1.0.7` and
   bumping `config.version` never busted it — a restyle of `style.css` would
   silently not appear for returning visitors. Both themes now use
-  `{{CONFIG assets_version}}` for it. `Tag_version()` is left in place for the
-  `<meta name="version">` tag, which nothing in the repo reads.
+  `{{CONFIG assets_version}}` for it. `Tag_version()` has since been deleted:
+  it was left in place only for the `<meta name="version">` tag, and nothing in
+  the repo read it, so that tag now reads `{{CONFIG assets_version}}` too.
 - `night-mode.css` had no cache-buster at all in several templates, including
   the JS that injects it on dark-mode toggle, and `style.css` in the
   `hybird_view` layouts had none either. All now carry
