@@ -3819,15 +3819,18 @@ function getStatus($config = array()) {
     
 
     $getSqlModes = $db->rawQuery("SELECT @@sql_mode as modes;");
-      if (!empty($getSqlModes[0]->modes)) {
-         $results = @explode(',', strtolower($getSqlModes[0]->modes));
-         if (in_array('strict_trans_tables', $results)) {
-           $errors[] = ["type" => "error", "message" => "The sql-mode <b>strict_trans_tables</b> is enabled in your mysql server, please contact your host provider to disable it."];
-         }
-         if (in_array('only_full_group_by', $results)) {
-           $errors[] = ["type" => "error", "message" => "The sql-mode <b>only_full_group_by</b> is enabled in your mysql server, this can cause some issues on your website, please contact your host provider to disable it."];
-         }
-      }
+    if (!empty($getSqlModes[0]->modes)) {
+        $results = array_map('trim', explode(',', strtolower($getSqlModes[0]->modes)));
+        $disabledSqlModes = [];
+        foreach (['only_full_group_by', 'strict_trans_tables'] as $requiredSqlMode) {
+            if (!in_array($requiredSqlMode, $results)) {
+                $disabledSqlModes[] = $requiredSqlMode;
+            }
+        }
+        if (!empty($disabledSqlModes)) {
+            $errors[] = ["type" => "warning", "message" => "Recommended MySQL sql-mode not enabled on this server: <b>" . implode('</b>, <b>', $disabledSqlModes) . "</b>. These are MySQL defaults and they prevent silent data corruption: truncated or out-of-range values, and invalid <b>GROUP BY</b> results. Re-enable them instead of working around the queries that trip them."];
+        }
+    }
 
     $getUploadSize = file_upload_max_size();
 
