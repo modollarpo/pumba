@@ -636,9 +636,9 @@ function PT_SendMessage($data = array()) {
             $mail->Port        = $pt->config->smtp_port;
             $mail->SMTPOptions = array(
                 'ssl' => array(
-                    'verify_peer' => false,
-                    'verify_peer_name' => false,
-                    'allow_self_signed' => true
+                    'verify_peer' => true,
+                    'verify_peer_name' => true,
+                    'allow_self_signed' => false
                 )
             );
         }
@@ -3709,6 +3709,14 @@ function PT_VerifySmtpLogin($timeout = 12) {
         $mail->SMTPSecure = $pt->config->smtp_encryption;
         $mail->Timeout = $timeout;
         $mail->SMTPDebug = 0;
+        // must match PT_SendMessage so the check exercises the real transport
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => true,
+                'verify_peer_name' => true,
+                'allow_self_signed' => false
+            )
+        );
         $mail->smtpConnect();
         $mail->SMTPAuthenticate();
         $mail->smtpClose();
