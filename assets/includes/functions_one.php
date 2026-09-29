@@ -3674,6 +3674,65 @@ function parse_size($size) {
 }
 
 
+// Attempts a real authenticated SMTP login. Returns true on success, or a
+// short human-readable reason on failure. Deliberately does not send mail.
+function PT_VerifySmtpLogin($timeout = 12) {
+    global $pt;
+
+    $autoload = __DIR__ . '/../libs/PHPMailer/vendor/autoload.php';
+    if (!file_exists($autoload)) {
+        return 'PHPMailer is not installed on this server';
+    }
+    require_once $autoload;
+
+    $password = $pt->config->smtp_password;
+    if (!empty($password)) {
+        // stored the same way the mailer reads it back
+        $decrypted = @openssl_decrypt($password, "AES-128-ECB", 'mysecretkey1234');
+        if ($decrypted !== false && $decrypted !== '') {
+            $password = $decrypted;
+        }
+    }
+    if ($password === null || $password === '') {
+        return 'no SMTP password is set';
+    }
+
+    $mail = null;
+    try {
+        $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+        $mail->isSMTP();
+        $mail->Host = $pt->config->smtp_host;
+        $mail->Port = (int)$pt->config->smtp_port;
+        $mail->SMTPAuth = true;
+        $mail->Username = $pt->config->smtp_username;
+        $mail->Password = $password;
+        $mail->SMTPSecure = $pt->config->smtp_encryption;
+        $mail->Timeout = $timeout;
+        $mail->SMTPDebug = 0;
+        $mail->smtpConnect();
+        $mail->SMTPAuthenticate();
+        $mail->smtpClose();
+    } catch (Throwable $e) {
+        $reason = '';
+        if ($mail !== null) {
+            $reason = trim((string)$mail->ErrorInfo);
+        }
+        if ($reason === '') {
+            $reason = trim($e->getMessage());
+        }
+        if ($reason === '') {
+            $reason = 'connection or authentication failed';
+        }
+        // never echo anything credential-shaped back into the page
+        $reason = preg_replace('/[A-Za-z0-9_\-]{12,}/', 'redacted', $reason);
+        $reason = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
+        return substr($reason, 0, 200);
+    }
+
+    return true;
+}
+
+
 function getStatus($config = array()) {
     global $pt,$db;
 
@@ -3786,6 +3845,13 @@ function getStatus($config = array()) {
 
     if (empty($pt->config->smtp_host) && empty($pt->config->smtp_username)) {
         $errors[] = ["type" => "error", "message" => "<strong>SMTP</strong> is not configured, it's recommended to setup <strong>SMTP</strong>, so the system can send e-mails from the server. <br> <a href=" . PT_LoadAdminLinkSettings('email-settings') . ">Click Here To Setup SMTP</a>"];
+    } else {
+        // Configured is not the same as working. Without this the page reports
+        // "all good" while password resets and other mail are silently dropped.
+        $pt_smtp_result = PT_VerifySmtpLogin();
+        if ($pt_smtp_result !== true) {
+            $errors[] = ["type" => "warning", "message" => "<strong>SMTP</strong> is configured (<strong>" . htmlspecialchars((string)$pt->config->smtp_host, ENT_QUOTES, 'UTF-8') . ":" . (int)$pt->config->smtp_port . "</strong>) but the login test failed: <strong>" . $pt_smtp_result . "</strong>. E-mails such as password resets will not be delivered. <br> <a href=" . PT_LoadAdminLinkSettings('email-settings') . ">Click Here To Setup SMTP</a>"];
+        }
     }
 
 
