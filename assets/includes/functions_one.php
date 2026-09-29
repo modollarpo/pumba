@@ -1321,14 +1321,77 @@ function PT_AzureBlobRequest($method = 'GET', $blobPath = '', $body = null, $bod
         curl_setopt($ch, CURLOPT_INFILE, $body);
         curl_setopt($ch, CURLOPT_INFILESIZE, $bodyLength);
     }
-    curl_exec($ch);
-    $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $response  = curl_exec($ch);
+    $status    = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
     curl_close($ch);
     if (is_resource($body)) {
         @fclose($body);
     }
 
-    return ($status >= 200 && $status < 300);
+    $ok = ($status >= 200 && $status < 300);
+    if (!$ok) {
+        PT_AzureBlobLogError($method, $blobPath, $status, $curlError, $response);
+    }
+
+    return $ok;
+}
+
+function PT_AzureBlobLogPath() {
+    $configured = getenv('PUMBA_AZURE_BLOB_LOG');
+    if (!empty($configured)) {
+        return $configured;
+    }
+    return '/var/log/pumba-azure-blob.log';
+}
+
+// Without this the caller only ever sees false, and Azure's error body - the
+// one thing that says why - is thrown away. Deliberately logs the error code
+// and message only: never the Authorization header or the account key. Stops
+// writing past 1MB so a failing upload loop cannot fill the disk.
+function PT_AzureBlobLogError($method = '', $blobPath = '', $status = 0, $curlError = '', $response = '') {
+    // successes must never be logged, whoever calls this
+    if ($status >= 200 && $status < 300 && empty($curlError)) {
+        return;
+    }
+
+    $path = PT_AzureBlobLogPath();
+    if (empty($path)) {
+        return;
+    }
+
+    $code    = '';
+    $message = '';
+    if (is_string($response) && $response !== '') {
+        // Match Code and Message explicitly. A generic <tag>...</tag> pattern
+        // latches onto the outer <Error> element and swallows both, which would
+        // silently fall through to logging the whole response - including the
+        // AuthenticationErrorDetail that echoes the expected MAC signature.
+        if (preg_match('/<Code>([^<]*)<\/Code>/', $response, $m)) {
+            $code = trim($m[1]);
+        }
+        if (preg_match('/<Message>([^<]*)<\/Message>/', $response, $m)) {
+            $message = trim($m[1]);
+        }
+    }
+    if ($message === '') {
+        $message = trim((string)$curlError);
+    }
+    if ($code === '' && $message === '') {
+        $message = 'no error detail returned';
+    }
+    // defence in depth: never let a credential-shaped token reach the log
+    $message = preg_replace('/[A-Za-z0-9+\/=]{24,}/', '[redacted]', $message);
+    $message = substr(trim(preg_replace('/\s+/', ' ', $message)), 0, 300);
+
+    $line = '[' . gmdate('Y-m-d H:i:s') . ' UTC] ' . $method . ' ' . $blobPath
+          . ' -> HTTP ' . $status . ' ' . $code . ': ' . $message . "\n";
+
+    clearstatcache(true, $path);
+    if (@filesize($path) > 1048576) {
+        return;
+    }
+    @file_put_contents($path, $line, FILE_APPEND | LOCK_EX);
 }
 
 function PT_AzureCDNPurge($media = '') {
