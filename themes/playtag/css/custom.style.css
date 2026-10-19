@@ -203,6 +203,20 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, .title, .modal-title {
 .pt-rail__btn--prev { right: 46px; }
 .pt-rail__btn--next { right: 0; }
 
-@media (max-width: 767px) {
+/* The thumbnail strip would collide with the hero title (<=900px) and with
+   the CTA row (~1024px) once a second featured slide exists, so only show it
+   on desktop widths where the hero copy has room. */
+@media (max-width: 1199.98px) {
 	.tag_feat_video_thumbs { display: none !important; }
+}
+
+/* ---- Small phones: keep the header on one row and the menu on-screen ---- */
+@media (max-width: 399.98px) {
+	.tag_library .tag_library_label { display: none; }
+	.tag_library .btn { padding-left: .75rem; padding-right: .75rem; }
+	.tag_library.mr-3 { margin-right: .5rem !important; }
+}
+
+@media (max-width: 767.98px) {
+	.tag_library .dropdown-menu { left: 0 !important; right: auto !important; max-width: calc(100vw - 30px); }
 }
