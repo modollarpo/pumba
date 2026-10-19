@@ -218,5 +218,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, .title, .modal-title {
 }
 
 @media (max-width: 767.98px) {
-	.tag_library .dropdown-menu { left: 0 !important; right: auto !important; max-width: calc(100vw - 30px); }
+	/* At ~320px the toggle sits mid-viewport, so a 220px menu cannot be
+	   right- or left-anchored without leaving the screen. Shrink the menu to
+	   what its text needs and keep it right-aligned to the toggle. */
+	.tag_library .dropdown-menu { min-width: 160px !important; max-width: calc(100vw - 30px) !important; }
+	.tag_library .dropdown-menu .dropdown-item svg { display: none; }
+	.tag_library .dropdown-menu .dropdown-item a { gap: 0; }
 }
