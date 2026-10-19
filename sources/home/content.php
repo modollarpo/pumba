@@ -353,6 +353,36 @@ if ($pt->config->shorts_system == 'on') {
         ));
     }
 }
+$keep_spinning_html = '';
+$pt->have_keep_spinning = false;
+if (IS_LOGGED == true && !empty($user->id)) {
+    $keep_spinning = $db->where('user_id', $user->id)->orderBy('id', 'DESC')->get(T_WLATER, 10);
+    if (!empty($keep_spinning)) {
+        foreach ($keep_spinning as $key => $row) {
+            $video = $pt->video = PT_GetVideoByID($row->video_id, 0, 0, 2);
+            if (empty($video) || empty($video->id)) {
+                continue;
+            }
+            $keep_spinning_html .= PT_LoadPage('home/list', array(
+                'ID' => $video->id,
+                'TITLE' => $video->title,
+                'VIEWS' => number_format($video->views),
+                'VIEWS_NUM' => number_format($video->views),
+                'USER_DATA' => $video->owner,
+                'THUMBNAIL' => $video->thumbnail,
+                'URL' => $video->url,
+                'ajax_url' => $video->ajax_url,
+                'TIME' => $video->time_ago,
+                'DURATION' => $video->duration,
+                'VIDEO_ID' => $video->video_id_,
+                'VIDEO_ID_' => PT_Slug($video->title, $video->video_id),
+                'GIF' => $video->gif
+            ));
+        }
+    }
+}
+$pt->have_keep_spinning = !empty($keep_spinning_html);
+
 $pt->content = PT_LoadPage('home/content', array(
     'ID' => $get_video->id,
     'THUMBNAIL' => $get_video->thumbnail,
@@ -394,6 +424,7 @@ $pt->content = PT_LoadPage('home/content', array(
     'VIDEO_ID_' => PT_Slug($get_video->title, $get_video->video_id),
     'HTML_POSTS' => $html_posts,
     'SHORTS_HTML' => $shorts_html,
+    'KEEP_SPINNING' => $keep_spinning_html,
     'ENCODED_URL' => urlencode($get_video->url),
     'SHORT_ID' => $get_video->short_id,
 ));

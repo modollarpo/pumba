@@ -3764,7 +3764,9 @@ COMMIT;
 --
 -- LANG keys for the playtag theme UI lifted from VidBox.
 -- Keep in sync with deploy/sql/2026-10-19-my-library-lang-keys.sql
+-- and deploy/sql/2026-10-19-keep-spinning-lang-key.sql
 --
 INSERT INTO `langs` (`lang_key`, `type`, `english`) VALUES
 ('my_library', '', 'My Library'),
-('more_info', '', 'More Info');
+('more_info', '', 'More Info'),
+('keep_spinning', '', 'Keep Spinning');

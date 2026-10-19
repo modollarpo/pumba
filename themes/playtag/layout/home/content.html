@@ -51,6 +51,18 @@
 <div class="pb-4 container">
 	{{SUBSC_HTML}}
 
+	<?php if (!empty($pt->have_keep_spinning)) { ?>
+	<div class="mb-5">
+		<div class="tag_home_vid_list pb-2">
+			<h4 class="title mb-3"><a href="{{ME url}}?page=play-lists" data-load="?link1=timeline&id={{ME username}}&page=play-lists" class="black black-hover d-inline-flex align-items-center">{{LANG keep_spinning}} <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.4301 5.92993L20.5001 11.9999L14.4301 18.0699" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 12H20.33" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h4>
+
+			<div class="row tag_video_grid scroll">
+				{{KEEP_SPINNING}}
+			</div>
+		</div>
+	</div>
+	<?php } ?>
+
 	<?php if ($pt->config->shorts_system == 'on') { ?>
         <div class="mb-5">
 			<div class="tag_home_vid_list pb-2">
