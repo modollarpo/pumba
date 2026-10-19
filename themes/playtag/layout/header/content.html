@@ -6,6 +6,44 @@
 			</a>
 		</div>
 		
+		<div class="d-flex align-items-center tag_header_actions">
+		<?php if (IS_LOGGED) { ?>
+		<div class="dropdown nav tag_library mr-3">
+			<a href="javascript:void(0);" role="button" data-toggle="dropdown" data-display="static" class="btn btn-main-outline">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4H20M2 9H16M2 14H11M2 19H9M21.0015 17.6656L17.2438 20.1708C16.8397 20.4402 16.6377 20.5749 16.4702 20.5649C16.3243 20.5561 16.1894 20.484 16.1012 20.3674C16 20.2336 16 19.9908 16 19.5052V14.4948C16 14.0092 16 13.7664 16.1012 13.6326C16.1894 13.516 16.3243 13.4439 16.4702 13.4351C16.6377 13.4251 16.8397 13.5598 17.2438 13.8292L21.0015 16.3344C21.3354 16.5569 21.5023 16.6682 21.5605 16.8085C21.6113 16.9311 21.6113 17.0689 21.5605 17.1915C21.5023 17.3318 21.3354 17.4431 21.0015 17.6656Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG my_library}}
+			</a>
+			<div class="dropdown-menu dropdown-menu-right">
+				<div class="dropdown-item">
+					<a href="{{ME url}}?page=play-lists" data-load="?link1=timeline&id={{ME username}}&page=play-lists">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 8V16M8 12H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG watch_later}}
+					</a>
+				</div>
+				<div class="dropdown-item">
+					<a href="{{ME url}}?page=play-lists" data-load="?link1=timeline&id={{ME username}}&page=play-lists">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4H20M2 9H16M2 14H11M2 19H9M21.0015 17.6656L17.2438 20.1708C16.8397 20.4402 16.6377 20.5749 16.4702 20.5649C16.3243 20.5561 16.1894 20.484 16.1012 20.3674C16 20.2336 16 19.9908 16 19.5052V14.4948C16 14.0092 16 13.7664 16.1012 13.6326C16.1894 13.516 16.3243 13.4439 16.4702 13.4351C16.6377 13.4251 16.8397 13.5598 17.2438 13.8292L21.0015 16.3344C21.3354 16.5569 21.5023 16.6682 21.5605 16.8085C21.6113 16.9311 21.6113 17.0689 21.5605 17.1915C21.5023 17.3318 21.3354 17.4431 21.0015 17.6656Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG play_lists}}
+					</a>
+				</div>
+				<div class="dropdown-divider"></div>
+				<div class="dropdown-item">
+					<a href="{{ME url}}?page=liked-videos" data-load="?link1=timeline&id={{ME username}}&page=liked-videos">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.62 20.81C12.28 20.93 11.72 20.93 11.38 20.81C8.48 19.82 2 15.69 2 8.68998C2 5.59998 4.49 3.09998 7.56 3.09998C9.38 3.09998 10.99 3.97998 12 5.33998C13.01 3.97998 14.63 3.09998 16.44 3.09998C19.51 3.09998 22 5.59998 22 8.68998C22 15.69 15.52 19.82 12.62 20.81Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG liked_videos}}
+					</a>
+				</div>
+				<?php if ($pt->config->history_system == 'on') { ?>
+				<div class="dropdown-item">
+					<a href="{{LINK history}}" data-load="?link1=history">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 12C2 16.9706 6 22 12 22C18 22 22 18 22 12C22 6 18 2 12 2C6 2 2 7 2 7M2 7V3M2 7H5.5M12 8V12L15 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG history}}
+					</a>
+				</div>
+				<?php } ?>
+				<div class="dropdown-item">
+					<a href="{{LINK subscriptions}}" data-load="?link1=subscriptions">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 5H18M8 2H16M14.0031 16.3313L12.4875 17.3417C11.6795 17.8804 11.2754 18.1497 10.9404 18.1297C10.6485 18.1123 10.3789 17.968 10.2025 17.7348C10 17.4671 10 16.9815 10 16.0104V13.9896C10 13.0185 10 12.5329 10.2025 12.2652C10.3789 12.032 10.6485 11.8877 10.9404 11.8703C11.2754 11.8503 11.6795 12.1196 12.4875 12.6583L14.0031 13.6687C14.6708 14.1138 15.0046 14.3364 15.1209 14.6169C15.2227 14.8622 15.2227 15.1378 15.1209 15.3831C15.0046 15.6636 14.6708 15.8862 14.0031 16.3313ZM8.4 22H15.6C17.8402 22 18.9603 22 19.816 21.564C20.5686 21.1805 21.1805 20.5686 21.564 19.816C22 18.9603 22 17.8402 22 15.6V14.4C22 12.1598 22 11.0397 21.564 10.184C21.1805 9.43139 20.5686 8.81947 19.816 8.43597C18.9603 8 17.8402 8 15.6 8H8.4C6.15979 8 5.03968 8 4.18404 8.43597C3.43139 8.81947 2.81947 9.43139 2.43597 10.184C2 11.0397 2 12.1598 2 14.4V15.6C2 17.8402 2 18.9603 2.43597 19.816C2.81947 20.5686 3.43139 21.1805 4.18404 21.564C5.03968 22 6.15979 22 8.4 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> {{LANG subscriptions}}
+					</a>
+				</div>
+			</div>
+		</div>
+		<?php } ?>
 		<div class="dropdown nav">
 			<?php if (IS_LOGGED) { ?>
 				<a href="javascript:void(0);" role="button" data-toggle="dropdown" data-display="static" class="btn btn-main-outline">
@@ -56,6 +94,7 @@
 					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.12 12.78C12.05 12.77 11.96 12.77 11.88 12.78C10.12 12.72 8.71997 11.28 8.71997 9.50998C8.71997 7.69998 10.18 6.22998 12 6.22998C13.81 6.22998 15.28 7.69998 15.28 9.50998C15.27 11.28 13.88 12.72 12.12 12.78Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18.74 19.3801C16.96 21.0101 14.6 22.0001 12 22.0001C9.40001 22.0001 7.04001 21.0101 5.26001 19.3801C5.36001 18.4401 5.96001 17.5201 7.03001 16.8001C9.77001 14.9801 14.25 14.9801 16.97 16.8001C18.04 17.5201 18.64 18.4401 18.74 19.3801Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg> {{LANG login}}
 				</a>
 			<?php } ?>
+		</div>
 		</div>
 	</div>
 </nav>

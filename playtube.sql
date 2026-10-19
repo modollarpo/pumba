@@ -3760,3 +3760,11 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+--
+-- LANG keys for the playtag theme UI lifted from VidBox.
+-- Keep in sync with deploy/sql/2026-10-19-my-library-lang-keys.sql
+--
+INSERT INTO `langs` (`lang_key`, `type`, `english`) VALUES
+('my_library', '', 'My Library'),
+('more_info', '', 'More Info');

@@ -23,6 +23,61 @@
 			<link rel="canonical" href="<?php echo($pt->page_url_); ?>"/>
 		<?php } ?>
 		
+		<?php if ($pt_robots == 'index, follow') { ?>
+		<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@graph": [
+				{
+					"@type": "WebSite",
+					"@id": "{{CONFIG site_url}}/#website",
+					"url": "{{CONFIG site_url}}/",
+					"name": "{{CONFIG title}}",
+					"potentialAction": {
+						"@type": "SearchAction",
+						"target": {
+							"@type": "EntryPoint",
+							"urlTemplate": "{{CONFIG site_url}}/search?q={search_term_string}"
+						},
+						"query-input": "required name=search_term_string"
+					}
+				},
+				{
+					"@type": "Organization",
+					"@id": "{{CONFIG site_url}}/#organization",
+					"name": "{{CONFIG title}}",
+					"url": "{{CONFIG site_url}}/",
+					"logo": {
+						"@type": "ImageObject",
+						"url": "{{CONFIG theme_url}}/img/icon.png"
+					}
+				}
+			]
+		}
+		</script>
+		<?php } ?>
+		<script type="speculationrules">
+		{
+			"prerender": [
+				{
+					"source": "document",
+					"where": {
+						"and": [
+							{ "href_matches": "/*" },
+							{ "not": { "href_matches": "/watch/*" } },
+							{ "not": { "href_matches": "/shorts/*" } },
+							{ "not": { "href_matches": "/aj/*" } },
+							{ "not": { "href_matches": "/login*" } },
+							{ "not": { "href_matches": "/register*" } },
+							{ "not": { "href_matches": "/logout*" } }
+						]
+					},
+					"eagerness": "moderate"
+				}
+			]
+		}
+		</script>
+		
 		<meta property="fb:app_id" content="1643990952546825" />
 		<meta name="format-detection" content="telephone=no" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -875,5 +930,45 @@
 		<?php } ?>
 	  
 		<div class="fixed-top head_menu_backdrop"></div>
+		
+		<script type="text/javascript">
+			/* Swap broken thumbnails for a local placeholder so cards never render empty. */
+			window.PT_FALLBACK_IMG = '{{CONFIG theme_url}}/img/no-thumb.svg';
+			document.addEventListener('error', function (event) {
+				var el = event.target;
+				if (el && el.tagName === 'IMG' && el.src.indexOf('no-thumb.svg') === -1) {
+					el.src = el.getAttribute('data-fallback') || window.PT_FALLBACK_IMG;
+				}
+			}, true);
+
+			/* Horizontal rail arrows for overflowing content rows. */
+			function ptInitRails() {
+				var selector = '.tag_video_grid.scroll, .tag_short_home.scroll, .tag_home_cat_list.scroll';
+				$(selector).each(function () {
+					var rail = this;
+					var $rail = $(rail);
+					if ($rail.data('ptRail')) { return; }
+					$rail.data('ptRail', 1);
+					var $wrap = $rail.parent();
+					if (!$wrap.hasClass('pt-rail')) { $wrap.addClass('pt-rail'); }
+					var $prev = $('<button type="button" class="pt-rail__btn pt-rail__btn--prev" aria-label="Scroll left"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>');
+					var $next = $('<button type="button" class="pt-rail__btn pt-rail__btn--next" aria-label="Scroll right"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>');
+					$wrap.append($prev, $next);
+					function update() {
+						var max = rail.scrollWidth - rail.clientWidth - 4;
+						if (max <= 4) { $prev.addClass('d-none'); $next.addClass('d-none'); return; }
+						$prev.toggleClass('d-none', rail.scrollLeft <= 2);
+						$next.toggleClass('d-none', rail.scrollLeft >= max);
+					}
+					$prev.on('click', function () { rail.scrollBy({ left: -Math.round(rail.clientWidth * 0.85), behavior: 'smooth' }); });
+					$next.on('click', function () { rail.scrollBy({ left: Math.round(rail.clientWidth * 0.85), behavior: 'smooth' }); });
+					$rail.on('scroll', update);
+					$(window).on('resize', update);
+					setTimeout(update, 200);
+				});
+			}
+			$(document).ready(ptInitRails);
+			$(document).ajaxComplete(ptInitRails);
+		</script>
 	</body>
 </html>
