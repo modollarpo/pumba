@@ -65,10 +65,14 @@ Add here your custom css styles Example: p { text-align: center; color: red; }
 :root {
 	--main: #FF6600 !important;
 	--main-hover: #E66D00 !important;
-	--font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+	--font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+	--title-font: 'Outfit', sans-serif;
 }
 body, .btn, input, textarea, select, .form-control, .modal-body, .dropdown-menu {
 	font-family: var(--font-family);
+}
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, .title, .modal-title {
+	font-family: var(--title-font);
 }
 
 .tag_header {

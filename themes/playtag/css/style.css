@@ -3,12 +3,14 @@
 :root {
 	--body-bg: #F9F9FB;
 	--font-family: 'Inter', sans-serif;
+	--title-font: 'Outfit', sans-serif;
 	--main: #6E67CC;
 	--main-color: #FFF;
 	--main-hover: #5D56C7;
 	--main-hover-color: #FFF;
 }
 body {background: var(--body-bg);font-family: var(--font-family);margin: 0;padding: 0;height: 100%;width: 100%;min-height: 100%;overflow-x: hidden;overflow-y: scroll;}
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {font-family: var(--title-font);}
 a:hover {text-decoration: none;}
 .hover_path {display: none;}
 .content, .video-options .btn:hover {background: #fff;border-radius: 16px;box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;}
@@ -213,7 +215,7 @@ footer {font-size: 14px;}
 .swiper-slide-active .tag_feat_video_info {opacity: 1;transform: translateY(0);}
 .tag_feat_video_info:before {content: '';position: absolute;width: calc(100vw - 140px);background: linear-gradient(90deg,var(--body-bg) 15%,rgb(255 255 255 / 0%));height: 100%;pointer-events: none;bottom: 0;top: 0;left: 0;opacity: 0;}
 .tag_feat_video_info h6 {gap: 5px;color: #faa500;}
-.tag_feat_video_info h1 {font-weight: 700;line-height: 1.4;font-size: 50px;text-shadow: 1px 1px 2px rgb(0 0 0 / 5%);display: -webkit-box;-webkit-box-orient: vertical;text-overflow: ellipsis;-webkit-line-clamp: 2;overflow: hidden;max-height: 140px;}
+.tag_feat_video_info h1 {font-weight: 700;line-height: 1.4;font-size: 50px;text-shadow: 1px 1px 2px rgb(0 0 0 / 5%);display: -webkit-box;-webkit-box-orient: vertical;text-overflow: ellipsis;-webkit-line-clamp: 2;overflow: hidden;max-height: 140px;font-family: var(--title-font);}
 .tag_feat_video_info p {opacity: 0.8;font-size: 18px;font-weight: 500;}
 .tag_feat_video_info .btn {min-width: 250px;line-height: 50px;}
 .tag_feat_video_thumbs {width: 400px;right: 20px;bottom: 150px;z-index: 3;}
@@ -266,7 +268,7 @@ footer {font-size: 14px;}
 .tag_video_grid_list .duration {right: -10px;bottom: -10px;background: black;border-radius: 10px 0 10px 0;font-weight: 500;font-size: 14px;line-height: 1;padding: 10px;transition: all 0.2s ease, opacity 0.1s;opacity: 0;}
 .tag_video_grid_list:hover .duration {right: 0px;bottom: 0px;opacity: 1;}
 .tag_video_grid_list .info {margin-top: 8px;}
-.tag_video_grid_list .info h4, .play-list-cont .side-barlist-wrapper h6 {display: -webkit-box;-webkit-box-orient: vertical;text-overflow: ellipsis;-webkit-line-clamp: 2;font-weight: 600;line-height: normal;max-height: 40px;overflow: hidden;font-size: 1rem;margin: 0 0 2px;}
+.tag_video_grid_list .info h4, .play-list-cont .side-barlist-wrapper h6 {display: -webkit-box;-webkit-box-orient: vertical;text-overflow: ellipsis;-webkit-line-clamp: 2;font-weight: 600;line-height: normal;max-height: 40px;overflow: hidden;font-size: 1rem;margin: 0 0 2px;font-family: var(--title-font);}
 
 /*Profile Liked Videos*/
 .tag_liked_grid .tag_short_home_list {-ms-flex: 0 0 20%;flex: 0 0 20%;max-width: 20%;padding-right: 8px;padding-left: 8px;}
