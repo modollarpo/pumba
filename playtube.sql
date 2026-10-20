@@ -2678,6 +2678,13 @@ CREATE TABLE `video_ads` (
   `user_id` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `video_ads`
+--
+
+INSERT INTO `video_ads` (`id`, `name`, `ad_link`, `ad_media`, `ad_image`, `skip_seconds`, `vast_type`, `vast_xml_link`, `views`, `clicks`, `active`, `user_id`) VALUES
+(1, 'KIKI network pre-roll', '', '', '', 5, 'vast', 'https://keekii.net/api/ads/vast?property=play&slot=preroll', 0, 0, 1, 0);
+
 -- --------------------------------------------------------
 
 --

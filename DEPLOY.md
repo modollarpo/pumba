@@ -63,6 +63,43 @@ in each Node `.env` (see Step 3). Row 448 sets how many days of `backups/` blobs
 backup worker keeps (see `deploy/backup/README.md`). Rows 449-450 are the import/encoding
 worker's heartbeat + resident-loop interval (see `deploy/import/README.md`).
 
+### Ad network (KIKI pre-roll)
+
+`playtube.sql` ships one `video_ads` row that points the watch pre-roll at the KIKI ad
+network:
+
+```sql
+SELECT `vast_xml_link` FROM `video_ads` WHERE `active` = 1;
+-- https://keekii.net/api/ads/vast?property=play&slot=preroll
+```
+
+On an already-installed site, apply the equivalent migration — it is idempotent and also
+turns the ad system on:
+
+```bash
+mysql -u <user> -p <db> < deploy/sql/2026-10-19-keekii-ad-network.sql
+```
+
+The ad tag is served by the KIKI app (`/api/ads/vast`), which resolves `property=play` /
+`slot=preroll`, picks a creative and returns VAST 4.2 plus signed impression, tracking and
+click URLs. Rotate creatives on the KIKI side — add one row per creative here only if you
+want PlayTube, not the network, to do the rotation, and leave `vast_xml_link` empty on a
+row you want PlayTube to serve from its local `ad_media`/`ad_image` paths instead.
+
+Check the end-to-end path from **Admin → Manage Video Ads → Check** (that button fetches
+`vast_xml_link`), or directly:
+
+```bash
+curl -s -D- -o /dev/null \
+  -H 'Origin: https://play.keekii.net' \
+  'https://keekii.net/api/ads/vast?property=play&slot=preroll'
+# 200 + Content-Type: application/xml + Access-Control-Allow-Origin: https://play.keekii.net
+```
+
+Without the CORS `Access-Control-Allow-Origin` echo the IMA SDK cannot fetch the tag
+(`themes/playtag/layout/watch/ima.html:47`) and no ad is shown. The row itself is inert
+when `user_ads` is off, or for Pro viewers and anyone who saw an ad within 600s.
+
 ---
 
 ## 3. Deploy the YouTube API
